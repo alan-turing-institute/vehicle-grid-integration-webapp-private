@@ -1,0 +1,12 @@
+# DO NOT include azure-functions-worker in this file
+# The Python Worker is managed by Azure Functions platform
+# Manually managing azure-functions-worker may cause unexpected issues
+
+azure-functions
+azure-storage-blob
+dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl; sys_platform == 'linux'
+dependencies/dss_python-0.10.7.post1-cp39-cp39-macosx_10_15_x86_64.whl; sys_platform == 'darwin'
+bunch
+govuk-bank-holidays
+matplotlib
+scipy
