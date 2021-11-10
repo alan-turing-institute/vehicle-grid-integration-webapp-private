@@ -180,7 +180,7 @@ export default {
       this.isLoading = true;
       this.responseAvailable = false;
 
-      var url = '/api/dsssimulation';
+      var url = 'https://vgiwebprodfunctionapp.azurewebsites.net/api/dsssimulation';
 
       // If given a non-integer, switch back to 5
       if (this.config.n_lv != Math.round(this.config.n_lv)) {
