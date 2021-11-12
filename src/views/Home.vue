@@ -38,5 +38,6 @@
         informed decisions
       </li>
     </ul>
+    <h2>An additional section to use as a test</h2>
   </div>
 </template>
