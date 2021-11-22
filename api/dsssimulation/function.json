@@ -2,14 +2,18 @@
   "scriptFile": "__init__.py",
   "bindings": [
     {
-      "authLevel": "Anonymous",
+      "authLevel": "anonymous",
       "type": "httpTrigger",
       "direction": "in",
       "name": "req",
       "methods": [
         "get",
-        "post"
-      ]
+        "post",
+        "put",
+        "patch",
+        "delete"
+      ],
+      "route": "/{*route}"
     },
     {
       "type": "http",

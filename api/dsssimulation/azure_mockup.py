@@ -89,8 +89,6 @@ def run_dss_simulation(rd, sf=0):
     plt.gcf().savefig(voltage_buffer, facecolor="LightGray")
     # plt.show()
 
-  logging.info("Leaving run_dss_simulation")
-
   return network_buffer, voltage_buffer
 
 

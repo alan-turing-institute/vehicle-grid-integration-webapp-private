@@ -1,6 +1,4 @@
-# DO NOT include azure-functions-worker in this file
-# The Python Worker is managed by Azure Functions platform
-# Manually managing azure-functions-worker may cause unexpected issues
+# Do not include azure-functions-worker as it may conflict with the Azure Functions platform
 
 azure-functions
 azure-storage-blob
@@ -10,3 +8,5 @@ bunch
 govuk-bank-holidays
 matplotlib
 scipy
+fastapi
+python-multipart
