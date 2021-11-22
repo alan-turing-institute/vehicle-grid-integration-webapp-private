@@ -67,7 +67,8 @@ def run_dss_simulation(rd, sf=0):
             }
         )
         simulation.plotXvNetwork(
-            pType="B", pnkw={"txtOpts": "all"},
+            pType="B",
+            pnkw={"txtOpts": "all"},
         )
         network_buffer = io.BytesIO()
         plt.gcf().savefig(network_buffer, facecolor="DarkGray")
@@ -92,7 +93,8 @@ def run_dss_simulation(rd, sf=0):
             "txtFs": txtFss[frid0],
         }
         simulation.plotXvNetwork(
-            pType="p", pnkw=pnkw,
+            pType="p",
+            pnkw=pnkw,
         )
         power_buffer = io.BytesIO()
         plt.gcf().savefig(power_buffer, facecolor="LightGray")
@@ -116,4 +118,3 @@ def run_dss_simulation(rd, sf=0):
 
 if __name__ == "__main__":
     run_dss_simulation(aox.run_dict0)
-

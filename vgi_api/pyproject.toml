@@ -22,6 +22,7 @@ dss_python = [ { file = "dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinu
                 {file = "dependencies/dss_python-0.10.7.post1-cp39-cp39-macosx_10_15_x86_64.whl", platform = "darwin"}]
 # dss-python = "^0.10.7"
 httpie = "^2.6.0"
+black = "^21.11b1"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

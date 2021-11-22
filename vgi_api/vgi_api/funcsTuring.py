@@ -56,9 +56,7 @@ ic00_prof = 0.8 + 0.15 * (
 
 
 class turingNet(snk.dNet):
-    """A MLV class for development of code alongside V2G with Turing.
-    
-    """
+    """A MLV class for development of code alongside V2G with Turing."""
 
     def __init__(
         self,
@@ -68,13 +66,13 @@ class turingNet(snk.dNet):
         mod_dir=os.path.join(os.getcwd(), "_network_mod"),
     ):
         """Initialise - first calling snk.dNet, then snk.mlvNet for more info.
-        
+
         Inputs
         ---
         frId - the feeder ID
         frId0 - the modified feeder ID (when calling modified MVLV networks)
         rundict - the 'rundict' options dictionary (see azureOptsXmpls)
-        
+
         """
 
         snk.dNet.__init__(
@@ -91,12 +89,18 @@ class turingNet(snk.dNet):
         # snk.mlvNet.setAuxCktAttributes(self,) # Not too sure if needed?
 
         self.set_base_tags()
-        self.set_ldsi(dgd=rundict["dmnd_gen_data"],)
-        self.set_load_profiles(tsp=rundict["simulation_data"]["ts_profiles"],)
+        self.set_ldsi(
+            dgd=rundict["dmnd_gen_data"],
+        )
+        self.set_load_profiles(
+            tsp=rundict["simulation_data"]["ts_profiles"],
+        )
 
-    def set_base_tags(self,):
+    def set_base_tags(
+        self,
+    ):
         """Finds the nominal indices used with record_solution.
-        
+
         Sets
         ---
         self.mvlvi - indexes of MV and LV loads in d.LDS
@@ -158,34 +162,35 @@ class turingNet(snk.dNet):
                 self.sdryLnsi[lnb.split("_")[1]].append(i)
 
     def set_ldsi(
-        self, dgd={},
+        self,
+        dgd={},
     ):
         """Set ldsi, the indexes for each demand type using dmnd_gen_data (dgd).
-        
+
         Flags which are set (via a list of indexes in d.LDS):
         - residential (LV, MV lumped): rslv, rsmv;
         - I&C (LV, MV lumped): iclv, icmv;
         - daytime / overnight charging: dytm, ovnt;
         - solar PV: slr;
         - heat pump: hps;
-        
+
         Options in dgd (all can be set to None):
         - rs.lv + ic.lv:
             - 'lv' (all lv)
         - rs.mv + ic.mv
             - 'mv' (all mv)
             - 'odds'/'evens' (either all 'odd' or all 'even' indexes)
-        - ovnt/dytm: 
-            - 'rs' (all residential), 
+        - ovnt/dytm:
+            - 'rs' (all residential),
             - 'ic' (all I&C)
-        - slr: 
+        - slr:
             - None [to implement]
-        - hps: 
+        - hps:
             - None [to implement]
-        
+
         TO DO - it would be worthwhile adding some assertions here so that only
         things that 'make sense' are options that work and otherwise things
-        a problem is flagged. 
+        a problem is flagged.
         """
         # Initialise and set all values with None to be empty.
         self.ldsi = Bunch({})
@@ -236,12 +241,16 @@ class turingNet(snk.dNet):
             ]
 
     def plotXvNetwork(
-        self, xv="mv", pType=None, pnkw={}, net=None,
+        self,
+        xv="mv",
+        pType=None,
+        pnkw={},
+        net=None,
     ):
         """Plot the XV network (ie MV or LV). Based on plotNetwork from dNet.
-        
+
         Difference: we will not plot the whole network, ONLY a subnetwork.
-        
+
         Inputs
         ---
         xv - either 'mv', 'lv', or 'lvraw'
@@ -253,17 +262,33 @@ class turingNet(snk.dNet):
         net - an LV network ID
         """
         self.setupXvPlots(
-            xv, net=net,
+            xv,
+            net=net,
         )
         txtOpts = pnkw.get("txtOpts", None)
-        lvnFlag = pnkw.get("lvnFlag", True,)
-        txtFs = pnkw.get("txtFs", 10,)
+        lvnFlag = pnkw.get(
+            "lvnFlag",
+            True,
+        )
+        txtFs = pnkw.get(
+            "txtFs",
+            10,
+        )
 
         lvn_clr = "r"
         lvn_dict = {} if not pType == "B" else {"facecolor": lvn_clr, "alpha": 0.3}
 
         # First get the lumped MV loads and LV network loads if wanted
-        if pType in ["B", "s", "p", "q",] or not txtOpts is None:
+        if (
+            pType
+            in [
+                "B",
+                "s",
+                "p",
+                "q",
+            ]
+            or not txtOpts is None
+        ):
             lvntwkopts = {
                 "color": lvn_clr,
                 "marker": ".",
@@ -278,21 +303,32 @@ class turingNet(snk.dNet):
             lvNtwkBuses = self.ckts.ldNo
             aln = ["top", "bottom"] * (d.LDS.Count // 2)
             # fig,ax = plt.subplots(figsize=(13,7),)
-            fig, ax = plt.subplots(figsize=(9, 5),)
+            fig, ax = plt.subplots(
+                figsize=(9, 5),
+            )
             pnkw.update({"ax": ax})
 
         # Then plot any buses
         if txtOpts == "all":
             # Create the plot and mark bus numbers
             self.plotLoadNos(
-                icMvBuses, ax=ax, aln=aln, fontsize=txtFs,
+                icMvBuses,
+                ax=ax,
+                aln=aln,
+                fontsize=txtFs,
             )
             self.plotLoadNos(
-                rsMvBuses, ax=ax, aln=aln, fontsize=txtFs,
+                rsMvBuses,
+                ax=ax,
+                aln=aln,
+                fontsize=txtFs,
             )
             if len(lvn_dict) == 0:
                 self.plotLoadNos(
-                    lvNtwkBuses, ax=ax, aln=aln, fontsize=txtFs,
+                    lvNtwkBuses,
+                    ax=ax,
+                    aln=aln,
+                    fontsize=txtFs,
                 )
             else:
                 self.plotLoadNos(
@@ -312,14 +348,29 @@ class turingNet(snk.dNet):
 
             # Plot the LV network 'flag'
             if lvnFlag:
-                ax_scat = self.plotLvNtwx(ax, lvn_clr,)
+                ax_scat = self.plotLvNtwx(
+                    ax,
+                    lvn_clr,
+                )
 
             # Do the legend (nb ax_scat a bit messy for legends)
             (plt_lv,) = plt.plot(
-                np.nan, np.nan, ".", color=c_lv, mec="k", mew=0.3, ms=10,
+                np.nan,
+                np.nan,
+                ".",
+                color=c_lv,
+                mec="k",
+                mew=0.3,
+                ms=10,
             )
             (plt_mv,) = plt.plot(
-                np.nan, np.nan, ".", color=c_mv, mec="k", mew=0.3, ms=10,
+                np.nan,
+                np.nan,
+                ".",
+                color=c_mv,
+                mec="k",
+                mew=0.3,
+                ms=10,
             )
             (xLg,) = plt.plot(np.nan, np.nan, **lvntwkopts)
             lbls = [
@@ -328,7 +379,8 @@ class turingNet(snk.dNet):
                 "Res. demand,\nLV Modelled",
             ]
             plt.legend(
-                [plt_lv, plt_mv, (plt_lv, xLg)], lbls,
+                [plt_lv, plt_mv, (plt_lv, xLg)],
+                lbls,
             )
 
             # Create plotting options to send to plotNetwork
@@ -339,7 +391,15 @@ class turingNet(snk.dNet):
                 }
             )
 
-        if pType in ["s", "p", "q",] and xv == "mv":
+        if (
+            pType
+            in [
+                "s",
+                "p",
+                "q",
+            ]
+            and xv == "mv"
+        ):
             # When we are looking at loads in the MV circuits of MV/LV, we also
             # consider lumped LV circuits as load on MV.
             mvBuses = self.ldsi2buses(self.mvlvi.mv)  # lumped only
@@ -377,7 +437,8 @@ class turingNet(snk.dNet):
             # Plot the LV network locations
             if lvnFlag:
                 self.plotLvNtwx(
-                    ax, lvn_clr,
+                    ax,
+                    lvn_clr,
                 )
 
             # Update so that only the voltage locations are plotted
@@ -408,7 +469,7 @@ class turingNet(snk.dNet):
 
     def plotLoadNos(self, buses, ax=None, aln=None, **kwargs):
         """Plot load numbers and locations of buses.
-        
+
         Inputs
         ---
         idxs - the indexes in d.LDS (if None plot all);
@@ -422,16 +483,21 @@ class turingNet(snk.dNet):
 
         for ii, bus in enumerate(buses):
             ax.text(
-                *self.busCoords[bus], bus, verticalalignment=aln[ii], **kwargs,
+                *self.busCoords[bus],
+                bus,
+                verticalalignment=aln[ii],
+                **kwargs,
             )
 
         return ax
 
     def setupXvPlots(
-        self, xv, net=None,
+        self,
+        xv,
+        net=None,
     ):
         """Get data required for using plotNetwork via plotXvNetwork.
-        
+
         Based on self.setupPlots; see self.plotXvNetwork for more info
         """
         # regBuses is as-in setupPlots
@@ -504,30 +570,31 @@ class turingNet(snk.dNet):
         self.getBusPhs()
 
     def set_load_profiles(
-        self, tsp,
+        self,
+        tsp,
     ):
         """Load the underlying demand curves for all specified loads.
-        
+
         Types set are specifed in self.ldsi.kw.
-        
+
         Each is split into either a 'lumped' (mv) or 'individual' (lv) load.
-        
-        Each profile is indexed by an index i, with j the hourly demand. For 
-        now we are looking at 10-minute timesteps. The units of ALL of the 
+
+        Each profile is indexed by an index i, with j the hourly demand. For
+        now we are looking at 10-minute timesteps. The units of ALL of the
         values are in kW. Create the loads matrix using self.get_lds_kva.
-        
-        ***NB***: this function is sometimes dependent on the the current state 
+
+        ***NB***: this function is sometimes dependent on the the current state
                   of d.LDS (which changes if opendss is changed.
-        
-        
+
+
         Inputs
         ---
         tsp: ts_profiles (time series profiles dict) from runDict.
-        
+
         Sets
         ---
         self.dmnd, a bunch-of-bunches for each of the load types in self.ldsi.kw
-        
+
         Options in tsp
         ---
         All can be set to None, which assigns the profiles zeros.
@@ -540,7 +607,7 @@ class turingNet(snk.dNet):
         - ic.lv:
             - pass
         - ic.mv:
-            - 'ic00_prof', a I&C profile loosely based on I&C profiles from the 
+            - 'ic00_prof', a I&C profile loosely based on I&C profiles from the
             T. Short's 'Electric Power Distribution Handbook', 2014, Ch 1.
         - ovnt.lv:
             - 'ee', estimated profile from Element Energy report (data in
@@ -566,7 +633,10 @@ class turingNet(snk.dNet):
                 k: Bunch(
                     {
                         vv: np.zeros((self.ldsi[k]["n" + vv], tsp["n"]))
-                        for vv in ["lv", "mv",]
+                        for vv in [
+                            "lv",
+                            "mv",
+                        ]
                     }
                 )
                 for k in self.ldsi.kw
@@ -574,7 +644,12 @@ class turingNet(snk.dNet):
         )
 
         # Load the current kVA ratings of existing loads for scaling
-        lds0 = np.array(d.getObjAttr(d.LDS, "kva",))
+        lds0 = np.array(
+            d.getObjAttr(
+                d.LDS,
+                "kva",
+            )
+        )
 
         # First load the CREST demand (in case it is used)
         fndemand = os.path.join(fn_root, "data", "ciredData.pkl")
@@ -635,7 +710,7 @@ class turingNet(snk.dNet):
     @staticmethod
     def load_ee_data():
         """Load the Element Energy charging profiles.
-        
+
         Values returned in kW at a 10 mintue resolution.
         """
         fnev = os.path.join(fn_root, "data", "ev-profile-data")
@@ -649,33 +724,34 @@ class turingNet(snk.dNet):
         return rsev, icev
 
     def record_solution(
-        self, opts=None,
+        self,
+        opts=None,
     ):
         """Record a solution for further visualization.
-        
+
         Loosely based on self.getSln
-        
+
         Inputs
         ---
         opts - None, not used rn
-        
+
         Returns
         ---
         A sln Bunch (powers in kW/kVA; voltages/currents complex (A,V or pu)):
         - Spri, power through primary substation (tot system)
         - Ssec, power through MV/LV transformers
-        
+
         - Ifmv, power through MV feeder (per phase)
         - Iflv, power through LV feeder (list of lists, per phase)
-        
+
         - Ltot, total system losses
-        
+
         - Vmv, complex voltage at all MV buses (indexed by self.mvIdx)
         - Vsb, pos sequence voltage at all LV secondary substations
-        - VlvLds, complex voltage at all LV loads [list of vectors, 
+        - VlvLds, complex voltage at all LV loads [list of vectors,
                                                 indexed by self.ckts.ldNo]
         - VmvLds, complex voltage at all MV loads [indexed by self.ldsi.ic]
-        
+
         - Tap, tap position(s)
         - Cnvg, convergence flag
         - Slds, power of all loads when solved solution
@@ -748,31 +824,43 @@ class turingNet(snk.dNet):
         return sln
 
     def get_lds_kva(
-        self, tsp_n, dtypes=None,
+        self,
+        tsp_n,
+        dtypes=None,
     ):
         """Determine the d.LDS demand (kw) for running with OpenDSS.
-        
+
         Uses the matrices determined in self.set_load_profiles.
-        
+
         Inputs
         ---
         tsp_n; the ts_profiles data 'n'
-        dtypes; if None the uses all of self.ldsi.kw; otherwise, pass in a 
-                list of which of these would like to be included in 
+        dtypes; if None the uses all of self.ldsi.kw; otherwise, pass in a
+                list of which of these would like to be included in
                 matrix returned.
-        
+
         Returns
         ---
-        lds; a nlds x tsp_n matrix of demands, with the row index 
-            corresponding to the ith load (in d.LDS, when iterated over [i.e., 
-            when looping through, not necessarily the load that will be set 
+        lds; a nlds x tsp_n matrix of demands, with the row index
+            corresponding to the ith load (in d.LDS, when iterated over [i.e.,
+            when looping through, not necessarily the load that will be set
             due to disabled loads.])
         """
         dtypes = self.ldsi.kw if dtypes is None else dtypes
 
         # Get no. lds - d.LDS.Count does NOT work here due to disabled loads
-        nlds = len(d.getObjAttr(d.LDS, "kva",))
-        lds = np.zeros((nlds, tsp_n,))
+        nlds = len(
+            d.getObjAttr(
+                d.LDS,
+                "kva",
+            )
+        )
+        lds = np.zeros(
+            (
+                nlds,
+                tsp_n,
+            )
+        )
         for dtype in dtypes:
             for lvl in [
                 "lv",
@@ -783,19 +871,20 @@ class turingNet(snk.dNet):
         return lds
 
     def run_dss_lds(
-        self, lds,
+        self,
+        lds,
     ):
         """Run a time series analysis using nlds x ntime matrix lds.
-        
+
         Inputs
         ---
         lds - the loads matrix to set d.LDS with using d.setObjAttr
-        
+
         Returns
         ---
         slns - a list of solutions (see help(self.record_solution) )
         sln0 - the solution prior to running the analysis
-        
+
         """
         # First record the initial solution
         sln0 = self.record_solution()
@@ -812,15 +901,15 @@ class turingNet(snk.dNet):
 
 class modify_network:
     """Class to take the params of run_dict and create a working dss model.
-    
+
     The approach is to manually modify a DSS network and save in a temporary folder in ./networks.
-    
+
     Method:
     - Copy the main network files to the dnout directory (not the LV networks);
-    - Modify the relative paths in those files so that they point to the LV 
+    - Modify the relative paths in those files so that they point to the LV
         networks;
     - Re-enable the lump loads on the MV system that do not have LV networks.
-    
+
     """
 
     def __init__(self, run_dict, mod_dir=os.getcwd(), dnout="_network_mod"):
@@ -842,14 +931,16 @@ class modify_network:
         # self.copy_network_files()
 
         # Finally modify the dss files according the options in run_dict
-        self.modify_dss_files(run_dict["network_data"],)
+        self.modify_dss_files(
+            run_dict["network_data"],
+        )
 
         logging.info("Leaving modify_network __init__")
 
-    def initialise_directory(self,):
-        """Create/cleanup the directory self.dnout in ./networks .
-        
-        """
+    def initialise_directory(
+        self,
+    ):
+        """Create/cleanup the directory self.dnout in ./networks ."""
 
         logging.info("Entering initialise_directory")
 
@@ -862,8 +953,7 @@ class modify_network:
         logging.info("Leaving initialise_directory")
 
     def copy_network_files(self):
-        """Copy the network directory.
-        """
+        """Copy the network directory."""
 
         logging.info("Entering copy_network_files")
 
@@ -873,14 +963,15 @@ class modify_network:
         logging.info("Leaving copy_network_files")
 
     def modify_dss_files(
-        self, nd,
+        self,
+        nd,
     ):
         """Modify the files in the new directory as specified by nd.
-        
+
         Inputs
         ---
         nd - 'network_dict' from runDict.
-        
+
         """
 
         logging.info("Entering modify_dss_files")
@@ -978,9 +1069,7 @@ class modify_network:
 
 
 def unzip_networks(dest_dir, n_id):
-    """Unzip the networks in ./networks/ if any need doing.
-    
-    """
+    """Unzip the networks in ./networks/ if any need doing."""
 
     logging.info("Entering unzip_networks")
 
@@ -1021,10 +1110,15 @@ def unzip_networks(dest_dir, n_id):
 
     # Basic checking numbers - basic, might need updating in future for,
     # e.g., frIds above 100
-    installed_names = get_path_dirs(dest_dir, mode="names",)
+    installed_names = get_path_dirs(
+        dest_dir,
+        mode="names",
+    )
     dn2frids = snk.dNet.dn2frids
     dn2frids.update(
-        {"manchester_models": "101-125 incl.",}
+        {
+            "manchester_models": "101-125 incl.",
+        }
     )
     frids = [dn2frids.get(nm, "na") for nm in installed_names]
 
