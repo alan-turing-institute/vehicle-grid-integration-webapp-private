@@ -2,7 +2,7 @@
 name = "vgi_api"
 version = "0.1.0"
 description = "The Vehicle Grid Integration API"
-authors = ["Your Name <you@example.com>"]
+authors = ["Oscar Giles <ogiles@turing.ac.uk>, Louise Bowler <lbowler@turing.ac.uk>, David Beavan <dbeavan@turing.ac.uk>, Pamela Wochner <pwochner@turing.ac.uk>, Myriam Neaimeh <mneaimeh@turing.ac.uk>"]
 
 [tool.poetry.dependencies]
 python = ">=3.8,<3.11"
