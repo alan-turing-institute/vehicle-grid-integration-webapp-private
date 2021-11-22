@@ -64,5 +64,8 @@ jobs:
       run: poetry run python -c "import sys; print(sys.version)"
 
     - name: Generate Report
+      env:
+        NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING: ${{ secrets.NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING }}
+        NETWORKS_DATA_CONTAINER_READONLY: ${{ secrets.NETWORKS_DATA_CONTAINER_READONLY }}
       run: |
         python -m poetry run pytest tests
