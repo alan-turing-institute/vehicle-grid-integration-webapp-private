@@ -6,8 +6,8 @@ try:
 except ImportError:
     from _future.azure.functions._http_asgi import AsgiMiddleware
 
-from . import main
+from vgi_api import app
 
 
 def main(req: func.HttpRequest, context: func.Context) -> func.HttpResponse:
-    return AsgiMiddleware(main.app).handle(req, context)
+    return AsgiMiddleware(app).handle(req, context)
