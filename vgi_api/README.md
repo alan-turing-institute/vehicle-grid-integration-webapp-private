@@ -48,3 +48,10 @@ http POST :8000/simulate
 ### Run as an Azure function
 
 See the instructions in [azure_funcs](../azure_funcs/README.md)
+
+
+### Run unit tests
+
+```bash
+poetry run pytest tests
+```
