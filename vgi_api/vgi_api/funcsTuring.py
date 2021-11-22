@@ -11,7 +11,7 @@ from timeit import default_timer as timer
 from collections import OrderedDict as odict
 from copy import deepcopy
 import logging
-
+from pathlib import Path
 from bunch import Bunch
 
 from .funcsPython_turing import (
@@ -36,8 +36,8 @@ from azure.storage.blob import BlobServiceClient
 import gc
 from .config import get_settings
 
-fn_root = sys.path[0] if __name__ == "__main__" else os.path.dirname(__file__)
 
+data_dir = Path(__file__).parent / "data"
 # Load opendss
 
 # dssObj = loadDss()
@@ -506,7 +506,7 @@ class turingNet(snk.dNet):
         self.branches = d.getBranchBuses()
 
         self.busCoords = {k: (np.nan, np.nan) for k in d.DSSCircuit.AllBusNames}
-        dn0 = os.path.join(fn_root, "data", "coords")
+        dn0 = str(data_dir / "coords")
         if xv == "mv":
             m0 = d.DSSCircuit.Name.split("_")[1].upper()
             m0 = m0[:-1] + (m0[-1].lower() if m0[-1] in ["A", "B"] else m0[-1])
@@ -652,7 +652,8 @@ class turingNet(snk.dNet):
         )
 
         # First load the CREST demand (in case it is used)
-        fndemand = os.path.join(fn_root, "data", "ciredData.pkl")
+
+        fndemand = str(data_dir / "ciredData.pkl")
         with open(fndemand, "rb") as file:
             crestData = pickle.load(file)
 
@@ -713,7 +714,7 @@ class turingNet(snk.dNet):
 
         Values returned in kW at a 10 mintue resolution.
         """
-        fnev = os.path.join(fn_root, "data", "ev-profile-data")
+        fnev = str(data_dir / "ev-profile-data")
         rsev_, icev_ = [
             csvIn(os.path.join(fnev, f"{ss}.csv"), hh=False)
             for ss in ["rsev-week", "icev-week"]
