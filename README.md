@@ -25,9 +25,22 @@ npm install
 ```
 
 ### Compiles and hot-reloads for development
+
 ```
 npm run serve
 ```
+
+You can change the API endpoint by altering [.env.development](.env.development) which defaults to `http://127.0.0.1:8000`.
+
+This assumes you are running the API server locally, which you can do with:
+
+```bash
+cd vgi_api && poetry run uvicorn vgi_api:app --reload --port 8000
+```
+
+If you want to use the production API (i.e. on Azure) change the contents of [.env.development](.env.development) to match that in [.env.production](.env.production).
+
+
 
 ### Compiles and minifies for production
 ```

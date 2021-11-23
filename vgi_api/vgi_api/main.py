@@ -8,13 +8,23 @@ import shutil
 import os
 import csv
 
-from fastapi import Form, File, UploadFile, HTTPException
+from fastapi import Query, Form, File, UploadFile, HTTPException
 from starlette import status
 
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 
 app = fastapi.FastAPI()
+
+origins = ["http://localhost:8080", "http://192.168.1.63:8080"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 def save_uploaded_file(file, save_name, size_limit):
@@ -37,10 +47,10 @@ def save_uploaded_file(file, save_name, size_limit):
     shutil.move(temp.name, save_name)
 
 
-@app.post("/simulate")
+@app.get("/simulate")
 async def simulate(
-    n_lv: int = Form(5, title="Number of LV networks (up to 20)", ge=0, le=20),
-    n_id: int = Form(1060, title="Network ID"),
+    n_lv: int = Query(5, title="Number of LV networks (up to 20)", ge=0, le=20),
+    n_id: int = Query(1060, title="Network ID"),
     c_load: UploadFile = File(None, title="Custom load values"),
 ):
 
