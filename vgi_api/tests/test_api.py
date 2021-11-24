@@ -5,5 +5,5 @@ client = TestClient(app)
 
 
 def test_simulation():
-    response = client.post("/simulate")
+    response = client.get("/simulate")
     assert response.status_code == 200
