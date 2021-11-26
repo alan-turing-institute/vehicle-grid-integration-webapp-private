@@ -112,7 +112,7 @@ def vecSlc(vec_like, new_idx):
         if type(vec_like) == tuple:
             vec_slc = tuple(np.array(vec_like)[new_idx].tolist())
         elif type(vec_like) == list:
-            vec_slc = np.array(vec_like, dtype=object)[new_idx].tolist()
+            vec_slc = np.array(vec_like)[new_idx].tolist()
     return vec_slc
 
 
@@ -1197,3 +1197,8 @@ def calcR2(y, yhat, rsdl=None):
         rss = np.sum(rsdl ** 2)
 
     return 1 - (rss / tss)
+
+
+def tp2arL(l_tuples):
+    """Returns [tp2ar(t) for t in l_tuples]"""
+    return [tp2ar(t) for t in l_tuples]

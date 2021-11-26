@@ -25,11 +25,12 @@ import matplotlib.cm as mplcm
 from copy import deepcopy
 import scipy.sparse.linalg as spla
 import matplotlib.pyplot as plt
-from . import dss_utils
-
+import dss_utils
 from pprint import pprint
+from collections import OrderedDict as odict
 
-from .funcsMath_turing import (
+
+from funcsMath_turing import (
     aMulBsp,
     tp2ar,
     vecSlc,
@@ -44,9 +45,10 @@ from .funcsMath_turing import (
     calcVar,
     magicSlice,
     sparseBlkDiag,
+    tp2arL,
 )
-from .funcsDss_turing import dssIfc, updateFlagState, pdIdxCmp, getVset, phs2seq
-from .funcsPython_turing import (
+from funcsDss_turing import dssIfc, updateFlagState, pdIdxCmp, getVset, phs2seq
+from funcsPython_turing import (
     fPrmsInit,
     whocalledme,
     saveFigFunc,
@@ -61,6 +63,7 @@ from .funcsPython_turing import (
     o2o,
     rngSeed,
     sff_legacy,
+    cmsq,
 )
 import dss
 
@@ -235,7 +238,7 @@ class dNet:
         126: join("network_7", "masterNetwork7feeder1"),
         127: join("network_27", "masterNetwork1"),
         128: join("network_28", "masterNetwork1"),
-        1000: join("_network_mod", "master_mvlv"),
+        1000: join("_network_mod", "master_mvlv_network_mod"),
         1060: join("HV_UG_full", "master_mvlv"),
         1061: join("HV_UG-OHa_full", "master_mvlv"),
         # 1062:join('HV_UG-OHb_full','master_full'),
@@ -361,14 +364,7 @@ class dNet:
         "33bus": 12,
     }
 
-    def __init__(
-        self,
-        frId=30,
-        yBdInit=True,
-        prmIn={},
-        mod_dir=os.path.join(os.getcwd(), "_network_mod"),
-        **kwargs,
-    ):
+    def __init__(self, frId=30, yBdInit=True, prmIn={}, **kwargs):
         """Initialise with kwargs.
 
         =====
@@ -382,7 +378,6 @@ class dNet:
                 - qCvr: 0, q cvr coefficient at initial solution
                 - tolStr: the chosen opendss solution tolerance
                 - yset: 'Ybus' or 'both', the latter also getting self.Yprm
-        mod_dir - directory where modified OpenDSS files are stored. Used only for frID 1000.
 
         =====
         kwargs
@@ -393,8 +388,6 @@ class dNet:
                 - 'ykvbase' for checking the voltage bases
 
         """
-
-        self.mod_dir = mod_dir
 
         self.prm = {
             "nomLdLm": 0.6,
@@ -849,9 +842,7 @@ class dNet:
                 ND = join(fn_ntwx, "ukgds-master-full")
             elif frId in list(range(70, 77)):
                 ND = join(fn_ntwx, "ukgds-master-mod")
-            elif frId == 1000:
-                ND = self.mod_dir
-            elif frId > 1000:
+            elif frId >= 1000:
                 ND = join(
                     fn_ntwx,
                 )
@@ -896,6 +887,7 @@ class dNet:
         i0 = frId - lvId
         iLv = str(lvId)
 
+        # NB - as of 21/7/21, these could be tweaked still to get all working
         lvInfo = {  # frid0: [root, feederId end, master name end]
             100: [
                 dnA,
@@ -909,7 +901,7 @@ class dNet:
             ],
             225: [
                 dnA,
-                "_ukgds",
+                "",
                 "_pruned_ukgds",
             ],
             250: [
@@ -917,7 +909,7 @@ class dNet:
                 "_p_mod",
                 "_mod",
             ],
-            275: [dnB, "_pone_mod", "_one_mod"],
+            275: [dnA, "", "_pruned_one"],
         }
 
         ND = join(ND0, lvInfo[i0][0])
@@ -2183,7 +2175,7 @@ class dNet:
         Creates
         ---
         self.busCoords - dict of bus:(x,y)
-        self.branches - dict of brch:((x0,y0),(x1,y1))
+        self.branches - odict of brch:[bus0,bus1]
         self.regBuses - list of buses which are regulated
         self.srcReg - flag if there is a regulator at the source node
         - also updates fPrm_['pms'] to a new size if wanted.
@@ -2193,7 +2185,7 @@ class dNet:
 
         """
         self.busCoords = d.getBusCoordsAug()
-        self.branches = d.getBranchBuses()
+        self.branches = odict(d.getBranchBuses())
         self.regBuses = d.getRgcNds(self.YZvIdxs)[0]
 
         # if there is a regulator 'on' the source bus
@@ -2236,7 +2228,8 @@ class dNet:
         INPUTS
         -----
         pType - an option to choose what thing to plot.
-            Options are:
+
+            --- 'Node' options:
             > None  - a basic plot with all colours identical
             > 'n'   - a basic plot with all colours identical
             > 'v'   - mean node voltage
@@ -2245,15 +2238,23 @@ class dNet:
             > 'q'   - total reactive power injection
             > 's'   - total apparent power injection
             > 'qPh' - daisy plot of reactive powers
-        kwargs
+
+            --- 'Branch' options:
+            > '_s' - power through each line
+            > '_sLog' - same, but log taken
+            > '_L' - losses in the line
+
+        kwargs:
             minMax  - the min/max value for the colorbar, if there is one.
-            score0  - force a score value to be passed into get scores
+            score0  - force a score value to be passed into get bus_score
             cmapSet - force the colormap color to cmapSet
+            cmapSetB - force the branch colormap color to cmapSetB
             cbTtl   - force the colormap title
             ax      - axis to plot onto
 
         """
         cmapSet = kwargs.get("cmapSet", None)
+        bMinMax = kwargs.get("bMinMax", None)
         ax = kwargs.get("ax", None)
         pType = "n" if pType is None else pType
 
@@ -2263,70 +2264,30 @@ class dNet:
         if ax is None:
             _, ax = plt.subplots()
 
-        self.plotBranches(ax)
+        # First plot the branches:
+        if pType[0] != "_":
+            self.plotBranches(ax)
+        else:
+            bch_scores, bMinMax = self.get_bch_score(
+                pType,
+                bMinMax,
+            )
+            self.plotBranches(
+                ax,
+                scores=bch_scores,
+                kw=kwargs,
+            )
+
+            # Opts: cmsq(cm.PuBuGn,0.8,0.9),
+            cmapSet = cmsq(cm.Greys, 0.6, 0.7) if cmapSet is None else cmapSet
+
         # self.plotSub(ax,pltSrcReg=False)
         self.plotSub(ax)
-        ttl = None
-        edgeOn = True
-        pltRegs = True
 
-        if pType in "n":
-            score0 = kwargs.get("score0", np.ones((self.nP)))
-            scores, minMax0 = self.getScrVals(score0, "s", "mean")
-            edgeOn = False
-            cbTtl0 = ""
-        elif pType == "v":
-            score0 = kwargs.get("score0", np.abs(self.sln.V) / self.vKvbase)
-            scores, minMax0 = self.getScrVals(score0, "v", "mean")
-            cbTtl0 = "Voltage, pu"
-        elif pType == "B":
-            # Build plot - based on Turing code
-            score0 = kwargs["score0"]  # required to be passed in
-            scores, _ = self.getScrVals(score0, "v", "mean")
-            minMax0 = kwargs["minMax0"]
-            pltRegs = False
-            cbTtl0 = ""
-        elif pType == "vPh":
-            score0 = kwargs.get("score0", np.abs(self.sln.V) / self.vKvbase)
-            scores, minMax0 = self.getScrVals(score0, "v", "ph")
-            cbTtl0 = "Voltage, pu"
-        elif pType == "p":
-            score0 = kwargs.get("score0", -1e-3 * self.getX()[: self.nP])
-            scores, minMax0 = self.getScrVals(score0, "s", "sum")
-            cbTtl0 = "Load, kW"
-        elif pType == "q":
-            score0 = kwargs.get("score0", -1e-3 * self.getX()[self.nP : self.nS])
-            scores, minMax0 = self.getScrVals(score0, "s", "sum")
-            minMaxAbs = np.max(
-                np.abs(
-                    np.array(
-                        [
-                            np.nanmax(list(scores.values())),
-                            np.nanmin(list(scores.values())),
-                        ]
-                    )
-                )
-            )
-            minMax0 = [-minMaxAbs, minMaxAbs]
-            cbTtl0 = "$Q$, kVAr"  # Positive implies capacitive
-        elif pType == "s":
-            score0 = kwargs.get("score0", 1e-3 * np.abs(self.getXc()[: self.nP]))
-            scores, minMax0 = self.getScrVals(score0, "s", "sum")
-            cbTtl0 = "$|S|$, kVA"
-        elif pType == "qPh":
-            score0 = kwargs.get("score0", -1e-3 * self.getX()[self.nP : self.nS])
-            scores, minMax0 = self.getScrVals(score0, "s", "ph")
-            scoresFull = (
-                list(scores["1"].values())
-                + list(scores["2"].values())
-                + list(scores["3"].values())
-            )
-            minMaxAbs = np.max(
-                np.abs(np.array([np.nanmax(scoresFull), np.nanmin(scoresFull)]))
-            )
-            minMax0 = [-minMaxAbs, minMaxAbs]
-            cbTtl0 = "$Q$, kVAr"  # Positive implies capacitive
-            # self.fPrm_['tFs'] = 8 # ttlFontsize
+        ttl, edgeOn, pltRegs, busNans, cbTtl0, bus_score, minMax0 = self.get_bus_score(
+            pType,
+            kwargs,
+        )
 
         # Set the cmaps for plotting
         if not cmapSet is None:
@@ -2342,15 +2303,19 @@ class dNet:
 
         # Plot the buses
         if pType[-2:] == "Ph":
-            self.plotBuses3ph(ax, scores, minMax)
+            self.plotBuses3ph(ax, bus_score, minMax)
         else:
-            self.plotBuses(ax, scores, minMax, edgeOn=edgeOn)
+            self.plotBuses(ax, bus_score, minMax, edgeOn=edgeOn, busNans=busNans)
 
         # Plot the colorbar
-        if pType not in [
-            "n",
-            "B",
-        ]:
+        if (
+            pType
+            not in [
+                "n",
+                "B",
+            ]
+            and pType[0] != "_"
+        ):
             self.plotNetColorbar(ax, minMax, cbTtl=cbTtl)
 
         # Plot the regs
@@ -2365,9 +2330,157 @@ class dNet:
         plt.grid(False)
         plt.tight_layout()
 
-        # Save figure if we like using sff, fPrm
+        # Save figure if we like using sff_legacy, fPrm
         figname = whocalledme(2) + "_" + self.feeder + "_" + pType
         self.sff_(figname)
+
+    def get_bch_score(
+        self,
+        pType,
+        bMinMax=None,
+    ):
+        """Get the branch score to pass into plotBranches.
+
+        Inputs
+        ---
+        pType - the plot type
+        bMinMax - the max & min plotting scale
+
+        Returns
+        ---
+        scores, values between 0 (or 0.1) and 1 for each bus
+        bMinMax, the corresponding max and min values
+        """
+        nm2ii = {nm: i for i, nm in enumerate(d.getObjAttr(d.PDE, AEval="Name"))}
+
+        if pType in ["_s", "_sLog"]:
+            pwrs = tp2arL(d.getObjAttr(d.PDE, AEval="Powers"))
+            scores = np.array(
+                [
+                    sum(np.abs(pwrs[nm2ii[br]])[: self.Yprm[br]["nAI"]])
+                    for br in self.branches.keys()
+                ]
+            )
+
+            if pType == "_sLog":
+                scores = np.log10(scores)
+                bMinMax = (
+                    [min(scores[scores > (max(scores) - 6)]), max(scores)]
+                    if bMinMax is None
+                    else bMinMax
+                )
+            else:
+                bMinMax = (
+                    [1e-6 * max(scores), max(scores)] if bMinMax is None else bMinMax
+                )
+
+        elif pType == "_L":
+            lsss = [r[0] for r in d.getObjAttr(d.PDE, AEval="Losses")]
+            scores = np.array([lsss[nm2ii[br]] for br in self.branches.keys()])
+
+            bMinMax = [1e-10 * max(scores), max(scores)] if bMinMax is None else bMinMax
+
+        # Remove small values
+        scores[scores < bMinMax[0]] = np.nan
+
+        # Fit to min/max
+        scores = (scores - bMinMax[0]) / (bMinMax[1] - bMinMax[0])
+
+        return scores, bMinMax
+
+    def get_bus_score(
+        self,
+        pType,
+        kwargs,
+    ):
+        """Get the bus score (and other properties) based on pType.
+
+        Inputs
+        ---
+        pType - the plot type, see help(self.plotNetwork)
+        kwargs - the kwargs passed into self.plotNetwork.
+
+        Returns
+        ---
+        ttl - the title for the figure
+        edgeOn - flag for buses to have edges or not on the lines
+        pltRegs - flag to plot voltage regulators
+        busNans - flag to plot buses with value of nan or not
+        cbTtl0 - title for the colorbar
+        bus_score - score for the buses to be plotted
+        minMax0 - minimum and maximum values to scale the scores by
+        """
+
+        ttl = None
+        edgeOn = True
+        pltRegs = True
+        busNans = True
+
+        if pType == "n":
+            bus_score0 = kwargs.get("score0", np.ones((self.nP)))
+            bus_score, minMax0 = self.getScrVals(bus_score0, "s", "mean")
+            edgeOn = False
+            cbTtl0 = ""
+        elif pType == "v":
+            bus_score0 = kwargs.get("score0", np.abs(self.sln.V) / self.vKvbase)
+            bus_score, minMax0 = self.getScrVals(bus_score0, "v", "mean")
+            cbTtl0 = "Voltage, pu"
+        elif pType == "B":
+            # Build plot - based on Turing code
+            bus_score0 = kwargs["score0"]  # required to be passed in
+            bus_score, _ = self.getScrVals(bus_score0, "v", "mean")
+            minMax0 = kwargs["minMax0"]
+            pltRegs = False
+            cbTtl0 = ""
+        elif pType == "vPh":
+            bus_score0 = kwargs.get("score0", np.abs(self.sln.V) / self.vKvbase)
+            bus_score, minMax0 = self.getScrVals(bus_score0, "v", "ph")
+            cbTtl0 = "Voltage, pu"
+        elif pType == "p":
+            bus_score0 = kwargs.get("score0", -1e-3 * self.getX()[: self.nP])
+            bus_score, minMax0 = self.getScrVals(bus_score0, "s", "sum")
+            cbTtl0 = "Load, kW"
+        elif pType == "q":
+            bus_score0 = kwargs.get("score0", -1e-3 * self.getX()[self.nP : self.nS])
+            bus_score, minMax0 = self.getScrVals(bus_score0, "s", "sum")
+            minMaxAbs = np.max(
+                np.abs(
+                    np.array(
+                        [
+                            np.nanmax(list(bus_score.values())),
+                            np.nanmin(list(bus_score.values())),
+                        ]
+                    )
+                )
+            )
+            minMax0 = [-minMaxAbs, minMaxAbs]
+            cbTtl0 = "$Q$, kVAr"  # Positive implies capacitive
+        elif pType == "s":
+            bus_score0 = kwargs.get("score0", 1e-3 * np.abs(self.getXc()[: self.nP]))
+            bus_score, minMax0 = self.getScrVals(bus_score0, "s", "sum")
+            cbTtl0 = "$|S|$, kVA"
+        elif pType == "qPh":
+            bus_score0 = kwargs.get("score0", -1e-3 * self.getX()[self.nP : self.nS])
+            bus_score, minMax0 = self.getScrVals(bus_score0, "s", "ph")
+            scoresFull = (
+                list(bus_score["1"].values())
+                + list(bus_score["2"].values())
+                + list(bus_score["3"].values())
+            )
+            minMaxAbs = np.max(
+                np.abs(np.array([np.nanmax(scoresFull), np.nanmin(scoresFull)]))
+            )
+            minMax0 = [-minMaxAbs, minMaxAbs]
+            cbTtl0 = "$Q$, kVAr"  # Positive implies capacitive
+            # self.fPrm_['tFs'] = 8 # ttlFontsize
+        elif pType[0] == "_":
+            bus_score0 = kwargs.get("score0", np.ones((self.nP)))
+            bus_score, minMax0 = self.getScrVals(bus_score0, "s", "mean")
+            edgeOn = False
+            cbTtl0 = ""
+            busNans = False
+
+        return ttl, edgeOn, pltRegs, busNans, cbTtl0, bus_score, minMax0
 
     def plotNetColorbar(self, ax, minMax, cbTtl=None, nCbar=150):
         xlim = ax.get_xlim()
@@ -2392,7 +2505,25 @@ class dNet:
         if cbTtl != None:
             cbar.ax.set_title(cbTtl, pad=10, fontsize=self.fPrm_["tFs"])
 
-    def plotBuses(self, ax, scores, minMax, edgeOn=True):
+    def plotBuses(
+        self,
+        ax,
+        scores,
+        minMax,
+        edgeOn=True,
+        busNans=True,
+    ):
+        """Plot the buses using scores scores.
+
+        Inputs
+        ---
+        ax - the axis
+        scores - the sscores to uses
+        minMax - linearly scale between minMax (useful for extending range)
+        edgeOn - if True, puts a thin edge around each bus with a score
+        busNans - if True, plots the busNans with color '#cccccc'.
+
+        """
         cmap = plt.cm.viridis if self.fPrm_["cmap"] is None else self.fPrm_["cmap"]
 
         x0scr, y0scr, xyClr, x0nne, y0nne = mtList(5)
@@ -2412,7 +2543,7 @@ class dNet:
                     xyClr.append(cmap(score))
 
         plt.scatter(
-            x0scr, y0scr, marker=".", color=xyClr, zorder=+10, s=self.fPrm_["pms"]
+            x0scr, y0scr, marker=".", Color=xyClr, zorder=+10, s=self.fPrm_["pms"]
         )
         if edgeOn:
             plt.scatter(
@@ -2425,7 +2556,8 @@ class dNet:
                 edgecolors="k",
             )
 
-        plt.scatter(x0nne, y0nne, color="#cccccc", marker=".", zorder=+5, s=15)
+        if busNans:
+            plt.scatter(x0nne, y0nne, Color="#cccccc", marker=".", zorder=+5, s=3)
 
     def plotBuses3ph(self, ax, scores3ph, minMax, edgeOn=True):
         if self.fPrm_["cmap"] is None:
@@ -2522,23 +2654,52 @@ class dNet:
         else:
             print("No regulators to plot.")
 
-    def plotBranches(self, ax, scores=[]):
-        segments = []
-        for branch, buses in self.branches.items():
+    def plotBranches(self, ax, scores=[], kw={}):
+        """Plot the branches.
+
+        To plot LV networks 'per feeder', then pass in lvFdrs=True
+
+        Inputs
+        ---
+        ax - the axis to plot onto
+        scores - the scores to plot with (if [] then plot as #cccccc
+        kw - kwargs passed into plotNetwork
+
+        """
+        cmsel = kw.get("cMapSetB", cm.cividis_r)
+
+        segclr, segnan, clrs = mtList(3)
+        for i, buses in enumerate(self.branches.values()):
             # buses[:2] required due to, e.g., 3-winding transformers
-            bus1, bus2 = [b.split(".")[0] for b in buses[:2]]
-            segments.append([self.busCoords[b] for b in [bus1, bus2]])
-            # if branch.split('.')[0]=='Transformer':
-            # ax.plot(points0[-1],points1[-1],'--',Color='#777777')
+            bcs = [self.busCoords[b.split(".")[0]] for b in buses[:2]]
+
+            if len(scores) == 0:
+                segnan.append(bcs)
+            else:
+                if np.isnan(scores[i]):
+                    segnan.append(bcs)
+                else:
+                    segclr.append(bcs)
+                    if not kw.get("lvFdrs", False):
+                        clrs.append(cmsel(scores[i]))
+                    else:
+                        # Get the feeder no
+                        try:
+                            fdri = int(buses[1].split("_")[0][-1])
+                        except:
+                            fdri = 0
+
+                        clrs.append(cmsel[fdri](scores[i]))
 
         if len(scores) == 0:
-            coll = LineCollection(segments, color="#cccccc")
+            coll = LineCollection(segnan, Color="#cccccc")
         else:
-            coll = LineCollection(segments, cmap=plt.cm.viridis)
-            coll.set_array(scores)
+            # At the moment, ignore segnans for colored plots. Reverse also
+            # seems a little cleaner for most of these.
+            coll = LineCollection(segclr[::-1], colors=clrs[::-1])
+
         ax.add_collection(coll)
         ax.autoscale_view()
-        self.segments = segments
 
     def plotSub(self, ax, pltSrcReg=True):
         """Plot the substation onto axis ax."""
@@ -2638,8 +2799,7 @@ class dNet:
         return scrVals, scrMinMax
 
     def sff_(self, figName=None):
-        """Alias for sff(self.fPrm,figName)."""
-        # sff(self.fPrm,figName)
+        """Alias for sff_legacy(self.fPrm,figName)."""
         sff_legacy(self.fPrm, figName)
 
 
@@ -3503,8 +3663,8 @@ class lNet(dNet):
             sln.cts.append(d.getCapTap())
 
             # Save convergence/total power for debugging
-            # sln.cvg.append(d.SLN.Converged)
-            # sln.sDs.append(tp2ar(d.DSSCircuit.TotalPower)[0])
+            sln.cvg.append(d.SLN.Converged)
+            sln.sDs.append(tp2ar(d.DSSCircuit.TotalPower)[0])
 
         cm_ = lambda x: getattr(mplcm, x[0])(np.linspace(0.5, 1.0, x[1]))
         if pShw:
@@ -4473,9 +4633,7 @@ class mlvNet(lNet):
                     int(d.TRN.Name.split("_")[0][2:-1]),
                 )
                 cc["ldNo"].append(ldNo)
-                cc["ctype"].append(
-                    mlvNet.getCtype(fn0, cc["lvFrid"][-1], cc["ldNo"][-1])
-                )
+                cc["ctype"].append(None)  # getCtype method has been superceded.
                 cc["N"] += 1
 
                 # Transformer indexes

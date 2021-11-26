@@ -19,8 +19,10 @@ from pprint import pprint
 import dss
 from copy import deepcopy
 
-from .funcsMath_turing import tp2ar, s_2_x, vecSlc, vmM, mvM, sparseSvty, rerr
-from .funcsPython_turing import structDict
+from funcsMath_turing import tp2ar, s_2_x, vecSlc, vmM, mvM, sparseSvty, rerr
+from funcsPython_turing import structDict, repl_list
+
+exec(repl_list)
 
 seq2phsB = np.array([1, np.exp(1j * np.pi * 4 / 3), np.exp(1j * np.pi * 2 / 3)])
 seq2phs = np.r_[[seq2phsB ** 0, seq2phsB ** 1, seq2phsB ** 2]]
@@ -231,8 +233,8 @@ class dssIfc:
 
         nodeSetAI, nodeSetBI = d.getIids(nodeSetA.copy(), nodeSetB.copy())
 
-        YZa = [YZidxs[yzA.upper()] for i, yzA in enumerate(nodeSetA)]
-        YZb = [YZidxs[yzB.upper()] for i, yzB in enumerate(nodeSetB)]
+        YZa = [YZidxs[yzA.upper()] for yzA in nodeSetA]
+        YZb = [YZidxs[yzB.upper()] for yzB in nodeSetB]
 
         pdeBuses = ["".join(nodeSetA[0].split(".")[:-1])]
         if not d.PDE.IsShunt:
@@ -258,6 +260,8 @@ class dssIfc:
                     "BDb": nodeSetBI,
                     "IsShunt": d.PDE.IsShunt,
                     "nPh": d.AE.NumPhases,
+                    "nAI": len(nodeSetAI),
+                    "nBI": len(nodeSetBI),
                 }
             }
         )
@@ -357,43 +361,47 @@ class dssIfc:
                 data.append(YprmV[j, i])
 
     def getYprmBuses(d):
+        """Get the nodes in the 'to' and 'from' side of d.AE."""
         NodeOrder = d.AE.NodeOrder
         Buses = d.AE.BusNames
 
         if len(Buses) == 3 and d.AE.NumPhases == 1:
+            # First run pesky transformers using an alternative method
             nodeSetA, nodeSetB, nzrosIdx = d.get1ph3wdYprm()
         else:
-            NodeSet = []
-            bus_i = 0
-            nodeSetA = []
-            nodeSetB = []
+            # Other run through
+            NodeSet, nodeSetA, nodeSetB, nzrosIdx = mtList(4)
             nBss = len(Buses)
-            if nBss == 3:  # (!) for three-phase windings
+            if nBss == 3:  # (!) for three-phase windings - not used RN
                 busSetC = []
 
-            jj = 0
-            nzros = [1] * len(NodeOrder)
-
-            for node in NodeOrder:
+            bus_i = 0  # flag to indicate which bus we are looking at
+            for jj, node in enumerate(NodeOrder):
                 if node in NodeSet:
                     NodeSet = []
                     if bus_i == 0:
                         bus_i = 1
+
+                # Get the bus name for the current node
                 if Buses[bus_i].count(".") == 0:
                     busName = Buses[bus_i] + "." + str(node)
                 else:
                     busName = Buses[bus_i].split(".")[0] + "." + str(node)
+
+                # For non-ground nodes, add to the nodeSet
                 if node != 0:
                     if bus_i == 0:
                         nodeSetA.append(busName)
                     else:
                         nodeSetB.append(busName)
-                    NodeSet = NodeSet + [node]
-                else:
-                    nzros[jj] = 0
-                jj += 1
 
-            nzrosIdx = np.nonzero(nzros)[0]
+                    NodeSet = NodeSet + [node]
+                    nzrosIdx.append(jj)
+
+            nzrosIdx = np.array(
+                nzrosIdx,
+                dtype=int,
+            )
 
         return nodeSetA, nodeSetB, nzrosIdx
 
@@ -926,60 +934,16 @@ class dssIfc:
         get the names d.getObjAttr(d.LDS,'Name') this is ONLY equivalent
         to d.LDS.AllNames if all loads are enabled.
         """
-
-        attrinval = not val is None
-        attrinaeval = not AEval is None
-
-        if attrinval and attrinaeval:
+        if (not val is None) and (not AEval is None):
             raise Exception("Only pass in val or AEval, not both.")
-        elif (not attrinval) and (not attrinaeval):
-            raise Exception("Only pass in val or AEval, not none.")
 
         vals = []
         i = obj.First
         while i:
-            if attrinval:
+            if not val is None:
                 vals.append(obj.__getattribute__(val))
-            else:
+            elif not AEval is None:
                 vals.append(d.AE.__getattribute__(AEval))
-            i = obj.Next
-
-        return vals
-
-    def getObjAttrDict(d, obj, val=None, AEval=None):
-        """Cycle through obj to get each of 'val' values.
-
-        If AEval is included, then also pulls out an attribute from d.AE.
-
-        Opposite is setObjAttr.
-
-        NOTE that this does not re-enable objects, so, for example, if you
-        get the names d.getObjAttr(d.LDS,'Name') this is ONLY equivalent
-        to d.LDS.AllNames if all loads are enabled.
-        """
-
-        attrinval = not val is None
-        attrinaeval = not AEval is None
-
-        if (not attrinval) and (not attrinaeval):
-            raise Exception("Pass in val and/or AEval, not none.")
-
-        vals = {}
-        if attrinval:
-            for idx, attribute in enumerate(val):
-                vals[attribute] = []
-        if attrinaeval:
-            for idx, attribute in enumerate(AEval):
-                vals[attribute] = []
-
-        i = obj.First
-        while i:
-            if attrinval:
-                for idx, attribute in enumerate(val):
-                    vals[attribute].append(obj.__getattribute__(attribute))
-            if attrinaeval:
-                for idx, attribute in enumerate(AEval):
-                    vals[attribute].append(d.AE.__getattribute__(attribute))
             i = obj.Next
 
         return vals
@@ -2219,9 +2183,9 @@ def get_regZneIdx(DSSCircuit):
 
     zoneNames = []
     regSze = []
-    # yzRegIdx = [] # for debugging
-    # zoneIdx = [] # for debugging
-    # zoneBus = [] # for debugging
+    yzRegIdx = []  # for debugging
+    zoneIdx = []  # for debugging
+    zoneBus = []  # for debugging
     zoneRegId = []
     i = DSSEM.First
     while i:
