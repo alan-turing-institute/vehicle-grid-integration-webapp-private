@@ -2,15 +2,15 @@ import logging
 import base64
 from . import azure_mockup
 from . import azureOptsXmpls as aox
-
+from typing import Optional, List, Dict
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 import shutil
 import os
 import csv
-
+from fastapi.exceptions import RequestValidationError
 from fastapi import Query, Form, File, UploadFile, HTTPException
 from starlette import status
-
+from enum import Enum
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -47,12 +47,135 @@ def save_uploaded_file(file, save_name, size_limit):
     shutil.move(temp.name, save_name)
 
 
+class NetworkID(str, Enum):
+    # See https://github.com/alan-turing-institute/e4Future-collab/blob/e1b9430c594e33736c924eaf0793ef484bd146d7/mtd-dss-digital-twins/slesNtwk_turing.py#L212
+    URBAN = "1060"
+    RURAL = "1061"
+
+
+class DefaultLV(str, Enum):
+
+    OPTION1 = "1"
+    OPTION2 = "2"
+    OPTION3 = "3"
+
+
+# ToDo: Matt to give us full list of options
+VALID_LV_NETWORKS_URBAN: List[int] = []
+VALID_LV_NETWORKS_RURAL: List[int] = []
+
+DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
+    NetworkID.RURAL: {
+        DefaultLV.OPTION1: [],
+        DefaultLV.OPTION2: [],
+        DefaultLV.OPTION3: [],
+    },
+    NetworkID.URBAN: {
+        DefaultLV.OPTION1: [],
+        DefaultLV.OPTION2: [],
+        DefaultLV.OPTION3: [],
+    },
+}
+
+
+# ToDo: Write test
+def validate_lv_list(lv_list: Optional[str], n_id: NetworkID) -> Optional[List[int]]:
+
+    if not lv_list:
+        return
+
+    validation_error = HTTPException(
+        status_code=422, detail="lv_list values are not valid"
+    )
+
+    lv_list_int = [int(i) for i in lv_list.split("")]
+
+    # if len(lv_list_int) > 5:
+    #     raise validation_error
+
+    valid = False
+    if n_id == NetworkID.URBAN:
+        valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_URBAN))
+    elif n_id == NetworkID.RURAL:
+        valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_RURAL))
+
+    if not valid:
+        raise validation_error
+
+    return lv_list_int
+
+
+def get_default_list(lv_default: DefaultLV, n_id: NetworkID) -> List[int]:
+
+    return DEFAULT_LV_NETWORKS[n_id][lv_default]
+
+
+@app.get("/lv-network")
+async def lv_network(
+    n_id: NetworkID = Query(
+        ...,
+        title="Network ID",
+        description="Choice of 11 kV integrated MV-LV network",
+    ),
+):
+
+    if n_id == NetworkID.URBAN:
+        return VALID_LV_NETWORKS_URBAN
+    else:
+        return VALID_LV_NETWORKS_RURAL
+
+
 @app.get("/simulate")
 async def simulate(
-    n_lv: int = Query(5, title="Number of LV networks (up to 20)", ge=0, le=20),
-    n_id: int = Query(1060, title="Network ID"),
+    n_id: NetworkID = Query(
+        ...,
+        title="Network ID",
+        description="Choice of 11 kV integrated MV-LV network",
+    ),
+    xfmr_scale: float = Query(
+        1.0, ge=0, title="MV transformer scaling", description=""
+    ),
+    oltc_setpoint: float = Query(
+        1.0,
+        ge=0,
+        le=1,
+        title="MV transformer on-load tap charger (OLTC) set point",
+        description="Change the set point (in % pu) of the oltc",
+    ),
+    oltc_bandwidth: float = Query(
+        1.0,
+        ge=0,
+        le=1,
+        title="MV transformer on-load tap charger (OLTC) set point",
+        description="Change the bandwidth (in % pu) of the oltc",
+    ),
+    rs_pen: float = Query(
+        0.8,
+        ge=0,
+        le=1,
+        title="Percentage residential loads",
+        description="",
+    ),
+    # ToDo: add sensible regex
+    lv_list: Optional[str] = Query(
+        None, title="Provide a list of lv_network ids", regex="(\d{4}, ){0,4}\d{4}$"
+    ),
+    lv_default: Optional[DefaultLV] = Query(
+        None, title="Choose a default set of LV Networks"
+    ),
     c_load: UploadFile = File(None, title="Custom load values"),
 ):
+
+    if not (lv_list or lv_default):
+        raise HTTPException(
+            status_code=422, detail="One of lv_list or lv_default must be provided"
+        )
+
+    # If lv list validate the list, otherwise must have selected one of three default lists
+    lv_list = validate_lv_list(lv_list, n_id)
+
+    if not lv_list:
+        lv_list = get_default_list(lv_default, n_id)
 
     logging.info("Starting API call")
     file_name = None
