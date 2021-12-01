@@ -1,5 +1,7 @@
 import logging
 import base64
+
+from pydantic.main import BaseModel
 from . import azure_mockup
 from . import azureOptsXmpls as aox
 from typing import Optional, List, Dict
@@ -58,6 +60,30 @@ class DefaultLV(str, Enum):
     OPTION1 = "1"
     OPTION2 = "2"
     OPTION3 = "3"
+
+
+class MVSolarPVOptions(str, Enum):
+
+    NONE = "None"
+    OPTION1 = "1"
+    OPTION2 = "2"
+    OPTION3 = "3"
+    CSV = "csv"
+
+
+class MVEVChargerOptions(str, Enum):
+
+    NONE = "None"
+    OPTION1 = "1"
+    OPTION2 = "2"
+    OPTION3 = "3"
+    CSV = "csv"
+
+
+class ProfileUnits(str, Enum):
+
+    KW = "kW"
+    KWH = "kWh"
 
 
 # ToDo: Matt to give us full list of options
@@ -163,7 +189,28 @@ async def simulate(
     lv_default: Optional[DefaultLV] = Query(
         None, title="Choose a default set of LV Networks"
     ),
-    c_load: UploadFile = File(None, title="Custom load values"),
+    mv_solar_pv: Optional[UploadFile] = File(
+        None, title="11kV connected solar photovoltaics (PV)"
+    ),
+    mv_solar_pv_profile: MVSolarPVOptions = Query(
+        MVSolarPVOptions.NONE,
+        title="Select a example solar pv profile or select CSV to upload your own. If using CSV must provide `mv_solar_pv`",
+    ),
+    mv_solar_pv_profile_units: ProfileUnits = Query(
+        ProfileUnits.KW,
+        title="Units in `mv_solar_pv`",
+    ),
+    mv_ev_charger: Optional[UploadFile] = File(
+        None, title="11kV connected EV fast chargers' stations"
+    ),
+    mv_ev_charger_profile: MVEVChargerOptions = Query(
+        MVEVChargerOptions.NONE,
+        title="Select a example solar pv profile or select CSV to upload your own. If using CSV must provide `mv_solar_pv`",
+    ),
+    mv_ev_charger_profile_units: ProfileUnits = Query(
+        ProfileUnits.KW,
+        title="Units in `mv_ev_charger`",
+    ),
 ):
 
     if not (lv_list or lv_default):
@@ -177,29 +224,30 @@ async def simulate(
     if not lv_list:
         lv_list = get_default_list(lv_default, n_id)
 
+    # ToDo: Validate upload files
+
     logging.info("Starting API call")
     file_name = None
 
-    if c_load is None:
-        logging.info("No input file provided")
-    else:
-        with TemporaryDirectory(prefix="tmp_vgi_uploads_") as tmp_dir:
-            tmp_file_name = os.path.join(tmp_dir, "vgi_loads_test.csv")
-            save_uploaded_file(c_load, tmp_file_name, 0.1e6)
-            file_name = c_load.filename
-            logging.info("File name: {}".format(c_load.filename))
-            logging.info("File type: {}".format(c_load.content_type))
-            logging.info("File saved to {}; contents:".format(tmp_file_name))
-            with open(tmp_file_name) as csv_file:
-                reader = csv.reader(csv_file)
-                header = next(reader)
-                l1 = next(reader)
-                logging.info(header[:5])
-                logging.info(l1[:5])
+    # if c_load is None:
+    #     logging.info("No input file provided")
+    # else:
+    #     with TemporaryDirectory(prefix="tmp_vgi_uploads_") as tmp_dir:
+    #         tmp_file_name = os.path.join(tmp_dir, "vgi_loads_test.csv")
+    #         save_uploaded_file(c_load, tmp_file_name, 0.1e6)
+    #         file_name = c_load.filename
+    #         logging.info("File name: {}".format(c_load.filename))
+    #         logging.info("File type: {}".format(c_load.content_type))
+    #         logging.info("File saved to {}; contents:".format(tmp_file_name))
+    #         with open(tmp_file_name) as csv_file:
+    #             reader = csv.reader(csv_file)
+    #             header = next(reader)
+    #             l1 = next(reader)
+    #             logging.info(header[:5])
+    #             logging.info(l1[:5])
 
     parameters = aox.run_dict0
     parameters["network_data"]["n_id"] = n_id
-    parameters["network_data"]["n_lv"] = n_lv
 
     fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
     resultdict = {
@@ -210,3 +258,18 @@ async def simulate(
     }
 
     return resultdict
+
+
+# class Files(BaseModel):
+
+#     file: str
+
+# class SimulateParams(BaseModel):
+
+#     files: List[Files]
+
+
+# @app.get("/simulate-body")
+# async def simulate_body(params: SimulateParams):
+
+#     return "hi"
