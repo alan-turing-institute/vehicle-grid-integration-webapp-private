@@ -126,3 +126,9 @@ def test_failure_validate_lv_params(lv_list, n_id, lv_default):
     with pytest.raises(ValidationError) as err:
         ValidateLVParams(lv_list=lv_list, n_id=n_id, lv_default=lv_default)
     debug(err)
+
+
+@pytest.mark.skip(reason="Not implemented")
+def test_upload_csv():
+
+    pass
