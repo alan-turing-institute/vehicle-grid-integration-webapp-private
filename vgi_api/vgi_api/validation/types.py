@@ -76,6 +76,7 @@ class ProfileUnits(str, Enum):
 VALID_LV_NETWORKS_URBAN: List[int] = []
 VALID_LV_NETWORKS_RURAL: List[int] = []
 
+# These are defaults that could be selected
 DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
     NetworkID.RURAL: {
         DefaultLV.OPTION1: [],

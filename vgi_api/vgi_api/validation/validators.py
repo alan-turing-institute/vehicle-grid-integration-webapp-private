@@ -40,7 +40,7 @@ def validate_lv_parameters(
             status_code=422, detail="lv_list values are not valid"
         )
 
-        lv_list_int = [int(i) for i in lv_list.split("")]
+        lv_list_int = [int(i) for i in lv_list.strip().split(",")]
 
         if len(lv_list_int) > 5:
             raise HTTPException(

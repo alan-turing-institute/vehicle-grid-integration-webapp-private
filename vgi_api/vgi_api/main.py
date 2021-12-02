@@ -26,6 +26,7 @@ from vgi_api.validation import (
     VALID_LV_NETWORKS_RURAL,
     VALID_LV_NETWORKS_URBAN,
 )
+from vgi_api.validation.types import DEFAULT_LV_NETWORKS
 
 app = fastapi.FastAPI()
 
@@ -74,11 +75,13 @@ async def simulate(
     lv_list: Optional[str] = Query(
         None,
         help="blah",
-        description="Provide a list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
+        description="Provide a comma seperated list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
         regex="(\d{4}, ){0,4}\d{4}$",
+        example="1101, 1105, 1103",
     ),
     lv_default: Optional[DefaultLV] = Query(
-        None, description="Choose a default set of Low Voltage Networks"
+        None,
+        description="Choose a default set of Low Voltage Networks. If `lv_list` is provided `lv_list` takes precedence",
     ),
     mv_solar_pv_profile: MVSolarPVOptions = Query(
         MVSolarPVOptions.NONE,
@@ -206,18 +209,20 @@ async def simulate(
     #             logging.info(header[:5])
     #             logging.info(l1[:5])
 
-    parameters = aox.run_dict0
-    parameters["network_data"]["n_id"] = n_id
+    # parameters = aox.run_dict0
+    # parameters["network_data"]["n_id"] = n_id
 
-    fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
-    resultdict = {
-        "parameters": parameters,
-        "filename": file_name,
-        "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
-        "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
-    }
+    # fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
+    # resultdict = {
+    #     "parameters": parameters,
+    #     "filename": file_name,
+    #     "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
+    #     "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
+    # }
 
-    return resultdict
+    # return resultdict
+
+    return "validated"
 
 
 @app.get("/lv-network", response_model=response_models.LVNetworks)
@@ -236,6 +241,23 @@ async def lv_network(
         networks = VALID_LV_NETWORKS_RURAL
 
     return {"networks": networks}
+
+
+@app.get("/lv-network-defaults", response_model=response_models.LVNetworks)
+async def lv_network(
+    n_id: NetworkID = Query(
+        ...,
+        title="Network ID",
+        description="Choice of 11 kV integrated MV-LV network",
+    ),
+    lv_default: DefaultLV = Query(
+        ...,
+        description="Choose a default set of Low Voltage Networks. If `lv_list` is provided `lv_list` takes precedence",
+    ),
+):
+    """Return the network ids of the network option"""
+
+    return {"networks": DEFAULT_LV_NETWORKS[n_id][lv_default]}
 
 
 # def save_uploaded_file(file, save_name, size_limit):
