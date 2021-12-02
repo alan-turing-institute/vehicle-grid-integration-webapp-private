@@ -71,6 +71,15 @@ def test_valid_params_simulation(params):
             ),
             ["query", "lv_default"],
         ),
+        (
+            # xfmr_scale less than zero
+            dict(
+                lv_list=",".join([str(i) for i in VALID_LV_NETWORKS_URBAN[:5]]),
+                n_id=NetworkID.URBAN.value,
+                xfmr_scale=-0.3,
+            ),
+            ["query", "xfmr_scale"],
+        ),
     ],
 )
 def test_invalid_params_simulation(params, loc):
