@@ -136,41 +136,71 @@ DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
 }
 
 
-# ToDo: Write test
-def validate_lv_list(lv_list: Optional[str], n_id: NetworkID) -> Optional[List[int]]:
-
-    if not lv_list:
-        return
-
-    validation_error = HTTPException(
-        status_code=422, detail="lv_list values are not valid"
-    )
-
-    lv_list_int = [int(i) for i in lv_list.split("")]
-
-    # if len(lv_list_int) > 5:
-    #     raise validation_error
-
-    valid = False
-    if n_id == NetworkID.URBAN:
-        valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_URBAN))
-    elif n_id == NetworkID.RURAL:
-        valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_RURAL))
-
-    if not valid:
-        raise validation_error
-
-    return lv_list_int
-
-
-def get_default_list(lv_default: DefaultLV, n_id: NetworkID) -> List[int]:
-
-    return DEFAULT_LV_NETWORKS[n_id][lv_default]
-
-
 class LVNetworks(BaseModel):
 
     networks: List[int]
+
+
+def validate_lv_parameters(
+    lv_list: Optional[str], lv_default: Optional[DefaultLV], n_id: NetworkID
+) -> List[int]:
+    """Validate the Low Voltage Network parameters and return a list of Low Voltage
+    network ids.
+
+    Pass either `lv_list` or `lv_default`. If both are passed will use `lv_list`.
+
+    Args:
+        lv_list (Optional[str]): A str of comma seperated network ids
+        lv_default (Optional[DefaultLV]): A DefaultLV choice
+        n_id (NetworkID): The choice of medium voltage network
+
+    Returns:
+        List[int]: [description]
+    """
+
+    def _validate_lv_list(
+        lv_list: Optional[str], n_id: NetworkID
+    ) -> Optional[List[int]]:
+
+        if not lv_list:
+            return
+
+        validation_error = HTTPException(
+            status_code=422, detail="lv_list values are not valid"
+        )
+
+        lv_list_int = [int(i) for i in lv_list.split("")]
+
+        # if len(lv_list_int) > 5:
+        #     raise validation_error
+
+        valid = False
+        if n_id == NetworkID.URBAN:
+            valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_URBAN))
+        elif n_id == NetworkID.RURAL:
+            valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_RURAL))
+
+        if not valid:
+            raise validation_error
+
+        return lv_list_int
+
+    def _get_default_list(lv_default: DefaultLV, n_id: NetworkID) -> List[int]:
+
+        return DEFAULT_LV_NETWORKS[n_id][lv_default]
+
+    if not (lv_list or lv_default):
+        raise HTTPException(
+            status_code=422, detail="One of lv_list or lv_default must be provided"
+        )
+
+    # If lv list validate the list, otherwise must have selected one of three default lists
+    lv_list = _validate_lv_list(lv_list, n_id)
+
+    if not lv_list:
+        lv_list = _get_default_list(lv_default, n_id)
+
+    return lv_list
 
 
 @app.get("/lv-network", response_model=LVNetworks)
@@ -191,115 +221,110 @@ async def lv_network(
     return {"networks": networks}
 
 
-@app.get("/simulate")
+@app.post("/simulate")
 async def simulate(
     n_id: NetworkID = Query(
         ...,
         title="Network ID",
-        description="Choice of 11 kV integrated MV-LV network",
+        description="Choice of 11 kV integrated Medium-Low Voltage network",
     ),
     xfmr_scale: float = Query(
-        1.0, ge=0, title="MV transformer scaling", description=""
+        1.0,
+        ge=0,
+        description="Medium Voltage transformer scaling",
     ),
     oltc_setpoint: float = Query(
         1.0,
         ge=0,
         le=1,
-        title="MV transformer on-load tap charger (OLTC) set point",
-        description="Change the set point (in % pu) of the oltc",
+        description="Medium Voltage transformer on-load tap charger (OLTC) set point. Change the set point (in % pu) of the oltc",
     ),
     oltc_bandwidth: float = Query(
         1.0,
         ge=0,
         le=1,
-        title="MV transformer on-load tap charger (OLTC) set point",
         description="Change the bandwidth (in % pu) of the oltc",
     ),
     rs_pen: float = Query(
         0.8,
         ge=0,
         le=1,
-        title="Percentage residential loads",
-        description="",
+        description="Percentage residential loads",
     ),
     # ToDo: add sensible regex
     lv_list: Optional[str] = Query(
-        None, title="Provide a list of lv_network ids", regex="(\d{4}, ){0,4}\d{4}$"
+        None,
+        help="blah",
+        description="Provide a list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
+        regex="(\d{4}, ){0,4}\d{4}$",
     ),
     lv_default: Optional[DefaultLV] = Query(
-        None, title="Choose a default set of LV Networks"
-    ),
-    mv_solar_pv_csv: Optional[UploadFile] = File(
-        None, title="11kV connected solar photovoltaics (PV)"
+        None, description="Choose a default set of Low Voltage Networks"
     ),
     mv_solar_pv_profile: MVSolarPVOptions = Query(
         MVSolarPVOptions.NONE,
-        title="Select a example solar pv profile or select CSV to upload your own. If using CSV must provide `mv_solar_pv`",
+        description="Select a example solar pv profile or select CSV to upload your own. If CSV selected you must provide `mv_solar_pv_csv`",
+    ),
+    mv_solar_pv_csv: Optional[UploadFile] = File(
+        None, description="11kV connected solar photovoltaics (PV)"
     ),
     mv_solar_pv_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        title="Units in `mv_solar_pv`",
+        description="If `mv_solar_pv_csv` provided gives the units",
+    ),
+    mv_ev_charger_profile: MVEVChargerOptions = Query(
+        MVEVChargerOptions.NONE,
+        description="Select a example ev profile or select CSV to upload your own. If CSV selected you must provide `mv_ev_charger_csv`",
     ),
     mv_ev_charger_csv: Optional[UploadFile] = File(
         None, title="11kV connected EV fast chargers' stations"
     ),
-    mv_ev_charger_profile: MVEVChargerOptions = Query(
-        MVEVChargerOptions.NONE,
-        title="Select a example solar pv profile or select CSV to upload your own. If using CSV must provide `mv_solar_pv_csv`",
-    ),
     mv_ev_charger_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        title="Units in `mv_ev_charger`",
+        description="If `mv_ev_charger` provided gives the units",
     ),
-    lv_smart_meter_csv: Optional[UploadFile] = File(None, title=""),
     lv_smart_meter_profile: LVSmartMeterOptions = Query(
         LVSmartMeterOptions.NONE,
-        title="",
+        description="",
     ),
+    lv_smart_meter_csv: Optional[UploadFile] = File(None, title=""),
     lv_smart_meter_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        title="",
+        description="",
     ),
     lv_electric_vehicle_csv: Optional[UploadFile] = File(None, title=""),
     lv_electric_vehicle_profile: LVElectricVehicleOptions = Query(
         LVElectricVehicleOptions.NONE,
-        title="",
+        description="",
     ),
     lv_electric_vehicle_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        title="",
+        description="",
     ),
     lv_pv_csv: Optional[UploadFile] = File(None, title=""),
     lv_pv_profile: LVPVOptions = Query(
         LVPVOptions.NONE,
-        title="",
+        description="",
     ),
     lv_pv_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        title="",
+        description="",
     ),
     lv_hp_csv: Optional[UploadFile] = File(None, title=""),
     lv_hp_profile: LVHPOptions = Query(
         LVHPOptions.NONE,
-        title="",
+        description="",
     ),
     lv_hp_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        title="",
+        description="",
     ),
 ):
+
+    # MV parameters are already valid. LV parameters need additional validation
+    validate_lv_parameters(lv_list, lv_default, n_id)
+
     # ToDo add penetration for EC, PV and HP
-    if not (lv_list or lv_default):
-        raise HTTPException(
-            status_code=422, detail="One of lv_list or lv_default must be provided"
-        )
-
-    # If lv list validate the list, otherwise must have selected one of three default lists
-    lv_list = validate_lv_list(lv_list, n_id)
-
-    if not lv_list:
-        lv_list = get_default_list(lv_default, n_id)
-
     # ToDo: Validate any uploaded files
     # Write the file to disk in a temporary directory
 
