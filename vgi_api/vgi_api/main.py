@@ -1,21 +1,31 @@
 import logging
 import base64
-from pathlib import Path
 
-from pydantic.main import BaseModel
-from . import azure_mockup
-from . import azureOptsXmpls as aox
-from typing import Optional, List, Dict, Union
-from tempfile import NamedTemporaryFile, TemporaryDirectory
-import shutil
-import os
-import csv
-from fastapi.exceptions import RequestValidationError
-from fastapi import Query, Form, File, UploadFile, HTTPException
-from starlette import status
-from enum import Enum
+from vgi_api import azure_mockup
+from vgi_api import azureOptsXmpls as aox
+from typing import Optional
+
+from fastapi import Query, File, UploadFile
 import fastapi
 from fastapi.middleware.cors import CORSMiddleware
+
+
+from vgi_api.validation import (
+    validate_lv_parameters,
+    validate_profile,
+    response_models,
+    NetworkID,
+    DefaultLV,
+    MVSolarPVOptions,
+    MVEVChargerOptions,
+    LVSmartMeterOptions,
+    LVElectricVehicleOptions,
+    LVPVOptions,
+    LVHPOptions,
+    ProfileUnits,
+    VALID_LV_NETWORKS_RURAL,
+    VALID_LV_NETWORKS_URBAN,
+)
 
 app = fastapi.FastAPI()
 
@@ -28,207 +38,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-def save_uploaded_file(file, save_name, size_limit):
-    real_file_size = 0
-    temp = NamedTemporaryFile(delete=False)
-    for chunk in file.file:
-        real_file_size += len(
-            chunk
-        )  # Chunk size (default 1MB) set by starlette https://github.com/encode/starlette/blob/master/starlette/datastructures.py#L412
-        if real_file_size > size_limit:
-            logging.info(
-                "File has reached size {} > limit {}".format(real_file_size, size_limit)
-            )
-            raise HTTPException(
-                status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-                detail="{} is too large".format(file.filename),
-            )
-        temp.write(chunk)
-    temp.close()
-    shutil.move(temp.name, save_name)
-
-
-class NetworkID(str, Enum):
-    # See https://github.com/alan-turing-institute/e4Future-collab/blob/e1b9430c594e33736c924eaf0793ef484bd146d7/mtd-dss-digital-twins/slesNtwk_turing.py#L212
-    URBAN = "1060"
-    RURAL = "1061"
-
-
-class DefaultLV(str, Enum):
-
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-
-
-class MVSolarPVOptions(str, Enum):
-
-    NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-    CSV = "csv"
-
-
-class MVEVChargerOptions(str, Enum):
-
-    NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-    CSV = "csv"
-
-
-class LVSmartMeterOptions(str, Enum):
-    NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-    CSV = "csv"
-
-
-class LVElectricVehicleOptions(str, Enum):
-    NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-    CSV = "csv"
-
-
-class LVPVOptions(str, Enum):
-    NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-    CSV = "csv"
-
-
-class LVHPOptions(str, Enum):
-    NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
-    CSV = "csv"
-
-
-class ProfileUnits(str, Enum):
-
-    KW = "kW"
-    KWH = "kWh"
-
-
-# ToDo: Matt to give us full list of options
-VALID_LV_NETWORKS_URBAN: List[int] = []
-VALID_LV_NETWORKS_RURAL: List[int] = []
-
-DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
-    NetworkID.RURAL: {
-        DefaultLV.OPTION1: [],
-        DefaultLV.OPTION2: [],
-        DefaultLV.OPTION3: [],
-    },
-    NetworkID.URBAN: {
-        DefaultLV.OPTION1: [],
-        DefaultLV.OPTION2: [],
-        DefaultLV.OPTION3: [],
-    },
-}
-
-
-class LVNetworks(BaseModel):
-
-    networks: List[int]
-
-
-def validate_lv_parameters(
-    lv_list: Optional[str], lv_default: Optional[DefaultLV], n_id: NetworkID
-) -> List[int]:
-    """Validate the Low Voltage Network parameters and return a list of Low Voltage
-    network ids.
-
-    Pass either `lv_list` or `lv_default`. If both are passed will use `lv_list`.
-
-    Args:
-        lv_list (Optional[str]): A str of comma seperated network ids
-        lv_default (Optional[DefaultLV]): A DefaultLV choice
-        n_id (NetworkID): The choice of medium voltage network
-
-    Returns:
-        List[int]: [description]
-    """
-
-    def _validate_lv_list(
-        lv_list: Optional[str], n_id: NetworkID
-    ) -> Optional[List[int]]:
-
-        if not lv_list:
-            return
-
-        validation_error = HTTPException(
-            status_code=422, detail="lv_list values are not valid"
-        )
-
-        lv_list_int = [int(i) for i in lv_list.split("")]
-
-        # if len(lv_list_int) > 5:
-        #     raise validation_error
-
-        valid = False
-        if n_id == NetworkID.URBAN:
-            valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_URBAN))
-        elif n_id == NetworkID.RURAL:
-            valid = set(lv_list_int).issubset(set(VALID_LV_NETWORKS_RURAL))
-
-        if not valid:
-            raise validation_error
-
-        return lv_list_int
-
-    def _get_default_list(lv_default: DefaultLV, n_id: NetworkID) -> List[int]:
-
-        return DEFAULT_LV_NETWORKS[n_id][lv_default]
-
-    if not (lv_list or lv_default):
-        raise HTTPException(
-            status_code=422, detail="One of lv_list or lv_default must be provided"
-        )
-
-    # If lv list validate the list, otherwise must have selected one of three default lists
-    lv_list = _validate_lv_list(lv_list, n_id)
-
-    if not lv_list:
-        lv_list = _get_default_list(lv_default, n_id)
-
-    return lv_list
-
-
-def validate_profile(
-    options: Union[MVSolarPVOptions, MVEVChargerOptions],
-    csv_file: Optional[UploadFile],
-    csv_profile_units: ProfileUnits,
-) -> Optional[Path]:
-    """Pass an enum of profile options: `options`. If the options enum variant is `NONE`
-    will return None.
-
-    If the variant is `CSV` it will validate the csv profiles, safe the disk and return
-    the absolute path to the csv.
-
-    If the variant is anything else it will return the absolute path to a pre-existing
-    csv profile
-
-    Args:
-        options (Union[MVSolarPVOptions, MVEVChargerOptions]): A profile option
-        csv_file (Optional[UploadFile]): An optional csv file. Only used if options is set to CSV
-        csv_profile_units (ProfileUnits): The units of the CSV file.
-
-    Returns:
-        Optional[Path]: A Path to a csv profile on disk
-    """
-
-    # ToDO: Implement
-    return None
 
 
 @app.post("/simulate")
@@ -411,22 +220,7 @@ async def simulate(
     return resultdict
 
 
-# class Files(BaseModel):
-
-#     file: str
-
-# class SimulateParams(BaseModel):
-
-#     files: List[Files]
-
-
-# @app.get("/simulate-body")
-# async def simulate_body(params: SimulateParams):
-
-#     return "hi"
-
-
-@app.get("/lv-network", response_model=LVNetworks)
+@app.get("/lv-network", response_model=response_models.LVNetworks)
 async def lv_network(
     n_id: NetworkID = Query(
         ...,
@@ -442,3 +236,23 @@ async def lv_network(
         networks = VALID_LV_NETWORKS_RURAL
 
     return {"networks": networks}
+
+
+# def save_uploaded_file(file, save_name, size_limit):
+#     real_file_size = 0
+#     temp = NamedTemporaryFile(delete=False)
+#     for chunk in file.file:
+#         real_file_size += len(
+#             chunk
+#         )  # Chunk size (default 1MB) set by starlette https://github.com/encode/starlette/blob/master/starlette/datastructures.py#L412
+#         if real_file_size > size_limit:
+#             logging.info(
+#                 "File has reached size {} > limit {}".format(real_file_size, size_limit)
+#             )
+#             raise HTTPException(
+#                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+#                 detail="{} is too large".format(file.filename),
+#             )
+#         temp.write(chunk)
+#     temp.close()
+#     shutil.move(temp.name, save_name)
