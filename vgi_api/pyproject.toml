@@ -24,6 +24,7 @@ uvicorn = {extras = ["standard"], version = "^0.15.0"}
 dss-python = [ { file = "dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", platform = "linux"}, 
                 {version = "^0.10.7", platform = "darwin"},
                 {version = "^0.10.7", platform = "windows"}]
+                
 httpie = "^2.6.0"
 black = "^21.11b1"
 pytest = "^6.2.5"

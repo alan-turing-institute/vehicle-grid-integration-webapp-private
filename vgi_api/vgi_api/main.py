@@ -76,7 +76,6 @@ async def simulate(
         None,
         help="blah",
         description="Provide a comma seperated list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
-        regex="(\d{4}, ){0,4}\d{4}$",
         example="1101, 1105, 1103",
     ),
     lv_default: Optional[DefaultLV] = Query(
