@@ -1,10 +1,11 @@
 import logging
 import base64
+from pathlib import Path
 
 from pydantic.main import BaseModel
 from . import azure_mockup
 from . import azureOptsXmpls as aox
-from typing import Optional, List, Dict
+from typing import Optional, List, Dict, Union
 from tempfile import NamedTemporaryFile, TemporaryDirectory
 import shutil
 import os
@@ -203,22 +204,31 @@ def validate_lv_parameters(
     return lv_list
 
 
-@app.get("/lv-network", response_model=LVNetworks)
-async def lv_network(
-    n_id: NetworkID = Query(
-        ...,
-        title="Network ID",
-        description="Choice of 11 kV integrated MV-LV network",
-    ),
-):
-    """Return a list of valid LV networks"""
+def validate_profile(
+    options: Union[MVSolarPVOptions, MVEVChargerOptions],
+    csv_file: Optional[UploadFile],
+    csv_profile_units: ProfileUnits,
+) -> Optional[Path]:
+    """Pass an enum of profile options: `options`. If the options enum variant is `NONE`
+    will return None.
 
-    if n_id == NetworkID.URBAN:
-        networks = VALID_LV_NETWORKS_URBAN
-    else:
-        networks = VALID_LV_NETWORKS_RURAL
+    If the variant is `CSV` it will validate the csv profiles, safe the disk and return
+    the absolute path to the csv.
 
-    return {"networks": networks}
+    If the variant is anything else it will return the absolute path to a pre-existing
+    csv profile
+
+    Args:
+        options (Union[MVSolarPVOptions, MVEVChargerOptions]): A profile option
+        csv_file (Optional[UploadFile]): An optional csv file. Only used if options is set to CSV
+        csv_profile_units (ProfileUnits): The units of the CSV file.
+
+    Returns:
+        Optional[Path]: A Path to a csv profile on disk
+    """
+
+    # ToDO: Implement
+    return None
 
 
 @app.post("/simulate")
@@ -292,37 +302,76 @@ async def simulate(
         ProfileUnits.KW,
         description="",
     ),
-    lv_electric_vehicle_csv: Optional[UploadFile] = File(None, title=""),
-    lv_electric_vehicle_profile: LVElectricVehicleOptions = Query(
+    lv_ev_profile: LVElectricVehicleOptions = Query(
         LVElectricVehicleOptions.NONE,
         description="",
     ),
-    lv_electric_vehicle_profile_units: ProfileUnits = Query(
+    lv_ev_csv: Optional[UploadFile] = File(None, title=""),
+    lv_ev_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
         description="",
     ),
-    lv_pv_csv: Optional[UploadFile] = File(None, title=""),
+    lv_ev_pen: float = Query(
+        0.0,
+        ge=0,
+        le=1,
+        description="Percentage Electric Vehicle Penetration",
+    ),
     lv_pv_profile: LVPVOptions = Query(
         LVPVOptions.NONE,
         description="",
     ),
+    lv_pv_csv: Optional[UploadFile] = File(None, title=""),
     lv_pv_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
         description="",
     ),
-    lv_hp_csv: Optional[UploadFile] = File(None, title=""),
+    lv_pv_pen: float = Query(
+        0.0,
+        ge=0,
+        le=1,
+        description="Percentage PV Penetration",
+    ),
     lv_hp_profile: LVHPOptions = Query(
         LVHPOptions.NONE,
         description="",
     ),
+    lv_hp_csv: Optional[UploadFile] = File(None, title=""),
     lv_hp_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
         description="",
     ),
+    lv_hp_pen: float = Query(
+        0.0,
+        ge=0,
+        le=1,
+        description="Percentage Heat Pump Penetration",
+    ),
 ):
 
     # MV parameters are already valid. LV parameters need additional validation
-    validate_lv_parameters(lv_list, lv_default, n_id)
+    lv_list_validated = validate_lv_parameters(lv_list, lv_default, n_id)
+
+    # Validate Demand and Generation Profiles
+    mv_solar_profile_path = validate_profile(
+        mv_solar_pv_profile, mv_solar_pv_csv, mv_solar_pv_profile_units
+    )
+    mv_ev_profile_path = validate_profile(
+        mv_ev_charger_profile, mv_ev_charger_csv, mv_ev_charger_profile_units
+    )
+
+    smart_meter_profile_path = validate_profile(
+        lv_smart_meter_profile, lv_smart_meter_csv, lv_smart_meter_profile_units
+    )
+
+    lv_ev_profile_path = validate_profile(
+        lv_ev_profile,
+        lv_ev_csv,
+        lv_ev_profile_units,
+    )
+
+    lv_pv_profile_path = validate_profile(lv_pv_profile, lv_pv_csv, lv_pv_profile_units)
+    lv_hp_profile_path = validate_profile(lv_hp_profile, lv_hp_csv, lv_hp_profile_units)
 
     # ToDo add penetration for EC, PV and HP
     # ToDo: Validate any uploaded files
@@ -375,3 +424,21 @@ async def simulate(
 # async def simulate_body(params: SimulateParams):
 
 #     return "hi"
+
+
+@app.get("/lv-network", response_model=LVNetworks)
+async def lv_network(
+    n_id: NetworkID = Query(
+        ...,
+        title="Network ID",
+        description="Choice of 11 kV integrated MV-LV network",
+    ),
+):
+    """Return a list of valid LV networks"""
+
+    if n_id == NetworkID.URBAN:
+        networks = VALID_LV_NETWORKS_URBAN
+    else:
+        networks = VALID_LV_NETWORKS_RURAL
+
+    return {"networks": networks}
