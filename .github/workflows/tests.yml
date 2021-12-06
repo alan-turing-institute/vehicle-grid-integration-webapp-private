@@ -63,7 +63,7 @@ jobs:
     - name: Display Python version
       run: poetry run python -c "import sys; print(sys.version)"
 
-    - name: Generate Report
+    - name: Run API unit tests
       env:
         NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING: ${{ secrets.NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING }}
         NETWORKS_DATA_CONTAINER_READONLY: ${{ secrets.NETWORKS_DATA_CONTAINER_READONLY }}
