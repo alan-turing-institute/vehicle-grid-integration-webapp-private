@@ -8,13 +8,17 @@ authors = ["Oscar Giles <ogiles@turing.ac.uk>, Louise Bowler <lbowler@turing.ac.
 python = ">=3.8,<3.11"
 azure-storage-blob = "^12.9.0"
 bunch = "^1.0.1"
+cmocean = "^2.0"
 govuk-bank-holidays = "^0.10"
+hsluv = "^5.0.2"
 matplotlib = "^3.5.0"
 scipy = "^1.7.2"
 fastapi = "^0.70.0"
 python-multipart = "^0.0.5"
 pydantic = "^1.8.2"
 
+[tool.poetry.scripts]
+azure_mockup = "vgi_api.azure_mockup:run_dss_simulation"
 
 [tool.poetry.dev-dependencies]
 uvicorn = {extras = ["standard"], version = "^0.15.0"}

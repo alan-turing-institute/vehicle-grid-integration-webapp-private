@@ -32,7 +32,7 @@ import logging
 fn_root = sys.path[0] if __name__ == "__main__" else os.path.dirname(__file__)
 
 
-def run_dss_simulation(rd, sf=0):
+def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
     logging.info("Entering run_dss_simulation")
 
