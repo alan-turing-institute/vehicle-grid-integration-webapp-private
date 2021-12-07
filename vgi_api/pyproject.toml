@@ -1,0 +1,31 @@
+[tool.poetry]
+name = "vgi_api"
+version = "0.1.0"
+description = "The Vehicle Grid Integration API"
+authors = ["Oscar Giles <ogiles@turing.ac.uk>, Louise Bowler <lbowler@turing.ac.uk>, David Beavan <dbeavan@turing.ac.uk>, Pamela Wochner <pwochner@turing.ac.uk>, Myriam Neaimeh <mneaimeh@turing.ac.uk>"]
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+azure-storage-blob = "^12.9.0"
+bunch = "^1.0.1"
+govuk-bank-holidays = "^0.10"
+matplotlib = "^3.5.0"
+scipy = "^1.7.2"
+fastapi = "^0.70.0"
+python-multipart = "^0.0.5"
+pydantic = "^1.8.2"
+
+
+[tool.poetry.dev-dependencies]
+uvicorn = {extras = ["standard"], version = "^0.15.0"}
+
+# Install normal dss-python on mac (because we don't have a build for it. But use the linux wheel in production)
+dss_python = [ { file = "dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", platform = "linux"}, 
+                {version = "^0.10.7", platform = "darwin"}]
+httpie = "^2.6.0"
+black = "^21.11b1"
+pytest = "^6.2.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

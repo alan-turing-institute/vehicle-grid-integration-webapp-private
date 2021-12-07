@@ -7,6 +7,7 @@ import logging
 Utility functions for handling dss files.
 """
 
+
 def changeDirectorySeparatorStyle(folder, verbose=False):
     """
     Utility function to change Windows-style directory separators (\) to that used by Mac/Linux (/).
@@ -18,11 +19,14 @@ def changeDirectorySeparatorStyle(folder, verbose=False):
         return
 
     # Get list of dss and txt files
-    dt_files = glob.glob(os.path.join(folder, "**", "*.dss"), recursive=True) + \
-        glob.glob(os.path.join(folder, "**", "*.txt"), recursive=True)
+    dt_files = glob.glob(
+        os.path.join(folder, "**", "*.dss"), recursive=True
+    ) + glob.glob(os.path.join(folder, "**", "*.txt"), recursive=True)
 
     if verbose:
-        logging.info("\nPreparing to edit directory separators used in {}...".format(folder))
+        logging.info(
+            "\nPreparing to edit directory separators used in {}...".format(folder)
+        )
 
     # Open every file and rewrite with \->/ if needed
     for dt_file in dt_files:
@@ -30,7 +34,7 @@ def changeDirectorySeparatorStyle(folder, verbose=False):
             contents = f.read()
 
             old_contents = contents
-            contents, substitutions = re.subn(r'\\(?! )', r'/', contents)
+            contents, substitutions = re.subn(r"\\(?! )", r"/", contents)
 
             if substitutions:
                 f.seek(0)

@@ -180,7 +180,11 @@ export default {
       this.isLoading = true;
       this.responseAvailable = false;
 
-      var url = 'https://vgiwebprodfunctionapp.azurewebsites.net/api/dsssimulation';
+      var url = process.env.VUE_APP_API_URL + "/simulate";
+
+      if (process.env.NODE_ENV == "development") {
+        console.log("Using API URL:", url);
+      }
 
       // If given a non-integer, switch back to 5
       if (this.config.n_lv != Math.round(this.config.n_lv)) {
