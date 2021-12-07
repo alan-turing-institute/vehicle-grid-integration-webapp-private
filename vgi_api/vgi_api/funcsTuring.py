@@ -40,7 +40,7 @@ import gc
 from .config import get_settings
 
 
-data_dir = Path(__file__).parent / "data"
+data_dir = os.path.join(Path(__file__).parent, "data")
 # Load opendss
 
 # dssObj = loadDss()
@@ -150,6 +150,7 @@ class turingNet(snk.dNet):
         )
 
         fn0 = None if frId0 is None else os.path.join(mod_dir, "_network_mod")
+        self.frId0 = frId0
         snk.mlvNet.getLvCktInfo(self, fn0=os.path.join(fn0, "lvNetworks"))
         # snk.mlvNet.setAuxCktAttributes(self,) # Not too sure if needed?
 
@@ -883,7 +884,7 @@ class turingNet(snk.dNet):
         self.branches = d.getBranchBuses()
 
         self.busCoords = {k: (np.nan, np.nan) for k in d.DSSCircuit.AllBusNames}
-        dn0 = os.path.join(fn_root, "data", "coords")
+        dn0 = os.path.join(data_dir, "coords")
         if xv == "mv":
             m0 = d.DSSCircuit.Name.split("_")[1].upper()
             m0 = m0[:-1] + (m0[-1].lower() if m0[-1] in ["A", "B"] else m0[-1])
@@ -966,7 +967,7 @@ class turingNet(snk.dNet):
         assert (144 % tsp["n"]) == 0
 
         # Load the CREST model
-        fndemand = os.path.join(fn_root, "data", "ciredData.pkl")
+        fndemand = os.path.join(data_dir, "ciredData.pkl")
         with open(fndemand, "rb") as file:
             crestData = pickle.load(file)
 
@@ -1313,8 +1314,7 @@ class turingNet(snk.dNet):
         Returns as 5*(288/nn) minute resolution data.
         """
         fn = os.path.join(
-            fn_root,
-            "data",
+            data_dir,
             "solar-profile",
             "Actual_41.55_-74.25_2006_UPV_101MW_5_Min_xmpl.csv",
         )
@@ -1330,7 +1330,7 @@ class turingNet(snk.dNet):
 
         Values returned in kW at a 10*(144/nn) minute resolution.
         """
-        fnev = os.path.join(fn_root, "data", "ev-profile-data")
+        fnev = os.path.join(data_dir, "ev-profile-data")
         rsev_, icev_ = [
             csvIn(os.path.join(fnev, f"{ss}.csv"), hh=False)
             for ss in ["rsev-week", "icev-week"]
@@ -1348,8 +1348,7 @@ class turingNet(snk.dNet):
         """Load nominal heat pump profiles."""
         fns = get_path_files(
             os.path.join(
-                fn_root,
-                "data",
+                data_dir,
                 "heat-pumps",
             ),
             ext="csv",
@@ -1374,8 +1373,7 @@ class turingNet(snk.dNet):
         """
         fns = get_path_files(
             os.path.join(
-                fn_root,
-                "data",
+                data_dir,
                 "heat-pumps",
                 "IndividualProfiles",
             ),
@@ -1414,7 +1412,7 @@ class turingNet(snk.dNet):
         to just be on/off continuously (e.g., if 2 kW at 4pm, is 2 kW right from
         4pm to 5pm).
         """
-        _, data_ = csvIn(os.path.join(fn_root, "data", "EV_urbanprofiles.csv"))
+        _, data_ = csvIn(os.path.join(data_dir, "EV_urbanprofiles.csv"))
         data = np.array(data_).astype(float)[:, 1:].T
 
         nday = 24
@@ -1439,8 +1437,7 @@ class turingNet(snk.dNet):
         https://ev.caltech.edu/dataset
         """
         fn = os.path.join(
-            fn_root,
-            "data",
+            data_dir,
             "ev-profile-data",
             "EV_ACN-21-07-27",
             "ACN_caltech--start-20210101-000000--end-20210630-000000.csv",
@@ -1500,8 +1497,7 @@ class turingNet(snk.dNet):
             fn
             for fn in get_path_files(
                 os.path.join(
-                    fn_root,
-                    "data",
+                    data_dir,
                     "ev-profile-data",
                     "EV_WPD_Electric_Nation-21-07-27",
                 )
@@ -1554,8 +1550,7 @@ class turingNet(snk.dNet):
     ):
         """Load the csv_in data."""
         fn = os.path.join(
-            fn_root,
-            "data",
+            data_dir,
             "csv_in.csv",
         )
         head, data_ = csvIn(fn)
@@ -1607,7 +1602,7 @@ class turingNet(snk.dNet):
         nn=144,
     ):
         """Load the smart meter data from the CLNR project."""
-        fn = os.path.join(fn_root, "data", "Book2_uss24_urban_over30k.csv")
+        fn = os.path.join(data_dir, "Book2_uss24_urban_over30k.csv")
         head, data_ = csvIn(fn)
         data = np.array(data_).astype(float)[:, 1:].T
 
@@ -1830,32 +1825,50 @@ class modify_network:
             run_dict["network_data"],
         )
 
-        logging.info("Leaving modify_network __init__")
+# # Commenting out initialise_directory() and copy_network_files() as they aren't used with our current method
+# # of editing the network files, but we may want to bring them back if we move the networks out of blob storage
+# # and back into this repo.
 
-    def initialise_directory(
-        self,
-    ):
-        """Create/cleanup the directory self.dnout in ./networks ."""
+    # def initialise_directory(
+    #     self,
+    # ):
+    #     """Create/cleanup the directory self.dnout in ./networks ."""
+    #     dn = os.path.join(fn_root, "networks", self.dnout)
+    #     if os.path.exists(dn):
+    #         shutil.rmtree(dn, ignore_errors=True)
 
-        logging.info("Entering initialise_directory")
+    #     _ = os.mkdir(dn) if not os.path.exists(dn) else None
+    #     print(os.path.exists(dn))
 
-        if os.path.exists(self.destination):
-            shutil.rmtree(self.destination, ignore_errors=True)
+    # def copy_network_files(
+    #     self,
+    #     n_id,
+    # ):
+    #     """Copy the master file in the network directory.
 
-        _ = os.mkdir(self.destination) if not os.path.exists(self.destination) else None
-        logging.info("Edited .dss files will be saved to %s", self.destination)
+    #     Inputs
+    #     ---
+    #     n_id - the ID of the MVLV network to use.
 
-        logging.info("Leaving initialise_directory")
+    #     """
+    #     # Get the source/destination directories
+    #     self.fldr_ntwk = os.path.dirname(snk.dNet.fdrsLoc[n_id])
+    #     dn_src = os.path.join(fn_root, "networks", self.fldr_ntwk)
+    #     dn_dst = os.path.join(
+    #         fn_root,
+    #         "networks",
+    #         self.dnout,
+    #     )
 
-    def copy_network_files(self):
-        """Copy the network directory."""
+    #     # Copy over the files.
+    #     fn_names = get_path_files(
+    #         dn_src,
+    #         mode="names",
+    #     )
+    #     for fn in fn_names:
+    #         shutil.copy(os.path.join(dn_src, fn), os.path.join(dn_dst, fn))
 
-        logging.info("Entering copy_network_files")
-
-        # Get the source/destination directories
-        shutil.copytree(self.source, self.destination, dirs_exist_ok=True)
-
-        logging.info("Leaving copy_network_files")
+        # self.dn_dst = dn_dst
 
     def modify_dss_files(
         self,
@@ -1885,34 +1898,42 @@ class modify_network:
         #     shutil.copy(fn_src+'.dss', fn_dst+'.dss')
 
         # # Get resulting file names
-        # fn_lds,fn_mstr,fn_lv = [os.path.join(
+        # fn_lds,fn_mstr,fn_lv,fn_rgc,fn_xfmr = [os.path.join(
         #         self.destination,fn_copy[vv]+'.dss')
-        #                                 for vv in ['lds','mstr','lv']]
-
-        # fn_lds,fn_mstr,fn_lv = [os.path.join(
-        #         self.destination,fn_copy[vv]+'.dss')
-        #                                 for vv in ['lds','mstr','lv']]
+        #                                 for vv in ['lds','mstr','lv','rgc','xfmr']]
 
         fn_lds = os.path.join(self.mod_dir, self.dnout, fn_copy["lds"] + ".dss")
         fn_lv = os.path.join(self.mod_dir, self.dnout, fn_copy["lv"] + ".dss")
-        logging.info("******{}".format(fn_lds))
+        fn_rgc = os.path.join(self.mod_dir, self.dnout, fn_copy["rgc"] + ".dss")
+        fn_xfmr = os.path.join(self.mod_dir, self.dnout, fn_copy["xfmr"] + ".dss")
 
         base_folder = os.path.join(self.mod_dir, self.dnout)
-        logging.info(os.listdir(base_folder))
 
         # # Update the master file
-        # with open(fn_mstr,'r') as file:
+        # with open(fn_mstr, "r") as file:
         #     mstr_txt = file.read()
 
         # mstr_txt = mstr_txt.replace(
-        #     'redirect redirect_lv_ntwx.dss',
-        #     f'!redirect redirect_lv_ntwx.dss\nredirect redirect_lv_ntwx{self.dnout}.dss',)
+        #     "redirect redirect_lv_ntwx.dss",
+        #     f"!redirect redirect_lv_ntwx.dss\nredirect redirect_lv_ntwx{self.dnout}.dss",
+        # )
 
         # mstr_txt = mstr_txt.replace(
-        #     'redirect lds_edit.dss',
-        #     f'!redirect lds_edit.dss\nredirect lds_edit{self.dnout}.dss',)
+        #     "redirect lds_edit.dss",
+        #     f"!redirect lds_edit.dss\nredirect lds_edit{self.dnout}.dss",
+        # )
 
-        # with open(fn_mstr,'w') as file:
+        # mstr_txt = mstr_txt.replace(
+        #     "Redirect transformers.dss",
+        #     f"!Redirect transformers.dss\nRedirect transformers{self.dnout}.dss",
+        # )
+
+        # mstr_txt = mstr_txt.replace(
+        #     "Redirect regcontrols.dss",
+        #     f"!Redirect regcontrols.dss\nRedirect regcontrols{self.dnout}.dss",
+        # )
+
+        # with open(fn_mstr, "w") as file:
         #     file.write(mstr_txt)
 
         # Functions for getting the LV network ID from strings
