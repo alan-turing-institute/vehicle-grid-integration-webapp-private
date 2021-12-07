@@ -20,7 +20,7 @@ import sys
 from . import funcsTuring as ft
 from . import funcsDss_turing
 from . import azureOptsXmpls as aox
-from .funcsPython_turing import gDir, fillplot, set_day_label
+from .funcsPython_turing import gDir, fillplot, set_day_label, tlps, new_hsl_map
 import matplotlib
 
 matplotlib.use("agg")
@@ -335,7 +335,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                     / np.array([v for v in simulation.fdr2pwr.values()])
                 )  # in %
                 _ = [
-                    plt.plot(tt, yy[:, i], color=cm.tab20(i))
+                    plt.plot(tt, yy[:, i], color=matplotlib.cm.tab20(i))
                     for i in range(yy.shape[1])
                 ]
                 lgnd = [
