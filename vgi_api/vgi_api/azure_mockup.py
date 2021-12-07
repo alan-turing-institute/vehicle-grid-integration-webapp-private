@@ -49,19 +49,13 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         # Simulation modifications
 
         frid0 = rd["network_data"]["n_id"]
-        simulation = ft.turingNet(
-            frId=1000,
-            frId0=frid0,
-            rundict=rd,
-            mod_dir=temp_dir
-        )
+        simulation = ft.turingNet(frId=1000, frId0=frid0, rundict=rd, mod_dir=temp_dir)
         tsp_n = rd["simulation_data"]["ts_profiles"]["n"]
         tt = np.arange(0, 24, 24 / tsp_n)  # get the clock
 
         # Get the solutions
         lds = simulation.get_lds_kva(tsp_n)
         slns, _ = simulation.run_dss_lds(lds)
-
 
         # From here: plotting options
         if rd["plot_options"]["mv_highlevel"]:
@@ -122,10 +116,15 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             )
 
         if rd["plot_options"]["lv_voltages"][0]:
-            assert len(rd["plot_options"]["lv_voltages"][1]) < 3  # for now only compare two profiles
+            assert (
+                len(rd["plot_options"]["lv_voltages"][1]) < 3
+            )  # for now only compare two profiles
 
             fig, ax = plt.subplots()
-            lv_idxs = [simulation.ckts.ldNo.index(nn) for nn in rd["plot_options"]["lv_voltages"][1]]
+            lv_idxs = [
+                simulation.ckts.ldNo.index(nn)
+                for nn in rd["plot_options"]["lv_voltages"][1]
+            ]
 
             clrs = [
                 "C0",
@@ -134,7 +133,11 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             for idx, clr in zip(lv_idxs, clrs):
                 Vsec = np.array([s["VlvLds"][idx] for s in slns])[:, :, 0]
                 fillplot(
-                    np.abs(Vsec) / 230, tt, ax=ax, lineClrs=[clr], fillKwargs={"color": clr}
+                    np.abs(Vsec) / 230,
+                    tt,
+                    ax=ax,
+                    lineClrs=[clr],
+                    fillKwargs={"color": clr},
                 )
 
             _ = [
@@ -142,7 +145,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 for lbl, clr in zip(simulation.ckts.ldNo, clrs)
             ]
             plt.legend(
-                title="LV ckt ID",
+                title="LV Network ID",
                 fontsize="small",
             )
             set_day_label()
@@ -160,6 +163,64 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
             tlps()
 
+        if rd["plot_options"]["lv_comparison"]:
+            fig, axs = plt.subplots(
+                figsize=(
+                    9,
+                    3.2,
+                ),
+                nrows=1,
+                ncols=simulation.ckts.N,
+                sharey=True,
+                sharex=True,
+            )
+
+            for ii, ax in enumerate(axs):
+                Vsec = np.array([s["VlvLds"][ii] for s in slns])[:, :, 0]
+                fillplot(
+                    np.abs(Vsec) / 230,
+                    tt,
+                    ax=ax,
+                    lineClrs=[
+                        f"C{ii}",
+                    ],
+                    fillKwargs={"color": f"C{ii}"},
+                )
+                xlm = plt.xlim()
+                ax.hlines(
+                    [0.94, 1.10],
+                    *xlm,
+                    linestyles="dashed",
+                    color="r",
+                )
+                ax.set_title(
+                    f"LV Network: {simulation.ckts.ldNo[ii]}",
+                    fontsize="medium",
+                )
+                set_day_label()
+
+            axs[0].text(
+                0.1,
+                1.0905,
+                "$Upper\;limit$",
+                fontsize="small",
+            )
+            axs[0].text(
+                0.1,
+                0.9425,
+                "$Lower\;limit$",
+                fontsize="small",
+            )
+            axs[0].set_ylabel("Voltage, per unit")
+            axs[2].set_xlabel("Hour of the day")
+            axs[-1].set_xlabel("")
+            xlm = plt.xlim()
+            plt.xlim(xlm)
+            if sf:
+                sff("lv_comparison")
+
+            tlps()
+
         if rd["plot_options"]["mv_voltage_ts"]:
             # Voltage plot against time
             smv2pu = lambda s: np.abs(s.Vmv) / simulation.vKvbase[simulation.mvIdx]
@@ -170,10 +231,20 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             plt.hlines([0.94, 1.06], *xlm, linestyle="dashed", color="r", lw=0.8)
             plt.xlim(xlm)
             plt.ylabel("MV Voltage, pu")
+            plt.text(
+                0.1,
+                1.0535,
+                "$Upper\;limit$",
+            )
+            plt.text(
+                0.1,
+                0.941,
+                "$Lower\;limit$",
+            )
             if sf:
                 sff("mv_voltage_ts")
-            tlps()
 
+            tlps()
 
         if rd["plot_options"]["trn_powers"]:
             spri = np.array([np.abs(s.Spri) for s in slns])
@@ -187,41 +258,46 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 ncols=2,
                 sharey=True,
             )
-            ax0.plot(tt, 100 * spri / spri_rating)
+            ax0.plot(tt, 100 * spri / spri_rating, ".-")
             ax0.hlines(
                 100,
                 tt[0],
-                tt[-1],
+                tt[-1] + 3,
                 linestyles="dashed",
+                color="r",
             ),
             set_day_label(
                 ax=ax0,
             )
             ax0.set_ylabel("Substation utilization, %")
             ax0.set_title("Primary Sub. Utilization")
-            ax1.plot(
-                tt,
-                100 * ssec / ssec_ratings,
-            )
+            ax1.plot(tt, 100 * ssec / ssec_ratings, ".-")
             ax1.hlines(
                 100,
                 tt[0],
-                tt[-1],
+                tt[-1] + 3,
                 linestyles="dashed",
+                color="r",
             ),
             set_day_label(
                 ax=ax1,
             )
+            lgns = [
+                simulation.ckts.ldNo[i] + f" ({int(ssec_ratings[i])} kVA)"
+                for i in range(simulation.ckts.N)
+            ]
             plt.legend(
-                simulation.ckts.ldNo,
+                lgns,
                 fontsize="small",
-                title="LV Ckt No.",
+                title="LV Network (rating)",
             )
             ax1.set_title("Secondary Sub. Utilization")
             ylm = plt.ylim()
             plt.ylim((min([ylm[0], -1]), max([ylm[1], 101])))
-            tlps()
+            if sf:
+                sff("trn_powers")
 
+            tlps()
 
         if rd["plot_options"]["profile_options"]:
             # Plot each of the profiles which only has a dimension of 1. [The profiles
@@ -240,7 +316,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 plt.plot(tt, simulation.p[k], mrk, color=clr, label=k)
 
             set_day_label()
-            plt.legend(title="Profile", fontsize="small", loc=(1.05, 0.1))
+            plt.legend(title="Profile ID", fontsize="small", loc=(1.05, 0.1))
             plt.ylabel("Power (kW, or normalised)")
             if sf:
                 sff(
@@ -249,16 +325,33 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
             tlps()
 
-
         if rd["plot_options"]["pmry_powers"] or rd["plot_options"]["pmry_loadings"]:
             splt = np.array([np.abs(np.sum(ss["Sfmv"], axis=1)) for ss in slns])
             if rd["plot_options"]["pmry_loadings"]:
-                yy = 1e2 * 1e-3 * splt / np.array([v for v in simulation.fdr2pwr.values()])  # in %
-                plt.plot(tt, yy)
+                yy = (
+                    1e2
+                    * 1e-3
+                    * splt
+                    / np.array([v for v in simulation.fdr2pwr.values()])
+                )  # in %
                 _ = [
-                    plt.text(0, yy[0][i], f"{b} (F{i+1}, {p} MVA)")
+                    plt.plot(tt, yy[:, i], color=cm.tab20(i))
+                    for i in range(yy.shape[1])
+                ]
+                lgnd = [
+                    f"F{i+1} (to {b}), {p} MVA"
                     for i, (b, p) in enumerate(simulation.fdr2pwr.items())
                 ]
+                plt.legend(
+                    lgnd, loc=(1.03, 0.2), fontsize="small", title="Feeder (to), rating"
+                )
+                plt.hlines(
+                    100,
+                    tt[0],
+                    tt[-1] + 3,
+                    linestyles="dashed",
+                    color="r",
+                )
                 set_day_label()
                 plt.ylabel("Power, % of rated")
                 if sf:
@@ -301,7 +394,9 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 )
                 for i in range(nplt)
             ]
-            ax0.set_title(f'Plotting {nplt} oo {len(simulation.p[ksel])} "{ksel}" profiles\n')
+            ax0.set_title(
+                f'Plotting {nplt} of {len(simulation.p[ksel])} "{ksel}" profiles\n'
+            )
             ax0.set_ylabel("Power, kW")
             ax0.set_xlabel("Hour of the day")
 
@@ -319,6 +414,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 sff(f"profile_sel_{ksel}")
 
             tlps()
+
 
 if __name__ == "__main__":
     run_dss_simulation(aox.run_dict0)

@@ -26,7 +26,8 @@ from .funcsPython_turing import (
     dds,
     csvIn,
     mtDict,
-    rngSeed
+    rngSeed,
+    o2o
 )
 from . import funcsDss_turing
 from .funcsMath_turing import vecSlc, tp2ar
@@ -1700,6 +1701,14 @@ class turingNet(snk.dNet):
         sln.VmvLds = np.array(vecSlc(vlds, self.mvlvi.mv))
         sln.VlvLds = [np.array(vecSlc(vlds, v)) for v in self.mvlvi.lv_n.values()]
 
+        # There are a few networks with 3-phase loads; pick phase A for ease
+        obj2array = lambda obj: o2o(np.array([v[0] for v in obj]))
+        _ = [
+            sln.VlvLds.__setitem__(i, obj2array(xx))
+            for i, xx in enumerate(sln.VlvLds)
+            if xx.dtype == "O"
+        ]
+
         # LV secondary substation voltages
         vsub = [v[4] for v in d.getObjAttr(d.TRN, val=None, AEval="SeqVoltages")]
         sln.Vsb = np.array(vsub)[self.xfmri.sdry]
@@ -1825,9 +1834,9 @@ class modify_network:
             run_dict["network_data"],
         )
 
-# # Commenting out initialise_directory() and copy_network_files() as they aren't used with our current method
-# # of editing the network files, but we may want to bring them back if we move the networks out of blob storage
-# # and back into this repo.
+    # # Commenting out initialise_directory() and copy_network_files() as they aren't used with our current method
+    # # of editing the network files, but we may want to bring them back if we move the networks out of blob storage
+    # # and back into this repo.
 
     # def initialise_directory(
     #     self,
@@ -1868,7 +1877,7 @@ class modify_network:
     #     for fn in fn_names:
     #         shutil.copy(os.path.join(dn_src, fn), os.path.join(dn_dst, fn))
 
-        # self.dn_dst = dn_dst
+    # self.dn_dst = dn_dst
 
     def modify_dss_files(
         self,
@@ -1957,9 +1966,14 @@ class modify_network:
             II = np.arange(nd["n_lv"], nlvTot)
         elif nd["lv_sel"] == "lv_ilist":
             II = [i for i in range(nlvTot) if i not in nd["lv_ilist"]]
-        elif nd["lv_sel"] == "lv_list":
+        elif nd["lv_sel"] == "lv_list" or nd["lv_sel"] in [
+            "near_sub",
+            "near_edge",
+            "mixed",
+        ]:
+            lv_list = nd["lv_list"] if nd["lv_sel"] == "lv_list" else nd[nd["lv_sel"]]
             lv_idxs = [getLvi(rr) for rr in lv_lst]
-            lvl_idxs = [lv_idxs.index(ii) for ii in nd["lv_list"]]
+            lvl_idxs = [lv_idxs.index(ii) for ii in lv_list]
             II = [i for i in range(nlvTot) if i not in lvl_idxs]
 
         lv_lst = [
@@ -2013,7 +2027,6 @@ class modify_network:
             file.write("\n".join(xfmr_lst))
 
         logging.info("Leaving modify_dss_files")
-
 
     @staticmethod
     def dss_value_update(

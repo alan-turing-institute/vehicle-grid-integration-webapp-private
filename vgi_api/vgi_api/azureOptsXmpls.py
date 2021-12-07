@@ -25,6 +25,7 @@ run_dict0 = {
             "1141",
             "1164",
         ],  # exact lv network ids [lv_sel]
+        # 'near_sub', 'near_edge', 'mixed' added below [lv_sel]
     },
     # For random number generation, either seed (with int) or not (None)
     "rand_seed": 0,  # None or int
@@ -129,36 +130,90 @@ run_dict0 = {
         "sim_type": None,  # type of simulation, e.g., da-ahead v2g, etc
     },
     # Various plotting options to return to the user etc.
-    "plot_options": {
-        "mv_highlevel": False,
-        "mv_highlevel_clean": False,
-        "mv_voltage_ts": False,
-        "mv_powers": False,
-        "trn_powers": False,
-        "pmry_powers": False,
-        "pmry_loadings": False,
-        "profile_options": False,
+    "plot_options": {  # Using:
+        "mv_highlevel": False,  # y
+        "mv_highlevel_clean": False,  # No
+        "mv_voltage_ts": False,  # y
+        "mv_powers": False,  # ??
+        "trn_powers": False,  # y
+        "pmry_powers": False,  # No
+        "pmry_loadings": False,  # y
+        "profile_options": False,  # No
         "lv_voltages": [
             False,
             [
                 "1101",
                 "1164",
             ],
-        ],  # only two numbers allowed
+        ],  # n only 2 numbers allowed.
+        "lv_comparison": False,  # y
         # use [k for k,v in self.p.items() if v.ndim==2] to see
         # what can be used with profile_sel
         "profile_sel": [
             False,
             "hp_love_Jan",
+        ],  # No
+    },
+}
+
+# Add the hard-coded lv options
+lv_example_options_all = {
+    1060: {
+        "near_sub": [
+            "1101",
+            "1137",
+            "1110",
+            "1116",
+            "1117",
+        ],
+        "near_edge": [
+            "1103",
+            "1109",
+            "1166",
+            "1145",
+            "1131",
+        ],
+        "mixed": [
+            "1108",
+            "1109",
+            "1151",
+            "1158",
+            "1175",
+        ],
+    },
+    1061: {
+        "near_sub": [
+            "1102",
+            "1154",
+            "1262",
+            "1206",
+            "1202",
+        ],
+        "near_edge": [
+            "1321",
+            "1254",
+            "1387",
+            "1194",
+            "1109",
+        ],
+        "mixed": [
+            "1101",
+            "1450",
+            "1152",
+            "1200",
+            "1122",
         ],
     },
 }
+run_dict0["network_data"].update(
+    lv_example_options_all[run_dict0["network_data"]["n_id"]]
+)
 
 
 # ------------- Specific dicts used for creating results.
 # rd_xmpl - used to create the results for
 rd_xmpl = deepcopy(run_dict0)
-lv_sel = [
+lv_list = [
     "1145",
     "1101",
 ]
@@ -171,7 +226,7 @@ rd_xmpl.update(
 )  # without
 # rd_xmpl.update({'slr_pen':0,'hps_pen':33,'ev_pen':33,}) # with
 rd_xmpl["simulation_data"]["ts_profiles"]["n"] = 48
-rd_xmpl["network_data"]["lv_list"] = lv_sel
+rd_xmpl["network_data"]["lv_list"] = lv_list
 
 # Choose the network mods - no FCS or DGs
 rd_xmpl["dmnd_gen_data"]["dgs"]["mv"] = None
@@ -186,7 +241,7 @@ rd_xmpl["plot_options"]["mv_highlevel_clean"] = False
 # Solution plotting
 rd_xmpl["plot_options"]["lv_voltages"] = [
     False,
-    lv_sel,
+    lv_list,
 ]
 rd_xmpl["plot_options"]["mv_voltage_ts"] = False
 rd_xmpl["plot_options"]["profile_sel"] = [
