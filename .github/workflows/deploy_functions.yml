@@ -37,9 +37,14 @@ jobs:
         echo '' >>  ../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/requirements.txt 
         echo 'dependencies/'$(ls dist) >> ../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/requirements.txt 
         popd
+
+    - name: 'Resolve Project Dependencies Using Pip'
+      shell: bash
+      run: |
         pushd './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}'
         python -m pip install --upgrade pip
         cat requirements.txt
+        ls dependencies
         pip install -r requirements.txt --target=".python_packages/lib/site-packages"
         popd
 
