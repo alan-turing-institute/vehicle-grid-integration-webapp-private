@@ -131,10 +131,10 @@ run_dict0 = {
     },
     # Various plotting options to return to the user etc.
     "plot_options": {  # Using:
-        "mv_highlevel": False,  # y
-        "mv_highlevel_clean": False,  # No
+        "mv_highlevel": True,  # y
+        "mv_highlevel_clean": True,  # No
         "mv_voltage_ts": True,  # y
-        "mv_powers": False,  # ??
+        "mv_powers": True,  # ??
         "trn_powers": True,  # y
         "pmry_powers": True,  # No
         "pmry_loadings": True,  # y

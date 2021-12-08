@@ -2553,7 +2553,7 @@ class dNet:
                     xyClr.append(cmap(score))
 
         plt.scatter(
-            x0scr, y0scr, marker=".", Color=xyClr, zorder=+10, s=self.fPrm_["pms"]
+            x0scr, y0scr, marker=".", color=xyClr, zorder=+10, s=self.fPrm_["pms"]
         )
         if edgeOn:
             plt.scatter(
@@ -2567,7 +2567,7 @@ class dNet:
             )
 
         if busNans:
-            plt.scatter(x0nne, y0nne, Color="#cccccc", marker=".", zorder=+5, s=3)
+            plt.scatter(x0nne, y0nne, color="#cccccc", marker=".", zorder=+5, s=3)
 
     def plotBuses3ph(self, ax, scores3ph, minMax, edgeOn=True):
         if self.fPrm_["cmap"] is None:
@@ -2602,12 +2602,12 @@ class dNet:
             self.hex3phPlot(
                 ax, x0scr, y0scr, xyClr, phscr, sf=self.sfDict3ph[self.feeder]
             )
-            # plt.scatter(x0scr,y0scr,marker='.',Color=xyClr,
+            # plt.scatter(x0scr,y0scr,marker='.',color=xyClr,
             # zorder=+10,s=self.plotMarkerSize)
             # if edgeOn: plt.scatter(x0scr,y0scr,marker='.',
             # zorder=+11,s=self.plotMarkerSize,
             # facecolors='none',edgecolors='k')
-            plt.scatter(x0nne, y0nne, Color="#cccccc", marker=".", zorder=+5, s=15)
+            plt.scatter(x0nne, y0nne, color="#cccccc", marker=".", zorder=+5, s=15)
 
     def hex3phPlot(self, ax, x, y, xyClr, xyPhs, sf):
         xy0 = np.exp(1j * np.linspace(np.pi / 2, 5 * np.pi / 2, 7))
@@ -2702,7 +2702,7 @@ class dNet:
                         clrs.append(cmsel[fdri](scores[i]))
 
         if len(scores) == 0:
-            coll = LineCollection(segnan, Color="#cccccc")
+            coll = LineCollection(segnan, colors="#cccccc")
         else:
             # At the moment, ignore segnans for colored plots. Reverse also
             # seems a little cleaner for most of these.
