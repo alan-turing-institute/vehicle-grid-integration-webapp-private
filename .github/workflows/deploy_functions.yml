@@ -34,7 +34,7 @@ jobs:
         python -m pip install --upgrade build
         python -m build -w           
         cp -r dist/ '../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/dependencies'
-        echo 'dependencies/'$(ls dist) >> ../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/requirements.txt 
+        echo '\ndependencies/'$(ls dist) >> ../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/requirements.txt 
         popd
 
     - name: 'Resolve Project Dependencies Using Pip'
