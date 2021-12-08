@@ -11,9 +11,9 @@ class NetworkID(str, Enum):
 
 class DefaultLV(str, Enum):
 
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
+    NEAR_SUB = "near-sub"
+    NEAR_EDGE = "near-edge"
+    MIXED = "mixed"
 
 
 class MVSolarPVOptions(str, Enum):
@@ -79,13 +79,38 @@ VALID_LV_NETWORKS_RURAL: List[int] = []
 # These are defaults that could be selected
 DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
     NetworkID.RURAL: {
-        DefaultLV.OPTION1: [],
-        DefaultLV.OPTION2: [],
-        DefaultLV.OPTION3: [],
+        DefaultLV.NEAR_SUB: [1102, 1154, 1262, 1206, 1202],
+        DefaultLV.NEAR_EDGE: [1321, 1254, 1387, 1194, 1109],
+        DefaultLV.MIXED: [1101, 1450, 1152, 1200, 1122],
     },
     NetworkID.URBAN: {
-        DefaultLV.OPTION1: [],
-        DefaultLV.OPTION2: [],
-        DefaultLV.OPTION3: [],
+        DefaultLV.NEAR_SUB: [1101, 1137, 1110, 1116, 1117],
+        DefaultLV.NEAR_EDGE: [1103, 1109, 1166, 1145, 1131],
+        DefaultLV.MIXED: [1108, 1109, 1151, 1158, 1175],
     },
 }
+
+
+# lv_example_options_all = {
+# Urban
+#     1060:{
+
+#     'near_sub':['1101','1137','1110','1116','1117',],
+
+#     'near_edge':['1103','1109','1166','1145','1131',],
+
+#     'mixed':['1108','1109','1151','1158','1175',],
+
+#     },
+
+#     1061:{
+
+#     'near_sub':['1102','1154','1262','1206','1202',],
+
+#     'near_edge':['1321','1254','1387','1194','1109',],
+
+#     'mixed':['1101','1450','1152','1200','1122',],
+
+#     },
+
+# }

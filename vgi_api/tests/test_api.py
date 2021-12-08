@@ -94,7 +94,6 @@ def test_invalid_params_simulation(params, loc):
     payload = response.json()
     debug(payload)
     assert response.status_code == 422
-
     # Check the parameter that was rejected was the correct one
     assert payload["detail"][0]["loc"] == loc
 
@@ -103,7 +102,7 @@ def test_invalid_params_simulation(params, loc):
     "lv_list,n_id, lv_default",
     [
         ("1101,1102", NetworkID.URBAN.value, None),
-        (None, NetworkID.URBAN.value, DefaultLV.OPTION1),
+        (None, NetworkID.URBAN.value, DefaultLV.NEAR_SUB),
         ("1101,1102,1103,1104,1105", NetworkID.URBAN.value, None),
     ],
 )

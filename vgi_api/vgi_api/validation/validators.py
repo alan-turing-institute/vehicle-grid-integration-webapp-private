@@ -114,10 +114,10 @@ def validate_profile(
     will return None.
 
     If the variant is `CSV` it will validate the csv profiles, safe the disk and return
-    the absolute path to the csv.
+    the absolute path to the csv. Raise an HTTP exception if no CSV is uploaded.
 
     If the variant is anything else it will return the absolute path to a pre-existing
-    csv profile
+    csv profile.
 
     Args:
         options (Union[MVSolarPVOptions, MVEVChargerOptions]): A profile option
