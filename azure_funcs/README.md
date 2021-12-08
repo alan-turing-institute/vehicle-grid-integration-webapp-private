@@ -31,6 +31,11 @@ source .venv/bin/activate
 pip install -r requirements.txt
 ```
 
+5. Install additional requirements (This is automated when deploying to Azure)
+```bash
+pip install ../vgi_api
+```
+
 ### Run the function
 
 First we need to configure environment variables
