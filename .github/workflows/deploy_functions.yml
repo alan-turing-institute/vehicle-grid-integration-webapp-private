@@ -7,6 +7,7 @@ on:
   push:
     branches:
       - main
+      - ogiles/fix-deployment #Tmp to test deployment
   workflow_dispatch:
 
 env:
