@@ -26,10 +26,16 @@ jobs:
       with:
         python-version: ${{ env.PYTHON_VERSION }}
 
-    - name: Copy VGI_api into dependencies
+    - name: Build vgi_api and copy wheel to dependencies
       shell: bash
       run: |
-        cp -r ./vgi_api './${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/dependencies/vgi_api'
+        pushd './vgi_api'
+        python -m pip install --upgrade pip
+        python -m pip install --upgrade build
+        python -m build -w           
+        cp -r dist/ '../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/dependencies'
+        echo 'dependencies/'$(ls dist) >> ../${{ env.AZURE_FUNCTIONAPP_PACKAGE_PATH }}/requirements.txt 
+        popd
 
     - name: 'Resolve Project Dependencies Using Pip'
       shell: bash
