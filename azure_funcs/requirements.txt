@@ -1,9 +1,9 @@
 # Relative install of VGI_API (assumes you are in azure_funcs directory)
-vgi_api
+dependencies/vgi_api
 
 # Install wheels of dss_python
-vgi_api/dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl; sys_platform == 'linux'
-vgi_api/dependencies/dss_python-0.10.7.post1-cp39-cp39-macosx_10_15_x86_64.whl; sys_platform == 'darwin'
+dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl; sys_platform == 'linux'
+dependencies/dss_python-0.10.7.post1-cp39-cp39-macosx_10_15_x86_64.whl; sys_platform == 'darwin'
 
 # Other dependencies
 azure-functions
