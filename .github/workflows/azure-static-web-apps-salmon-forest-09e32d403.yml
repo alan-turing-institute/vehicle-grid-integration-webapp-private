@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - ogiles/fix-deployment #Tmp to test deployment
 
 jobs:
   build_and_deploy_job:
