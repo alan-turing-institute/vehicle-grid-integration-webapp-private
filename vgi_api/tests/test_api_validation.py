@@ -242,3 +242,6 @@ def test_option_csv():
     )
     debug(resp.json())
     assert resp.status_code == 200
+
+
+# ToDo: Add tests to validate all static profiles bundled with API
