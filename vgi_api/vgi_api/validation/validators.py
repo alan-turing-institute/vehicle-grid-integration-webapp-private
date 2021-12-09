@@ -138,7 +138,7 @@ def csv_to_array(file: Union[tempfile.SpooledTemporaryFile, Path]) -> np.array:
             ncols = len(f.readline().split(","))
 
         return np.loadtxt(
-            file, dtype=float, skiprows=0, usecols=range(1, ncols), delimiter=","
+            file, dtype=float, skiprows=1, usecols=range(1, ncols), delimiter=","
         )
 
     else:
@@ -257,3 +257,5 @@ def validate_profile(
             return None
         else:
             return csv_to_array(SOLAR_PROFILES[options])
+
+    raise HTTPException(status_code=422, detail="Option not implemented")

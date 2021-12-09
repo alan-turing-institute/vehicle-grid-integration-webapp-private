@@ -228,3 +228,17 @@ def test_invalid_csv_not_float(invalid_profile_csv_not_float: io.BytesIO):
     resp = upload_csv(invalid_profile_csv_not_float)
     debug(resp.json())
     assert resp.status_code == 422
+
+
+def test_option_csv():
+
+    resp = client.post(
+        app.url_path_for("simulate"),
+        params={
+            "lv_default": DefaultLV.NEAR_SUB.value,
+            "n_id": NetworkID.URBAN.value,
+            "mv_solar_pv_profile": MVSolarPVOptions.OPTION1.value,
+        },
+    )
+    debug(resp.json())
+    assert resp.status_code == 200
