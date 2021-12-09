@@ -207,6 +207,10 @@ def validate_profile(
     """
 
     # ToDO: Implement
+    # 1. Process uploaded CSV. Done
+    # 2. Load an existing CSV.
+    # 3. Do for all other CSV.
+
     if isinstance(options, MVSolarPVOptions):
 
         if options == MVSolarPVOptions.CSV:
@@ -222,6 +226,3 @@ def validate_profile(
             pass  # Load profile
         elif options == MVSolarPVOptions.OPTION3:
             pass  # Load profile
-
-
-r
