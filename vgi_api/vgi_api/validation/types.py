@@ -1,6 +1,7 @@
 """Types used for validating API query parameters"""
 from enum import Enum
 from typing import List, Dict
+from pathlib import Path
 
 
 class NetworkID(str, Enum):
@@ -88,6 +89,15 @@ DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
         DefaultLV.NEAR_EDGE: [1103, 1109, 1166, 1145, 1131],
         DefaultLV.MIXED: [1108, 1109, 1151, 1158, 1175],
     },
+}
+
+# Where are all the data files
+DATA_FOLDER = Path(__file__).parent.parent / "data"
+
+SOLAR_PROFILES: Dict[MVSolarPVOptions, Path] = {
+    MVSolarPVOptions.OPTION1: Path(""),
+    MVSolarPVOptions.OPTION2: Path(""),
+    MVSolarPVOptions.OPTION3: Path(""),
 }
 
 

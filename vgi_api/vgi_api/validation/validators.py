@@ -14,10 +14,17 @@ from vgi_api.validation import (
     VALID_LV_NETWORKS_URBAN,
     DEFAULT_LV_NETWORKS,
 )
-from vgi_api.validation.types import MVEVChargerOptions, MVSolarPVOptions, ProfileUnits
+from vgi_api.validation.types import (
+    MVEVChargerOptions,
+    MVSolarPVOptions,
+    ProfileUnits,
+    DATA_FOLDER,
+)
 import tempfile
 import numpy as np
 import datetime
+
+from vgi_api.validation.types import SOLAR_PROFILES
 
 
 class ValidateLVParams(BaseModel):
@@ -113,15 +120,29 @@ class ProfileBaseModel(BaseModel):
         arbitrary_types_allowed = True
 
 
-def csv_to_numpy(file: tempfile.SpooledTemporaryFile) -> np.array:
+def csv_to_array(file: Union[tempfile.SpooledTemporaryFile, Path]) -> np.array:
     """Convert a csv file to numpy array"""
-    # Make sure we're at start of file
-    file.seek(0)
 
-    ncols = len(file.readline().decode().split(","))
-    return np.loadtxt(
-        file, dtype=float, skiprows=0, usecols=range(1, ncols), delimiter=","
-    )
+    if isinstance(file, tempfile.SpooledTemporaryFile):
+        # Make sure we're at start of file
+        file.seek(0)
+
+        ncols = len(file.readline().decode().split(","))
+        return np.loadtxt(
+            file, dtype=float, skiprows=0, usecols=range(1, ncols), delimiter=","
+        )
+
+    elif isinstance(file, Path):
+
+        with file.open() as f:
+            ncols = len(f.readline().split(","))
+
+        return np.loadtxt(
+            file, dtype=float, skiprows=0, usecols=range(1, ncols), delimiter=","
+        )
+
+    else:
+        raise NotImplementedError(f"Not implemented for type {type(file)}")
 
 
 class MVSolarProfile(ProfileBaseModel):
@@ -177,7 +198,7 @@ class MVSolarProfile(ProfileBaseModel):
 
     def to_array(self) -> np.array:
 
-        return csv_to_numpy(self.mv_solar_pv_csv)
+        return csv_to_array(self.mv_solar_pv_csv)
 
 
 # class MVEVChargerProfile(BaseModel):
@@ -211,18 +232,15 @@ def validate_profile(
     # 2. Load an existing CSV.
     # 3. Do for all other CSV.
 
+    print(DATA_FOLDER)
     if isinstance(options, MVSolarPVOptions):
-
         if options == MVSolarPVOptions.CSV:
             try:
                 profile = MVSolarProfile(mv_solar_pv_csv=csv_file.file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
-
-        elif options == MVSolarPVOptions.OPTION1:
-            pass  # Load profile
-        elif options == MVSolarPVOptions.OPTION2:
-            pass  # Load profile
-        elif options == MVSolarPVOptions.OPTION3:
-            pass  # Load profile
+        elif options == MVSolarPVOptions.NONE:
+            return None
+        else:
+            return csv_to_array(SOLAR_PROFILES[options])
