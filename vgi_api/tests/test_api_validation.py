@@ -1,3 +1,4 @@
+"""Tests related to API argument validation"""
 from fastapi.testclient import TestClient
 from devtools import debug
 import pytest
@@ -11,6 +12,7 @@ from vgi_api.validation import (
     DefaultLV,
     ValidateLVParams,
 )
+
 
 client = TestClient(app)
 
@@ -37,7 +39,7 @@ def test_valid_params_simulation(params):
     parameters"""
 
     response = client.post(
-        "/simulate",
+        app.url_path_for("simulate"),
         params=params,
     )
 
@@ -86,7 +88,7 @@ def test_invalid_params_simulation(params, loc):
     parameters"""
 
     response = client.post(
-        "/simulate",
+        app.url_path_for("simulate"),
         params=params,
     )
 
@@ -124,6 +126,48 @@ def test_failure_validate_lv_params(lv_list, n_id, lv_default):
     with pytest.raises(ValidationError) as err:
         ValidateLVParams(lv_list=lv_list, n_id=n_id, lv_default=lv_default)
     debug(err)
+
+
+@pytest.mark.parametrize(
+    "n_id",
+    [(NetworkID.RURAL), (NetworkID.URBAN)],
+)
+def test_lv_network(n_id):
+
+    response = client.get(app.url_path_for("lv_network"), params={"n_id": n_id.value})
+
+    payload = response.json()
+    debug(payload)
+
+    assert response.status_code == 200
+
+    if n_id == NetworkID.RURAL:
+        assert payload["networks"] == VALID_LV_NETWORKS_RURAL
+    elif n_id == NetworkID.URBAN:
+        assert payload["networks"] == VALID_LV_NETWORKS_URBAN
+
+
+@pytest.mark.parametrize(
+    "n_id",
+    [NetworkID.RURAL, NetworkID.URBAN],
+)
+@pytest.mark.parametrize(
+    "lv_default",
+    [DefaultLV.NEAR_SUB, DefaultLV.MIXED, DefaultLV.NEAR_EDGE],
+)
+def test_lv_network_defaults(n_id, lv_default):
+
+    response = client.get(
+        app.url_path_for("lv_network_defaults"),
+        params={"n_id": n_id.value, "lv_default": lv_default.value},
+    )
+
+    payload = response.json()
+    debug(payload)
+
+    assert response.status_code == 200
+
+    assert payload["networks"] == DEFAULT_LV_NETWORKS[n_id][lv_default]
 
 
 @pytest.mark.skip(reason="Not implemented")

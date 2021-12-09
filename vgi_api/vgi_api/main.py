@@ -242,7 +242,7 @@ async def lv_network(
 
 
 @app.get("/lv-network-defaults", response_model=response_models.LVNetworks)
-async def lv_network(
+async def lv_network_defaults(
     n_id: NetworkID = Query(
         ...,
         title="Network ID",
