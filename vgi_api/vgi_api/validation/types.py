@@ -95,7 +95,7 @@ DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
 DATA_FOLDER = Path(__file__).parent.parent / "data"
 
 SOLAR_PROFILES: Dict[MVSolarPVOptions, Path] = {
-    MVSolarPVOptions.OPTION1: Path(""),
+    MVSolarPVOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
     MVSolarPVOptions.OPTION2: Path(""),
     MVSolarPVOptions.OPTION3: Path(""),
 }

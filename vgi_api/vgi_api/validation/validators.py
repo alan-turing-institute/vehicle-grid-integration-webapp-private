@@ -145,56 +145,70 @@ def csv_to_array(file: Union[tempfile.SpooledTemporaryFile, Path]) -> np.array:
         raise NotImplementedError(f"Not implemented for type {type(file)}")
 
 
+def validate_csv(v: IO):
+    """Validate an uploaded csv
+
+    Args:
+        v (IO): CSV file uploaded
+
+    Raises:
+        ValueError: Must be 48 rows of data excluding header
+        ValueError: Time deltas must be in 30 minute intervals
+        ValueError: All non header element in column 1 onwards must be parsable as floats
+
+    Returns:
+        IO: Return v
+    """
+    # Check we have the right number of lines
+    expected_n_lines_excluding_header = 24 * 2
+    expect_n_lines = expected_n_lines_excluding_header + 1
+
+    lines = [l.decode().replace(" ", "").split(",") for l in v.readlines()]
+    lines = [[elem.replace("\n", "") for elem in line] for line in lines]
+
+    n_lines = len(lines)
+    if n_lines != expect_n_lines:
+        raise ValueError(
+            f"File has {n_lines} rows. Expecting {expect_n_lines} including header row"
+        )
+
+    # Check time delta column. Every time delta should be 30 min appart
+    time_deltas = []
+    for r, row in enumerate(lines[1:]):
+
+        time = datetime.datetime.strptime(row[0], "%H:%M:%S")
+        delta = datetime.timedelta(
+            hours=time.hour, minutes=time.minute, seconds=time.second
+        )
+
+        # Check it is 30 min after the last time
+        if len(time_deltas) > 1 and (
+            (delta - time_deltas[-1])
+            != datetime.timedelta(hours=0, minutes=30, seconds=0)
+        ):
+            raise ValueError(
+                f"Time on row {r+2} of file: '{delta}' is not 30 min after last row: {time_deltas[-1]}"
+            )
+
+        time_deltas.append(delta)
+
+        # Check everything else can be a float
+        for c, elem in enumerate(row[1:]):
+            try:
+                float(elem)
+            except ValueError:
+                raise ValueError(
+                    f"Value on row: {r+2}, col: {c + 2} of file (value = '{elem}') cannot be parsed as float"
+                )
+
+    # If we got this far everything looks good
+    return v
+
+
 class MVSolarProfile(ProfileBaseModel):
     mv_solar_pv_csv: Optional[tempfile.SpooledTemporaryFile]
 
-    @validator("mv_solar_pv_csv")
-    def validate_csv(cls, v: IO):
-
-        # Check we have the right number of lines
-        expected_n_lines_excluding_header = 24
-        expect_n_lines = expected_n_lines_excluding_header + 1
-
-        lines = [l.decode().replace(" ", "").split(",") for l in v.readlines()]
-        lines = [[elem.replace("\n", "") for elem in line] for line in lines]
-
-        n_lines = len(lines)
-        if n_lines != expect_n_lines:
-            raise ValueError(
-                f"File has {n_lines} rows. Expecting {expect_n_lines} including header row"
-            )
-
-        # Check time delta column. Every time delta should be 30 min appart
-        time_deltas = []
-        for r, row in enumerate(lines[1:]):
-
-            time = datetime.datetime.strptime(row[0], "%H:%M:%S")
-            delta = datetime.timedelta(
-                hours=time.hour, minutes=time.minute, seconds=time.second
-            )
-
-            # Check it is 30 min after the last time
-            if len(time_deltas) > 1 and (
-                (delta - time_deltas[-1])
-                != datetime.timedelta(hours=0, minutes=30, seconds=0)
-            ):
-                raise ValueError(
-                    f"Time on row {r+2} of file: '{delta}' is not 30 min after last row: {time_deltas[-1]}"
-                )
-
-            time_deltas.append(delta)
-
-            # Check everything else can be a float
-            for c, elem in enumerate(row[1:]):
-                try:
-                    float(elem)
-                except ValueError:
-                    raise ValueError(
-                        f"Value on row: {r+2}, col: {c + 2} of file (value = '{elem}') cannot be parsed as float"
-                    )
-
-        # If we got this far everything looks good
-        return v
+    _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -229,10 +243,9 @@ def validate_profile(
 
     # ToDO: Implement
     # 1. Process uploaded CSV. Done
-    # 2. Load an existing CSV.
+    # 2. Load an existing CSV. Done
     # 3. Do for all other CSV.
 
-    print(DATA_FOLDER)
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:
             try:

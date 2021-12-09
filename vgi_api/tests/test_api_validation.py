@@ -14,6 +14,8 @@ from vgi_api.validation import (
     ValidateLVParams,
 )
 import io
+import requests
+
 
 client = TestClient(app)
 
@@ -171,11 +173,11 @@ def test_lv_network_defaults(n_id, lv_default):
     assert payload["networks"] == DEFAULT_LV_NETWORKS[n_id][lv_default]
 
 
-def test_upload_csv(valid_profile_csv: io.BytesIO):
+def upload_csv(file: io.BytesIO) -> requests.Response:
 
     file_name = "example_profile.csv"
-    upload_file = {"mv_solar_pv_csv": (file_name, valid_profile_csv)}
-    resp = client.post(
+    upload_file = {"mv_solar_pv_csv": (file_name, file)}
+    return client.post(
         app.url_path_for("simulate"),
         files=upload_file,
         params={
@@ -185,6 +187,44 @@ def test_upload_csv(valid_profile_csv: io.BytesIO):
         },
     )
 
+
+def test_valid_csv(valid_profile_csv: io.BytesIO):
+
+    resp = upload_csv(valid_profile_csv)
     debug(resp.json())
-    # assert resp.status_code == 200
-    # pass
+    assert resp.status_code == 200
+
+
+def test_invalid_csv_long(invalid_profile_csv_too_long: io.BytesIO):
+
+    resp = upload_csv(invalid_profile_csv_too_long)
+    debug(resp.json())
+    assert resp.status_code == 422
+
+
+def test_invalid_csv_short(invalid_profile_csv_too_short: io.BytesIO):
+
+    resp = upload_csv(invalid_profile_csv_too_short)
+    debug(resp.json())
+    assert resp.status_code == 422
+
+
+def test_invalid_csv_wrong_time(invalid_profile_wrong_time: io.BytesIO):
+
+    resp = upload_csv(invalid_profile_wrong_time)
+    debug(resp.json())
+    assert resp.status_code == 422
+
+
+def test_invalid_csv_offset(invalid_profile_csv_offset: io.BytesIO):
+
+    resp = upload_csv(invalid_profile_csv_offset)
+    debug(resp.json())
+    assert resp.status_code == 422
+
+
+def test_invalid_csv_not_float(invalid_profile_csv_not_float: io.BytesIO):
+
+    resp = upload_csv(invalid_profile_csv_not_float)
+    debug(resp.json())
+    assert resp.status_code == 422
