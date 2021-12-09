@@ -1,5 +1,4 @@
 from fastapi.testclient import TestClient
-from vgi_api.validation.types import DefaultLV
 from devtools import debug
 import pytest
 from pydantic import ValidationError
@@ -27,7 +26,7 @@ client = TestClient(app)
         ),
         (
             dict(
-                lv_default=1,
+                lv_default=DefaultLV.NEAR_SUB,
                 n_id=NetworkID.URBAN.value,
             )
         ),
