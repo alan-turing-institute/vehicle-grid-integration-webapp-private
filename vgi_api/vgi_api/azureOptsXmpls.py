@@ -131,28 +131,11 @@ run_dict0 = {
     },
     # Various plotting options to return to the user etc.
     "plot_options": {  # Using:
-        "mv_highlevel": True,  # y
-        "mv_highlevel_clean": True,  # No
-        "mv_voltage_ts": True,  # y
-        "mv_powers": True,  # ??
-        "trn_powers": True,  # y
-        "pmry_powers": True,  # No
-        "pmry_loadings": True,  # y
-        "profile_options": True,  # No
-        "lv_voltages": [
-            True,
-            [
-                "1101",
-                "1164",
-            ],
-        ],  # n only 2 numbers allowed.
+        "lv_voltages": ["1101", "1164"],  # n only 2 numbers allowed.
         "lv_comparison": True,  # y
         # use [k for k,v in self.p.items() if v.ndim==2] to see
         # what can be used with profile_sel
-        "profile_sel": [
-            True,
-            "hp_love_Jan",
-        ],  # No
+        "profile_sel": ["hp_love_Jan"],  # No
     },
 }
 
