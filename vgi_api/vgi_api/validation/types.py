@@ -19,34 +19,34 @@ class DefaultLV(str, Enum):
 class MVSolarPVOptions(str, Enum):
 
     NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
+    OPTION1 = "Option a"
+    OPTION2 = "Option b"
+    OPTION3 = "Option c"
     CSV = "csv"
 
 
 class MVEVChargerOptions(str, Enum):
 
     NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
+    OPTION1 = "Option d"
+    OPTION2 = "Option e"
+    OPTION3 = "Option f"
     CSV = "csv"
 
 
 class LVSmartMeterOptions(str, Enum):
     NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
+    OPTION1 = "Option g"
+    OPTION2 = "Option h"
+    OPTION3 = "Option i"
     CSV = "csv"
 
 
 class LVElectricVehicleOptions(str, Enum):
     NONE = "None"
-    OPTION1 = "1"
-    OPTION2 = "2"
-    OPTION3 = "3"
+    OPTION1 = "Option j"
+    OPTION2 = "Option k"
+    OPTION3 = "Option l"
     CSV = "csv"
 
 

@@ -9,10 +9,11 @@ from vgi_api.validation import (
     VALID_LV_NETWORKS_URBAN,
     VALID_LV_NETWORKS_RURAL,
     DEFAULT_LV_NETWORKS,
+    MVSolarPVOptions,
     DefaultLV,
     ValidateLVParams,
 )
-
+import io
 
 client = TestClient(app)
 
@@ -170,7 +171,20 @@ def test_lv_network_defaults(n_id, lv_default):
     assert payload["networks"] == DEFAULT_LV_NETWORKS[n_id][lv_default]
 
 
-@pytest.mark.skip(reason="Not implemented")
-def test_upload_csv():
+def test_upload_csv(valid_profile_csv: io.BytesIO):
 
-    pass
+    file_name = "example_profile.csv"
+    upload_file = {"mv_solar_pv_csv": (file_name, valid_profile_csv)}
+    resp = client.post(
+        app.url_path_for("simulate"),
+        files=upload_file,
+        params={
+            "lv_default": DefaultLV.NEAR_SUB.value,
+            "n_id": NetworkID.URBAN.value,
+            "mv_solar_pv_profile": MVSolarPVOptions.CSV.value,
+        },
+    )
+
+    debug(resp.json())
+    # assert resp.status_code == 200
+    # pass

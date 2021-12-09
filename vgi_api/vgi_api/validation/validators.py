@@ -1,5 +1,5 @@
 import logging
-from typing import Optional, List, Union
+from typing import IO, Optional, List, Union
 from fastapi import HTTPException
 from fastapi import UploadFile
 from pathlib import Path
@@ -15,6 +15,9 @@ from vgi_api.validation import (
     DEFAULT_LV_NETWORKS,
 )
 from vgi_api.validation.types import MVEVChargerOptions, MVSolarPVOptions, ProfileUnits
+import tempfile
+import numpy as np
+import datetime
 
 
 class ValidateLVParams(BaseModel):
@@ -105,6 +108,82 @@ def validate_lv_parameters(
     return params.value
 
 
+class ProfileBaseModel(BaseModel):
+    class Config:
+        arbitrary_types_allowed = True
+
+
+def csv_to_numpy(file: tempfile.SpooledTemporaryFile) -> np.array:
+    """Convert a csv file to numpy array"""
+    # Make sure we're at start of file
+    file.seek(0)
+
+    ncols = len(file.readline().decode().split(","))
+    return np.loadtxt(
+        file, dtype=float, skiprows=0, usecols=range(1, ncols), delimiter=","
+    )
+
+
+class MVSolarProfile(ProfileBaseModel):
+    mv_solar_pv_csv: Optional[tempfile.SpooledTemporaryFile]
+
+    @validator("mv_solar_pv_csv")
+    def validate_csv(cls, v: IO):
+
+        # Check we have the right number of lines
+        expected_n_lines_excluding_header = 24
+        expect_n_lines = expected_n_lines_excluding_header + 1
+
+        lines = [l.decode().replace(" ", "").split(",") for l in v.readlines()]
+        lines = [[elem.replace("\n", "") for elem in line] for line in lines]
+
+        n_lines = len(lines)
+        if n_lines != expect_n_lines:
+            raise ValueError(
+                f"File has {n_lines} rows. Expecting {expect_n_lines} including header row"
+            )
+
+        # Check time delta column. Every time delta should be 30 min appart
+        time_deltas = []
+        for r, row in enumerate(lines[1:]):
+
+            time = datetime.datetime.strptime(row[0], "%H:%M:%S")
+            delta = datetime.timedelta(
+                hours=time.hour, minutes=time.minute, seconds=time.second
+            )
+
+            # Check it is 30 min after the last time
+            if len(time_deltas) > 1 and (
+                (delta - time_deltas[-1])
+                != datetime.timedelta(hours=0, minutes=30, seconds=0)
+            ):
+                raise ValueError(
+                    f"Time on row {r+2} of file: '{delta}' is not 30 min after last row: {time_deltas[-1]}"
+                )
+
+            time_deltas.append(delta)
+
+            # Check everything else can be a float
+            for c, elem in enumerate(row[1:]):
+                try:
+                    float(elem)
+                except ValueError:
+                    raise ValueError(
+                        f"Value on row: {r+2}, col: {c + 2} of file (value = '{elem}') cannot be parsed as float"
+                    )
+
+        # If we got this far everything looks good
+        return v
+
+    def to_array(self) -> np.array:
+
+        return csv_to_numpy(self.mv_solar_pv_csv)
+
+
+# class MVEVChargerProfile(BaseModel):
+#     mv_ev_charger_csv: Optional[IO]
+
+
 def validate_profile(
     options: Union[MVSolarPVOptions, MVEVChargerOptions],
     csv_file: Optional[UploadFile],
@@ -129,4 +208,20 @@ def validate_profile(
     """
 
     # ToDO: Implement
+    if isinstance(options, MVSolarPVOptions):
+
+        if options == MVSolarPVOptions.CSV:
+            try:
+                profile = MVSolarProfile(mv_solar_pv_csv=csv_file.file)
+                profile_data = profile.to_array()
+            except ValidationError as e:
+                raise RequestValidationError(errors=e.raw_errors)
+
+        elif options == MVSolarPVOptions.OPTION1:
+            pass  # Load profile
+        elif options == MVSolarPVOptions.OPTION2:
+            pass  # Load profile
+        elif options == MVSolarPVOptions.OPTION3:
+            pass  # Load profile
+
     return None
