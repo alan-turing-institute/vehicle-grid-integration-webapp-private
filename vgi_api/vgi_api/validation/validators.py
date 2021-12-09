@@ -193,10 +193,9 @@ def validate_profile(
     will return None.
 
     If the variant is `CSV` it will validate the csv profiles, safe the disk and return
-    the absolute path to the csv. Raise an HTTP exception if no CSV is uploaded.
+    a numpy array of the data. Raise an HTTP exception if no CSV is uploaded.
 
-    If the variant is anything else it will return the absolute path to a pre-existing
-    csv profile.
+    If the variant is anything else it will load a profile and return it
 
     Args:
         options (Union[MVSolarPVOptions, MVEVChargerOptions]): A profile option
@@ -204,7 +203,7 @@ def validate_profile(
         csv_profile_units (ProfileUnits): The units of the CSV file.
 
     Returns:
-        Optional[Path]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
+        Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
 
     # ToDO: Implement
@@ -213,7 +212,7 @@ def validate_profile(
         if options == MVSolarPVOptions.CSV:
             try:
                 profile = MVSolarProfile(mv_solar_pv_csv=csv_file.file)
-                profile_data = profile.to_array()
+                return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
 
@@ -224,4 +223,5 @@ def validate_profile(
         elif options == MVSolarPVOptions.OPTION3:
             pass  # Load profile
 
-    return None
+
+r
