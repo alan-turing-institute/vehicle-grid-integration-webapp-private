@@ -54,15 +54,15 @@ async def simulate(
         description="Medium Voltage transformer scaling",
     ),
     oltc_setpoint: float = Query(
-        1.0,
-        ge=0,
-        le=1,
+        1.04,
+        ge=0.95,
+        le=1.10,
         description="Medium Voltage transformer on-load tap charger (OLTC) set point. Change the set point (in % pu) of the oltc",
     ),
     oltc_bandwidth: float = Query(
-        1.0,
-        ge=0,
-        le=1,
+        0.13,
+        ge=0.1,
+        le=0.5,
         description="Change the bandwidth (in % pu) of the oltc",
     ),
     rs_pen: float = Query(
@@ -74,7 +74,6 @@ async def simulate(
     # ToDo: add sensible regex
     lv_list: Optional[str] = Query(
         None,
-        help="blah",
         description="Provide a comma seperated list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
         example="1101, 1105, 1103",
     ),
@@ -87,7 +86,7 @@ async def simulate(
         description="Select a example solar pv profile or select CSV to upload your own. If CSV selected you must provide `mv_solar_pv_csv`",
     ),
     mv_solar_pv_csv: Optional[UploadFile] = File(
-        None, description="11kV connected solar photovoltaics (PV)"
+        None, description="11kV connected solar photovoltaic (PV)"
     ),
     mv_solar_pv_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
@@ -98,7 +97,7 @@ async def simulate(
         description="Select a example ev profile or select CSV to upload your own. If CSV selected you must provide `mv_ev_charger_csv`",
     ),
     mv_ev_charger_csv: Optional[UploadFile] = File(
-        None, title="11kV connected EV fast chargers' stations"
+        None, description="11kV connected EV fast chargers' stations"
     ),
     mv_ev_charger_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
@@ -108,7 +107,7 @@ async def simulate(
         LVSmartMeterOptions.NONE,
         description="",
     ),
-    lv_smart_meter_csv: Optional[UploadFile] = File(None, title=""),
+    lv_smart_meter_csv: Optional[UploadFile] = File(None, description=""),
     lv_smart_meter_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
         description="",

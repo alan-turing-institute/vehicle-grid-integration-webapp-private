@@ -125,7 +125,7 @@ def validate_profile(
         csv_profile_units (ProfileUnits): The units of the CSV file.
 
     Returns:
-        Optional[Path]: A Path to a csv profile on disk
+        Optional[Path]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
 
     # ToDO: Implement
