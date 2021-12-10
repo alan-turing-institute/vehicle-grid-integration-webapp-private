@@ -282,7 +282,14 @@ class LVHPProfile(ProfileBaseModel):
 
 
 def validate_profile(
-    options: Union[MVSolarPVOptions, MVEVChargerOptions],
+    options: Union[
+        MVSolarPVOptions,
+        MVEVChargerOptions,
+        LVSmartMeterOptions,
+        LVElectricVehicleOptions,
+        LVPVOptions,
+        LVHPOptions,
+    ],
     csv_file: Optional[UploadFile],
     csv_profile_units: ProfileUnits,
 ) -> Optional[Path]:
@@ -302,11 +309,6 @@ def validate_profile(
     Returns:
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
-
-    # ToDO: Implement
-    # 1. Process uploaded CSV. Done
-    # 2. Load an existing CSV. Done
-    # 3. Do for all other CSV.
 
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:
