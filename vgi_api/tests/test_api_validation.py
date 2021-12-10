@@ -9,12 +9,18 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from vgi_api import app
-from vgi_api.validation import (DEFAULT_LV_NETWORKS, VALID_LV_NETWORKS_RURAL,
-                                VALID_LV_NETWORKS_URBAN, DefaultLV,
-                                LVSmartMeterOptions, MVEVChargerOptions,
-                                MVSolarPVOptions, NetworkID, ValidateLVParams)
-from vgi_api.validation.types import (LVElectricVehicleOptions, LVHPOptions,
-                                      LVPVOptions)
+from vgi_api.validation import (
+    DEFAULT_LV_NETWORKS,
+    VALID_LV_NETWORKS_RURAL,
+    VALID_LV_NETWORKS_URBAN,
+    DefaultLV,
+    LVSmartMeterOptions,
+    MVEVChargerOptions,
+    MVSolarPVOptions,
+    NetworkID,
+    ValidateLVParams,
+)
+from vgi_api.validation.types import LVElectricVehicleOptions, LVHPOptions, LVPVOptions
 
 client = TestClient(app)
 
@@ -40,6 +46,7 @@ def test_valid_params_simulation(params):
     """Test we get 200 status code with valid EV Distribution Network
     parameters"""
 
+    params["dry_run"] = True
     response = client.post(
         app.url_path_for("simulate"),
         params=params,
@@ -89,6 +96,7 @@ def test_invalid_params_simulation(params, loc):
     """Test we get 200 status code with valid EV Distribution Network
     parameters"""
 
+    params["dry_run"] = True
     response = client.post(
         app.url_path_for("simulate"),
         params=params,
@@ -136,7 +144,9 @@ def test_failure_validate_lv_params(lv_list, n_id, lv_default):
 )
 def test_lv_network(n_id):
 
-    response = client.get(app.url_path_for("lv_network"), params={"n_id": n_id.value})
+    response = client.get(
+        app.url_path_for("lv_network"), params={"n_id": n_id.value, "dry_run": True}
+    )
 
     payload = response.json()
     debug(payload)
@@ -161,7 +171,7 @@ def test_lv_network_defaults(n_id, lv_default):
 
     response = client.get(
         app.url_path_for("lv_network_defaults"),
-        params={"n_id": n_id.value, "lv_default": lv_default.value},
+        params={"n_id": n_id.value, "lv_default": lv_default.value, "dry_run": True},
     )
 
     payload = response.json()
@@ -183,6 +193,7 @@ def upload_csv(file: io.BytesIO) -> requests.Response:
             "lv_default": DefaultLV.NEAR_SUB.value,
             "n_id": NetworkID.URBAN.value,
             "mv_solar_pv_profile": MVSolarPVOptions.CSV.value,
+            "dry_run": True,
         },
     )
 
@@ -231,7 +242,7 @@ def test_invalid_csv_not_float(invalid_profile_csv_not_float: io.BytesIO):
 
 # ToDo: We should have a test for every option
 @pytest.mark.parametrize(
-    "param, option",
+    "param_key, option",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.OPTION1),
         ("mv_ev_charger_profile", MVEVChargerOptions.OPTION1),
@@ -241,7 +252,7 @@ def test_invalid_csv_not_float(invalid_profile_csv_not_float: io.BytesIO):
         ("lv_hp_profile", LVHPOptions.OPTION1),
     ],
 )
-def test_csv_options(param: str, option: Enum):
+def test_csv_options(param_key: str, option: Enum):
     """Check we dont get a validation error when uploading files"""
 
     resp = client.post(
@@ -249,7 +260,8 @@ def test_csv_options(param: str, option: Enum):
         params={
             "lv_default": DefaultLV.NEAR_SUB.value,
             "n_id": NetworkID.URBAN.value,
-            param: option.value,
+            "dry_run": True,
+            param_key: option.value,
         },
     )
     debug(resp.json())

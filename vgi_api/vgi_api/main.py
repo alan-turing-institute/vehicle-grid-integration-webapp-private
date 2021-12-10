@@ -41,6 +41,11 @@ app.add_middleware(
 
 @app.post("/simulate")
 async def simulate(
+    dry_run: bool = Query(
+        False,
+        title="Dry run",
+        description="Check all simulation arguments are valid without running simulation",
+    ),
     n_id: NetworkID = Query(
         ...,
         title="Network ID",
@@ -178,20 +183,21 @@ async def simulate(
     logging.info("Passing params to dss")
     file_name = None
 
-    # parameters = aox.run_dict0
-    # parameters["network_data"]["n_id"] = n_id
+    if not dry_run:
+        parameters = aox.run_dict0
+        parameters["network_data"]["n_id"] = n_id
 
-    # fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
-    # resultdict = {
-    #     "parameters": parameters,
-    #     "filename": file_name,
-    #     "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
-    #     "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
-    # }
+        fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
+        resultdict = {
+            "parameters": parameters,
+            "filename": file_name,
+            "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
+            "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
+        }
 
-    # return resultdict
+        return resultdict
 
-    return "validated"
+    return "valid"
 
 
 @app.get("/lv-network", response_model=response_models.LVNetworks)
