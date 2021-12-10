@@ -9,62 +9,42 @@
 #
 # =====
 
+import copy
 import glob
-import os, sys, pickle, timeit, copy, time
-import numpy as np
-from numpy.random import default_rng
-from numpy.linalg import norm
-from matplotlib.collections import LineCollection, PatchCollection
-from matplotlib.patches import Polygon
-from matplotlib import rcParams
-import matplotlib.cm as cm
-from scipy import sparse
-from os.path import join
-from itertools import chain
-import matplotlib.cm as mplcm
+import os
+import pickle
+import sys
+import time
+import timeit
 from copy import deepcopy
-import scipy.sparse.linalg as spla
-import matplotlib.pyplot as plt
-from . import dss_utils
-
+from importlib import reload
+from itertools import chain
+from os.path import join
 from pprint import pprint
 
-from .funcsMath_turing import (
-    aMulBsp,
-    tp2ar,
-    vecSlc,
-    pf2kq,
-    vmM,
-    mvM,
-    schurSolve,
-    calcDp1rSqrt,
-    rerr,
-    sparseInvUpdate,
-    dp1rMv,
-    calcVar,
-    magicSlice,
-    sparseBlkDiag,
-)
-from .funcsDss_turing import dssIfc, updateFlagState, pdIdxCmp, getVset, phs2seq
-from .funcsPython_turing import (
-    fPrmsInit,
-    whocalledme,
-    saveFigFunc,
-    sff,
-    struct,
-    mtList,
-    mtDict,
-    cleanFolder,
-    structDict,
-    fn_ntwx,
-    fn_root,
-    o2o,
-    rngSeed,
-    sff_legacy,
-)
 import dss
+import matplotlib.cm as mplcm
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.sparse.linalg as spla
+from matplotlib import rcParams
+from matplotlib.collections import LineCollection, PatchCollection
+from matplotlib.patches import Polygon
+from numpy.linalg import norm
+from numpy.random import default_rng
+from scipy import sparse
 
-from importlib import reload
+from . import dss_utils
+from .funcsDss_turing import (dssIfc, getVset, pdIdxCmp, phs2seq,
+                              updateFlagState)
+from .funcsMath_turing import (aMulBsp, calcDp1rSqrt, calcVar, dp1rMv,
+                               magicSlice, mvM, pf2kq, rerr, schurSolve,
+                               sparseBlkDiag, sparseInvUpdate, tp2ar, vecSlc,
+                               vmM)
+from .funcsPython_turing import (cleanFolder, fn_ntwx, fn_root, fPrmsInit,
+                                 mtDict, mtList, o2o, rngSeed, saveFigFunc,
+                                 sff, sff_legacy, struct, structDict,
+                                 whocalledme)
 
 d = dssIfc(dss.DSS)
 # Preamble END ---

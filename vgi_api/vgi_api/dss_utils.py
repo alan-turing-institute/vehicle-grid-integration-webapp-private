@@ -1,7 +1,8 @@
 import glob
+import logging
 import os
 import re
-import logging
+
 
 """
 Utility functions for handling dss files.

@@ -13,21 +13,23 @@ General approach:
 The full options and definitions of the run_dict are given in azureOptsXmpls.
 As a quick hack, ppd(aox) lists the options available.
 """
-import os
-import dss
 import io
+import logging
+import os
 import sys
-from . import funcsTuring as ft
-from . import funcsDss_turing
-from . import azureOptsXmpls as aox
-from .funcsPython_turing import gDir, fillplot, set_day_label
+import tempfile
+
+import dss
 import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+
+from . import azureOptsXmpls as aox
+from . import funcsDss_turing
+from . import funcsTuring as ft
+from .funcsPython_turing import fillplot, gDir, set_day_label
 
 matplotlib.use("agg")
-import matplotlib.pyplot as plt
-import tempfile
-import numpy as np
-import logging
 
 fn_root = sys.path[0] if __name__ == "__main__" else os.path.dirname(__file__)
 

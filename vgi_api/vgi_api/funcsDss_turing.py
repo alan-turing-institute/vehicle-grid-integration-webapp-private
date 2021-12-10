@@ -9,17 +9,19 @@
 #
 # =====
 
-import numpy as np
-import os, time
-from scipy import sparse, linalg
-import scipy.sparse.linalg as spla
-import matplotlib.pyplot as plt
-from matplotlib import cm
-from pprint import pprint
-import dss
+import os
+import time
 from copy import deepcopy
+from pprint import pprint
 
-from .funcsMath_turing import tp2ar, s_2_x, vecSlc, vmM, mvM, sparseSvty, rerr
+import dss
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy.sparse.linalg as spla
+from matplotlib import cm
+from scipy import linalg, sparse
+
+from .funcsMath_turing import mvM, rerr, s_2_x, sparseSvty, tp2ar, vecSlc, vmM
 from .funcsPython_turing import structDict
 
 seq2phsB = np.array([1, np.exp(1j * np.pi * 4 / 3), np.exp(1j * np.pi * 2 / 3)])
