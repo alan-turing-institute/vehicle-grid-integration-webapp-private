@@ -236,7 +236,7 @@ class MVEVProfile(ProfileBaseModel):
 
 class LVSmartMeterProfile(ProfileBaseModel):
 
-    lv_smart_meter_csv: Optional[tempfile.SpooledTemporaryFile]
+    lv_smart_meter_csv: tempfile.SpooledTemporaryFile
 
     _validate_csv = validator("lv_smart_meter_csv", allow_reuse=True)(validate_csv)
 
@@ -247,7 +247,7 @@ class LVSmartMeterProfile(ProfileBaseModel):
 
 class LVEVProfile(ProfileBaseModel):
 
-    lv_ev_csv: Optional[tempfile.SpooledTemporaryFile]
+    lv_ev_csv: tempfile.SpooledTemporaryFile
 
     _validate_csv = validator("lv_ev_csv", allow_reuse=True)(validate_csv)
 
@@ -258,7 +258,7 @@ class LVEVProfile(ProfileBaseModel):
 
 class LVPVProfile(ProfileBaseModel):
 
-    lv_pv_csv: Optional[tempfile.SpooledTemporaryFile]
+    lv_pv_csv: tempfile.SpooledTemporaryFile
 
     _validate_csv = validator("lv_pv_csv", allow_reuse=True)(validate_csv)
 
@@ -269,17 +269,13 @@ class LVPVProfile(ProfileBaseModel):
 
 class LVHPProfile(ProfileBaseModel):
 
-    lv_hp_csv: Optional[tempfile.SpooledTemporaryFile]
+    lv_hp_csv: tempfile.SpooledTemporaryFile
 
     _validate_csv = validator("lv_hp_csv", allow_reuse=True)(validate_csv)
 
     def to_array(self) -> np.array:
 
         return csv_to_array(self.lv_hp_csv)
-
-
-# class MVEVChargerProfile(BaseModel):
-#     mv_ev_charger_csv: Optional[IO]
 
 
 def validate_profile(
