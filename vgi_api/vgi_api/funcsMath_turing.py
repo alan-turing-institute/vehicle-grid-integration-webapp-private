@@ -9,14 +9,14 @@
 #
 # =====
 
-from itertools import cycle
-
-import matplotlib.pyplot as plt
 import numpy as np
+from scipy import sparse, linalg
 import scipy.sparse.linalg as spla
-import scipy.stats as stats
+from scipy import sparse
+import matplotlib.pyplot as plt
 from numpy.linalg import norm
-from scipy import linalg, sparse
+import scipy.stats as stats
+from itertools import cycle
 
 
 def equalMat(n):

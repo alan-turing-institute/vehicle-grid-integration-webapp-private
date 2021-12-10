@@ -9,42 +9,62 @@
 #
 # =====
 
-import copy
 import glob
-import os
-import pickle
-import sys
-import time
-import timeit
-from copy import deepcopy
-from importlib import reload
-from itertools import chain
-from os.path import join
-from pprint import pprint
-
-import dss
-import matplotlib.cm as mplcm
-import matplotlib.pyplot as plt
+import os, sys, pickle, timeit, copy, time
 import numpy as np
-import scipy.sparse.linalg as spla
-from matplotlib import rcParams
+from numpy.random import default_rng
+from numpy.linalg import norm
 from matplotlib.collections import LineCollection, PatchCollection
 from matplotlib.patches import Polygon
-from numpy.linalg import norm
-from numpy.random import default_rng
+from matplotlib import rcParams
+import matplotlib.cm as cm
 from scipy import sparse
-
+from os.path import join
+from itertools import chain
+import matplotlib.cm as mplcm
+from copy import deepcopy
+import scipy.sparse.linalg as spla
+import matplotlib.pyplot as plt
 from . import dss_utils
-from .funcsDss_turing import (dssIfc, getVset, pdIdxCmp, phs2seq,
-                              updateFlagState)
-from .funcsMath_turing import (aMulBsp, calcDp1rSqrt, calcVar, dp1rMv,
-                               magicSlice, mvM, pf2kq, rerr, schurSolve,
-                               sparseBlkDiag, sparseInvUpdate, tp2ar, vecSlc,
-                               vmM)
-from .funcsPython_turing import (cleanFolder, fn_ntwx, fn_root, fPrmsInit,
-                                 mtDict, mtList, o2o, rngSeed, saveFigFunc,
-                                 sff, sff_legacy, struct, structDict,
-                                 whocalledme)
+
+from pprint import pprint
+
+from .funcsMath_turing import (
+    aMulBsp,
+    tp2ar,
+    vecSlc,
+    pf2kq,
+    vmM,
+    mvM,
+    schurSolve,
+    calcDp1rSqrt,
+    rerr,
+    sparseInvUpdate,
+    dp1rMv,
+    calcVar,
+    magicSlice,
+    sparseBlkDiag,
+)
+from .funcsDss_turing import dssIfc, updateFlagState, pdIdxCmp, getVset, phs2seq
+from .funcsPython_turing import (
+    fPrmsInit,
+    whocalledme,
+    saveFigFunc,
+    sff,
+    struct,
+    mtList,
+    mtDict,
+    cleanFolder,
+    structDict,
+    fn_ntwx,
+    fn_root,
+    o2o,
+    rngSeed,
+    sff_legacy,
+)
+import dss
+
+from importlib import reload
 
 d = dssIfc(dss.DSS)
 # Preamble END ---

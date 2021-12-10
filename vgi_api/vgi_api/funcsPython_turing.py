@@ -9,28 +9,24 @@
 #
 # =====
 
-import csv
-import os
-import pickle
-import shutil
-import socket
-import sys
-import traceback
-from collections import OrderedDict as odict
-from datetime import date, datetime, timedelta
-from pprint import pprint
-from time import ctime
-
-import matplotlib.pyplot as plt
-import numpy as np
-from bunch import *
-from dateutil import tz
-from govuk_bank_holidays.bank_holidays import BankHolidays
+import sys, os, csv, socket, shutil, pickle
 from matplotlib import rcParams
+import traceback
+import matplotlib.pyplot as plt
+from scipy import sparse
+import numpy as np
+from pprint import pprint
+from datetime import datetime
+from datetime import datetime, date, timedelta
+from dateutil import tz
+from time import ctime
+from bunch import *
+from collections import OrderedDict as odict
+
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
 from numpy.random import MT19937, Generator, SeedSequence
-from scipy import sparse
+from govuk_bank_holidays.bank_holidays import BankHolidays
 
 # A useful set of directories for saving/loading data from etc
 fd = os.path.dirname(__file__)

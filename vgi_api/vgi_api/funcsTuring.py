@@ -1,32 +1,41 @@
-import gc
-import logging
-import os
-import pickle
-import shutil
-import sys
-import zipfile
+import os, sys, dss, shutil
+from . import dss_utils
+
+import os, sys, pickle, zipfile
+from pprint import pprint
+from importlib import reload
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm
+from timeit import default_timer as timer
 from collections import OrderedDict as odict
 from copy import deepcopy
-from importlib import reload
-from io import BytesIO
+import logging
 from pathlib import Path
-from pprint import pprint
-from timeit import default_timer as timer
-
-import dss
-import matplotlib.cm as cm
-import matplotlib.pyplot as plt
-import numpy as np
-from azure.storage.blob import BlobServiceClient
 from bunch import Bunch
 
-from . import azureOptsXmpls as aox
-from . import dss_utils, funcsDss_turing
+from .funcsPython_turing import (
+    fillplot,
+    get_path_files,
+    get_path_dirs,
+    sff,
+    listT,
+    mtOdict,
+    dds,
+    csvIn,
+    mtDict,
+)
+from . import funcsDss_turing
+from .funcsMath_turing import vecSlc, tp2ar
 from . import slesNtwk_turing as snk
+
+from . import azureOptsXmpls as aox
+
+from io import BytesIO
+from azure.storage.blob import BlobServiceClient
+import gc
 from .config import get_settings
-from .funcsMath_turing import tp2ar, vecSlc
-from .funcsPython_turing import (csvIn, dds, fillplot, get_path_dirs,
-                                 get_path_files, listT, mtDict, mtOdict, sff)
+
 
 data_dir = Path(__file__).parent / "data"
 # Load opendss

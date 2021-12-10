@@ -1,10 +1,8 @@
-import base64
 import json
-
-import pytest
-
+import base64
 from vgi_api import azure_mockup
 from vgi_api import azureOptsXmpls as aox
+import pytest
 
 
 def simrun(n_lv=15, n_id=1060):

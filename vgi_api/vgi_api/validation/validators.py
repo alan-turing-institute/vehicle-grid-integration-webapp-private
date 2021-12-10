@@ -17,22 +17,14 @@ from vgi_api.validation import (
 from vgi_api.validation.types import (
     MVEVChargerOptions,
     MVSolarPVOptions,
-    LVSmartMeterOptions,
-    LVElectricVehicleOptions,
     ProfileUnits,
-    SOLAR_PROFILES,
-    EV_PROFILES,
-    SMART_METER_PROFILES,
-    LV_EV_PROFILES,
-    LV_PV_PROFILES,
-    LV_HP_PROFILES,
-    LVHPOptions,
-    LVPVOptions,
     DATA_FOLDER,
 )
 import tempfile
 import numpy as np
 import datetime
+
+from vgi_api.validation.types import SOLAR_PROFILES
 
 
 class ValidateLVParams(BaseModel):
@@ -223,73 +215,12 @@ class MVSolarProfile(ProfileBaseModel):
         return csv_to_array(self.mv_solar_pv_csv)
 
 
-class MVEVProfile(ProfileBaseModel):
-    mv_ev_charger_csv: Optional[tempfile.SpooledTemporaryFile]
-
-    _validate_csv = validator("mv_ev_charger_csv", allow_reuse=True)(validate_csv)
-
-    def to_array(self) -> np.array:
-
-        return csv_to_array(self.mv_ev_charger_csv)
-
-
-class LVSmartMeterProfile(ProfileBaseModel):
-
-    lv_smart_meter_csv: Optional[tempfile.SpooledTemporaryFile]
-
-    _validate_csv = validator("lv_smart_meter_csv", allow_reuse=True)(validate_csv)
-
-    def to_array(self) -> np.array:
-
-        return csv_to_array(self.lv_smart_meter_csv)
-
-
-class LVEVProfile(ProfileBaseModel):
-
-    lv_ev_csv: Optional[tempfile.SpooledTemporaryFile]
-
-    _validate_csv = validator("lv_ev_csv", allow_reuse=True)(validate_csv)
-
-    def to_array(self) -> np.array:
-
-        return csv_to_array(self.lv_ev_csv)
-
-
-class LVPVProfile(ProfileBaseModel):
-
-    lv_pv_csv: Optional[tempfile.SpooledTemporaryFile]
-
-    _validate_csv = validator("lv_pv_csv", allow_reuse=True)(validate_csv)
-
-    def to_array(self) -> np.array:
-
-        return csv_to_array(self.lv_pv_csv)
-
-
-class LVHPProfile(ProfileBaseModel):
-
-    lv_hp_csv: Optional[tempfile.SpooledTemporaryFile]
-
-    _validate_csv = validator("lv_hp_csv", allow_reuse=True)(validate_csv)
-
-    def to_array(self) -> np.array:
-
-        return csv_to_array(self.lv_hp_csv)
-
-
 # class MVEVChargerProfile(BaseModel):
 #     mv_ev_charger_csv: Optional[IO]
 
 
 def validate_profile(
-    options: Union[
-        MVSolarPVOptions,
-        MVEVChargerOptions,
-        LVSmartMeterOptions,
-        LVElectricVehicleOptions,
-        LVPVOptions,
-        LVHPOptions,
-    ],
+    options: Union[MVSolarPVOptions, MVEVChargerOptions],
     csv_file: Optional[UploadFile],
     csv_profile_units: ProfileUnits,
 ) -> Optional[Path]:
@@ -310,6 +241,11 @@ def validate_profile(
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
 
+    # ToDO: Implement
+    # 1. Process uploaded CSV. Done
+    # 2. Load an existing CSV. Done
+    # 3. Do for all other CSV.
+
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:
             try:
@@ -321,70 +257,5 @@ def validate_profile(
             return None
         else:
             return csv_to_array(SOLAR_PROFILES[options])
-
-    elif isinstance(options, MVEVChargerOptions):
-
-        if options == MVEVChargerOptions.CSV:
-            try:
-                profile = MVEVProfile(mv_ev_charger_csv=csv_file.file)
-                return profile.to_array()
-            except ValidationError as e:
-                raise RequestValidationError(errors=e.raw_errors)
-        elif options == MVEVChargerOptions.NONE:
-            return None
-        else:
-            return csv_to_array(EV_PROFILES[options])
-
-    elif isinstance(options, LVSmartMeterOptions):
-
-        if options == LVSmartMeterOptions.CSV:
-            try:
-                profile = LVSmartMeterProfile(lv_smart_meter_csv=csv_file.file)
-                return profile.to_array()
-            except ValidationError as e:
-                raise RequestValidationError(errors=e.raw_errors)
-        elif options == LVSmartMeterOptions.NONE:
-            return None
-        else:
-            return csv_to_array(SMART_METER_PROFILES[options])
-
-    elif isinstance(options, LVElectricVehicleOptions):
-
-        if options == LVElectricVehicleOptions.CSV:
-            try:
-                profile = LVEVProfile(lv_ev_csv=csv_file.file)
-                return profile.to_array()
-            except ValidationError as e:
-                raise RequestValidationError(errors=e.raw_errors)
-        elif options == LVElectricVehicleOptions.NONE:
-            return None
-        else:
-            return csv_to_array(LV_EV_PROFILES[options])
-
-    elif isinstance(options, LVPVOptions):
-
-        if options == LVPVOptions.CSV:
-            try:
-                profile = LVPVProfile(lv_pv_csv=csv_file.file)
-                return profile.to_array()
-            except ValidationError as e:
-                raise RequestValidationError(errors=e.raw_errors)
-        elif options == LVPVOptions.NONE:
-            return None
-        else:
-            return csv_to_array(LV_PV_PROFILES[options])
-
-    elif isinstance(options, LVHPOptions):
-
-        if options == LVHPOptions.CSV:
-            try:
-                profile = LVHPProfile(lv_pv_csv=csv_file.file)
-                return profile.to_array()
-            except ValidationError as e:
-                raise RequestValidationError(errors=e.raw_errors)
-        elif options == LVHPOptions.NONE:
-            return None
-        else:
-            return csv_to_array(LV_HP_PROFILES[options])
 
     raise HTTPException(status_code=422, detail="Option not implemented")
