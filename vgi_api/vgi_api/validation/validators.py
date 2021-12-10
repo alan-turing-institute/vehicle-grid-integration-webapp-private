@@ -215,7 +215,7 @@ def validate_csv(v: IO):
 
 
 class MVSolarProfile(ProfileBaseModel):
-    mv_solar_pv_csv: Optional[tempfile.SpooledTemporaryFile]
+    mv_solar_pv_csv: tempfile.SpooledTemporaryFile
 
     _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True)(validate_csv)
 
@@ -225,7 +225,7 @@ class MVSolarProfile(ProfileBaseModel):
 
 
 class MVEVProfile(ProfileBaseModel):
-    mv_ev_charger_csv: Optional[tempfile.SpooledTemporaryFile]
+    mv_ev_charger_csv: tempfile.SpooledTemporaryFile
 
     _validate_csv = validator("mv_ev_charger_csv", allow_reuse=True)(validate_csv)
 

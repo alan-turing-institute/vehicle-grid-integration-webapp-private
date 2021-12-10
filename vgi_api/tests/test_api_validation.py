@@ -216,37 +216,102 @@ def test_valid_csv(valid_profile_csv: io.BytesIO, param_key, option, csv_name):
     assert resp.status_code == 200
 
 
-def test_invalid_csv_long(invalid_profile_csv_too_long: io.BytesIO):
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_invalid_csv_long(
+    invalid_profile_csv_too_long: io.BytesIO, param_key, option, csv_name
+):
 
-    resp = upload_csv(invalid_profile_csv_too_long)
+    resp = upload_csv(invalid_profile_csv_too_long, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 422
 
 
-def test_invalid_csv_short(invalid_profile_csv_too_short: io.BytesIO):
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_invalid_csv_short(
+    invalid_profile_csv_too_short: io.BytesIO, param_key, option, csv_name
+):
 
-    resp = upload_csv(invalid_profile_csv_too_short)
+    resp = upload_csv(invalid_profile_csv_too_short, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 422
 
 
-def test_invalid_csv_wrong_time(invalid_profile_wrong_time: io.BytesIO):
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_invalid_csv_wrong_time(
+    invalid_profile_wrong_time: io.BytesIO, param_key, option, csv_name
+):
 
-    resp = upload_csv(invalid_profile_wrong_time)
+    resp = upload_csv(invalid_profile_wrong_time, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 422
 
 
-def test_invalid_csv_offset(invalid_profile_csv_offset: io.BytesIO):
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_invalid_csv_offset(
+    invalid_profile_csv_offset: io.BytesIO, param_key, option, csv_name
+):
 
-    resp = upload_csv(invalid_profile_csv_offset)
+    resp = upload_csv(invalid_profile_csv_offset, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 422
 
 
-def test_invalid_csv_not_float(invalid_profile_csv_not_float: io.BytesIO):
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_invalid_csv_not_float(
+    invalid_profile_csv_not_float: io.BytesIO, param_key, option, csv_name
+):
 
-    resp = upload_csv(invalid_profile_csv_not_float)
+    resp = upload_csv(invalid_profile_csv_not_float, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 422
 
