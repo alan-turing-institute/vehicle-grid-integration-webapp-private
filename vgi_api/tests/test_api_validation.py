@@ -182,25 +182,36 @@ def test_lv_network_defaults(n_id, lv_default):
     assert payload["networks"] == DEFAULT_LV_NETWORKS[n_id][lv_default]
 
 
-def upload_csv(file: io.BytesIO) -> requests.Response:
+def upload_csv(file: io.BytesIO, param_key, option, csv_name) -> requests.Response:
 
     file_name = "example_profile.csv"
-    upload_file = {"mv_solar_pv_csv": (file_name, file)}
+    upload_file = {csv_name: (file_name, file)}
     return client.post(
         app.url_path_for("simulate"),
         files=upload_file,
         params={
             "lv_default": DefaultLV.NEAR_SUB.value,
             "n_id": NetworkID.URBAN.value,
-            "mv_solar_pv_profile": MVSolarPVOptions.CSV.value,
+            param_key: option,
             "dry_run": True,
         },
     )
 
 
-def test_valid_csv(valid_profile_csv: io.BytesIO):
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_valid_csv(valid_profile_csv: io.BytesIO, param_key, option, csv_name):
 
-    resp = upload_csv(valid_profile_csv)
+    resp = upload_csv(valid_profile_csv, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 200
 

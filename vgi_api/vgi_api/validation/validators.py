@@ -14,6 +14,7 @@ from vgi_api.validation import (
     VALID_LV_NETWORKS_URBAN,
     DEFAULT_LV_NETWORKS,
 )
+from vgi_api.validation import types
 from vgi_api.validation.types import (
     MVEVChargerOptions,
     MVSolarPVOptions,
@@ -381,7 +382,7 @@ def validate_profile(
 
         if options == LVHPOptions.CSV:
             try:
-                profile = LVHPProfile(lv_pv_csv=csv_file.file)
+                profile = LVHPProfile(lv_hp_csv=csv_file.file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
@@ -390,4 +391,5 @@ def validate_profile(
         else:
             return csv_to_array(LV_HP_PROFILES[options])
 
+    print(type(options))
     raise HTTPException(status_code=422, detail="Option not implemented")
