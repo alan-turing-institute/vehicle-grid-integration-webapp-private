@@ -183,21 +183,21 @@ async def simulate(
     logging.info("Passing params to dss")
     file_name = None
 
-    if not dry_run:
-        parameters = aox.run_dict0
-        parameters["network_data"]["n_id"] = n_id
+    if dry_run:
+        return "valid"
 
-        fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
-        resultdict = {
-            "parameters": parameters,
-            "filename": file_name,
-            "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
-            "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
-        }
+    parameters = aox.run_dict0
+    parameters["network_data"]["n_id"] = n_id
 
-        return resultdict
+    fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
+    resultdict = {
+        "parameters": parameters,
+        "filename": file_name,
+        "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
+        "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
+    }
 
-    return "valid"
+    return resultdict
 
 
 @app.get("/lv-network", response_model=response_models.LVNetworks)
