@@ -161,31 +161,19 @@ async def simulate(
     lv_list_validated = validate_lv_parameters(lv_list, lv_default, n_id)
 
     # Validate Demand and Generation Profiles
-    mv_solar_profile_array = validate_profile(
-        mv_solar_pv_profile, mv_solar_pv_csv, mv_solar_pv_profile_units
-    )
+    mv_solar_profile_array = validate_profile(mv_solar_pv_profile, mv_solar_pv_csv)
 
     ## ToDo: Add validation for all other files types
-    mv_ev_profile_array = validate_profile(
-        mv_ev_charger_profile, mv_ev_charger_csv, mv_ev_charger_profile_units
-    )
+    mv_ev_profile_array = validate_profile(mv_ev_charger_profile, mv_ev_charger_csv)
 
     smart_meter_profile_array = validate_profile(
-        lv_smart_meter_profile, lv_smart_meter_csv, lv_smart_meter_profile_units
+        lv_smart_meter_profile, lv_smart_meter_csv
     )
 
-    lv_ev_profile_array = validate_profile(
-        lv_ev_profile,
-        lv_ev_csv,
-        lv_ev_profile_units,
-    )
+    lv_ev_profile_array = validate_profile(lv_ev_profile, lv_ev_csv)
 
-    lv_pv_profile_array = validate_profile(
-        lv_pv_profile, lv_pv_csv, lv_pv_profile_units
-    )
-    lv_hp_profile_array = validate_profile(
-        lv_hp_profile, lv_hp_csv, lv_hp_profile_units
-    )
+    lv_pv_profile_array = validate_profile(lv_pv_profile, lv_pv_csv)
+    lv_hp_profile_array = validate_profile(lv_hp_profile, lv_hp_csv)
 
     logging.info("Passing params to dss")
     file_name = None

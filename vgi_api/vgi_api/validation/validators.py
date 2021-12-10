@@ -282,9 +282,15 @@ class LVHPProfile(ProfileBaseModel):
 
 
 def validate_profile(
-    options: Union[MVSolarPVOptions, MVEVChargerOptions],
+    options: Union[
+        MVSolarPVOptions,
+        MVEVChargerOptions,
+        LVSmartMeterOptions,
+        LVElectricVehicleOptions,
+        LVPVOptions,
+        LVHPOptions,
+    ],
     csv_file: Optional[UploadFile],
-    csv_profile_units: ProfileUnits,
 ) -> Optional[Path]:
     """Pass an enum of profile options: `options`. If the options enum variant is `NONE`
     will return None.
@@ -297,7 +303,6 @@ def validate_profile(
     Args:
         options (Union[MVSolarPVOptions, MVEVChargerOptions]): A profile option
         csv_file (Optional[UploadFile]): An optional csv file. Only used if options is set to CSV
-        csv_profile_units (ProfileUnits): The units of the CSV file.
 
     Returns:
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
