@@ -186,8 +186,10 @@ async def simulate(
     if dry_run:
         return "valid"
 
+    # Pass parameters to dss
+    # ToDo: Wire up all parmaeters
     parameters = aox.run_dict0
-    parameters["network_data"]["n_id"] = n_id
+    parameters["network_data"]["n_id"] = n_id.value
 
     fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
     resultdict = {
