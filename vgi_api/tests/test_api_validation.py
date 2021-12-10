@@ -1,21 +1,20 @@
 """Tests related to API argument validation"""
-from fastapi.testclient import TestClient
-from devtools import debug
-import pytest
-from pydantic import ValidationError
-from vgi_api import app
-from vgi_api.validation import (
-    NetworkID,
-    VALID_LV_NETWORKS_URBAN,
-    VALID_LV_NETWORKS_RURAL,
-    DEFAULT_LV_NETWORKS,
-    MVSolarPVOptions,
-    DefaultLV,
-    ValidateLVParams,
-)
 import io
-import requests
+from enum import Enum
 
+import pytest
+import requests
+from devtools import debug
+from fastapi.testclient import TestClient
+from pydantic import ValidationError
+
+from vgi_api import app
+from vgi_api.validation import (DEFAULT_LV_NETWORKS, VALID_LV_NETWORKS_RURAL,
+                                VALID_LV_NETWORKS_URBAN, DefaultLV,
+                                LVSmartMeterOptions, MVEVChargerOptions,
+                                MVSolarPVOptions, NetworkID, ValidateLVParams)
+from vgi_api.validation.types import (LVElectricVehicleOptions, LVHPOptions,
+                                      LVPVOptions)
 
 client = TestClient(app)
 
@@ -230,18 +229,28 @@ def test_invalid_csv_not_float(invalid_profile_csv_not_float: io.BytesIO):
     assert resp.status_code == 422
 
 
-def test_option_csv():
+# ToDo: We should have a test for every option
+@pytest.mark.parametrize(
+    "param, option",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.OPTION1),
+        ("mv_ev_charger_profile", MVEVChargerOptions.OPTION1),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.OPTION1),
+        ("lv_ev_profile", LVElectricVehicleOptions.OPTION1),
+        ("lv_pv_profile", LVPVOptions.OPTION1),
+        ("lv_hp_profile", LVHPOptions.OPTION1),
+    ],
+)
+def test_csv_options(param: str, option: Enum):
+    """Check we dont get a validation error when uploading files"""
 
     resp = client.post(
         app.url_path_for("simulate"),
         params={
             "lv_default": DefaultLV.NEAR_SUB.value,
             "n_id": NetworkID.URBAN.value,
-            "mv_solar_pv_profile": MVSolarPVOptions.OPTION1.value,
+            param: option.value,
         },
     )
     debug(resp.json())
     assert resp.status_code == 200
-
-
-# ToDo: Add tests to validate all static profiles bundled with API

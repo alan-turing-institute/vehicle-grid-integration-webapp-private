@@ -1,6 +1,7 @@
-from pydantic.networks import import_email_validator
-import pytest
 import io
+
+import pytest
+from pydantic.networks import import_email_validator
 
 
 def create_file(data: str) -> io.BytesIO:

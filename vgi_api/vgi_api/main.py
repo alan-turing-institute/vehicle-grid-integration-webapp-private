@@ -1,30 +1,28 @@
-import logging
 import base64
+import logging
+from typing import Optional
+
+import fastapi
+from fastapi import File, Query, UploadFile
+from fastapi.middleware.cors import CORSMiddleware
 
 from vgi_api import azure_mockup
 from vgi_api import azureOptsXmpls as aox
-from typing import Optional
-
-from fastapi import Query, File, UploadFile
-import fastapi
-from fastapi.middleware.cors import CORSMiddleware
-
-
 from vgi_api.validation import (
-    validate_lv_parameters,
-    validate_profile,
-    response_models,
-    NetworkID,
-    DefaultLV,
-    MVSolarPVOptions,
-    MVEVChargerOptions,
-    LVSmartMeterOptions,
-    LVElectricVehicleOptions,
-    LVPVOptions,
-    LVHPOptions,
-    ProfileUnits,
     VALID_LV_NETWORKS_RURAL,
     VALID_LV_NETWORKS_URBAN,
+    DefaultLV,
+    LVElectricVehicleOptions,
+    LVHPOptions,
+    LVPVOptions,
+    LVSmartMeterOptions,
+    MVEVChargerOptions,
+    MVSolarPVOptions,
+    NetworkID,
+    ProfileUnits,
+    response_models,
+    validate_lv_parameters,
+    validate_profile,
 )
 from vgi_api.validation.types import DEFAULT_LV_NETWORKS
 
@@ -168,46 +166,29 @@ async def simulate(
     )
 
     ## ToDo: Add validation for all other files types
-    # mv_ev_profile_path = validate_profile(
-    #     mv_ev_charger_profile, mv_ev_charger_csv, mv_ev_charger_profile_units
-    # )
+    mv_ev_profile_array = validate_profile(
+        mv_ev_charger_profile, mv_ev_charger_csv, mv_ev_charger_profile_units
+    )
 
-    # smart_meter_profile_path = validate_profile(
-    #     lv_smart_meter_profile, lv_smart_meter_csv, lv_smart_meter_profile_units
-    # )
+    smart_meter_profile_array = validate_profile(
+        lv_smart_meter_profile, lv_smart_meter_csv, lv_smart_meter_profile_units
+    )
 
-    # lv_ev_profile_path = validate_profile(
-    #     lv_ev_profile,
-    #     lv_ev_csv,
-    #     lv_ev_profile_units,
-    # )
+    lv_ev_profile_array = validate_profile(
+        lv_ev_profile,
+        lv_ev_csv,
+        lv_ev_profile_units,
+    )
 
-    # lv_pv_profile_path = validate_profile(lv_pv_profile, lv_pv_csv, lv_pv_profile_units)
-    # lv_hp_profile_path = validate_profile(lv_hp_profile, lv_hp_csv, lv_hp_profile_units)
+    lv_pv_profile_array = validate_profile(
+        lv_pv_profile, lv_pv_csv, lv_pv_profile_units
+    )
+    lv_hp_profile_array = validate_profile(
+        lv_hp_profile, lv_hp_csv, lv_hp_profile_units
+    )
 
-    # ToDo add penetration for EC, PV and HP
-    # ToDo: Validate any uploaded files
-    # Write the file to disk in a temporary directory
-
-    logging.info("Starting API call")
+    logging.info("Passing params to dss")
     file_name = None
-
-    # if c_load is None:
-    #     logging.info("No input file provided")
-    # else:
-    #     with TemporaryDirectory(prefix="tmp_vgi_uploads_") as tmp_dir:
-    #         tmp_file_name = os.path.join(tmp_dir, "vgi_loads_test.csv")
-    #         save_uploaded_file(c_load, tmp_file_name, 0.1e6)
-    #         file_name = c_load.filename
-    #         logging.info("File name: {}".format(c_load.filename))
-    #         logging.info("File type: {}".format(c_load.content_type))
-    #         logging.info("File saved to {}; contents:".format(tmp_file_name))
-    #         with open(tmp_file_name) as csv_file:
-    #             reader = csv.reader(csv_file)
-    #             header = next(reader)
-    #             l1 = next(reader)
-    #             logging.info(header[:5])
-    #             logging.info(l1[:5])
 
     # parameters = aox.run_dict0
     # parameters["network_data"]["n_id"] = n_id

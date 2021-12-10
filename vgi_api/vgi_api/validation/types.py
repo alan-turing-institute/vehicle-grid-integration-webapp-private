@@ -91,36 +91,43 @@ DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
     },
 }
 
-# Where are all the data files
+
 DATA_FOLDER = Path(__file__).parent.parent / "data"
 
+# ToDo: Get all profiles, stick in data folder and put file name here
 SOLAR_PROFILES: Dict[MVSolarPVOptions, Path] = {
     MVSolarPVOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
-    MVSolarPVOptions.OPTION2: Path(""),
-    MVSolarPVOptions.OPTION3: Path(""),
+    MVSolarPVOptions.OPTION2: DATA_FOLDER / "",
+    MVSolarPVOptions.OPTION3: DATA_FOLDER / "",
+}
+
+EV_PROFILES: Dict[MVSolarPVOptions, Path] = {
+    MVEVChargerOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    MVEVChargerOptions.OPTION2: DATA_FOLDER / "",
+    MVEVChargerOptions.OPTION3: DATA_FOLDER / "",
+}
+
+SMART_METER_PROFILES: Dict[LVSmartMeterOptions, Path] = {
+    LVSmartMeterOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVSmartMeterOptions.OPTION2: DATA_FOLDER / "",
+    LVSmartMeterOptions.OPTION3: DATA_FOLDER / "",
+}
+
+LV_EV_PROFILES: Dict[LVElectricVehicleOptions, Path] = {
+    LVElectricVehicleOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVElectricVehicleOptions.OPTION2: DATA_FOLDER / "",
+    LVElectricVehicleOptions.OPTION3: DATA_FOLDER / "",
+}
+
+LV_PV_PROFILES: Dict[LVPVOptions, Path] = {
+    LVPVOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVPVOptions.OPTION2: DATA_FOLDER / "",
+    LVPVOptions.OPTION3: DATA_FOLDER / "",
 }
 
 
-# lv_example_options_all = {
-# Urban
-#     1060:{
-
-#     'near_sub':['1101','1137','1110','1116','1117',],
-
-#     'near_edge':['1103','1109','1166','1145','1131',],
-
-#     'mixed':['1108','1109','1151','1158','1175',],
-
-#     },
-
-#     1061:{
-
-#     'near_sub':['1102','1154','1262','1206','1202',],
-
-#     'near_edge':['1321','1254','1387','1194','1109',],
-
-#     'mixed':['1101','1450','1152','1200','1122',],
-
-#     },
-
-# }
+LV_HP_PROFILES: Dict[LVHPOptions, Path] = {
+    LVHPOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVHPOptions.OPTION2: DATA_FOLDER / "",
+    LVHPOptions.OPTION3: DATA_FOLDER / "",
+}
