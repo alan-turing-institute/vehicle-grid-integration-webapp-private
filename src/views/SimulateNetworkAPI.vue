@@ -15,76 +15,138 @@
 
     <form id="config" ref="config" @submit.prevent>
       <div class="row">
-        <div class="col-sm-12">
-          <h5>Electricity distribution network parameters</h5>
+        <div class="col-lg-12">
+          <h4>Electricity distribution network parameters</h4>
+        </div>
 
-          <!-- Experiment parameter: n_lv -->
-          <div class="form-group row">
-            <label for="n_lv" class="col-md-2 col-form-label">
-              Number of LV circuits
-            </label>
-            <div class="col-md-1">
-              <input
-                v-model.number="config.n_lv"
-                type="number"
-                class="form-control"
-                id="n_lv"
-                placeholder="n_lv"
-              />
-            </div>
-          </div>
+        <div class="col-lg-6">
+          <h5>Medium voltage (MV)</h5>
 
-          <!-- Experiment parameter: n_id -->
           <div class="form-group row">
-            <label for="n_id" class="col-md-2 col-form-label">
+            <!-- Experiment parameter: n_id, network ID -->
+            <label for="n_id" class="col-sm-6 col-form-label">
               Network ID
             </label>
-            <div class="col-md-3">
-              <select v-model="config.n_id">
+            <div class="col-sm-6">
+              <select v-model="config.n_id" class="form-control">
                 <option value="1060">11kV urban network</option>
                 <option value="1061">11kV urban - rural network</option>
               </select>
             </div>
           </div>
 
-          <!-- DUMMY Experiment parameter: p_ev -->
           <div class="form-group row">
-            <label for="p_ev" class="col-md-2 col-form-label">
-              Percentage penetration EV
+            <!-- Experiment parameter: xfmr_scale, MV transformer scaling -->
+            <label for="xfmr_scale" class="col-md-6 col-form-label">
+              MV transformer scaling
             </label>
-            <div class="col-md-1">
+            <div class="col-md-6">
               <input
-                v-model.number="config.p_ev"
-                type="number"
+                v-model.number="config.xfmr_scale"
+                type="float"
                 class="form-control"
-                id="p_ev"
-                placeholder="p_ev"
+                id="xfmr_scale"
+                placeholder="xfmr_scale"
               />
             </div>
           </div>
 
-          <!-- DUMMY Experiment parameter: p_pv -->
           <div class="form-group row">
-            <label for="p_pv" class="col-md-2 col-form-label">
-              Percentage penetration PV
+            <!-- Experiment parameter: oltc_setpoint -->
+            <label for="oltc_setpoint" class="col-md-6 col-form-label">
+              MV transformer on-load tap charger (OLTC) set point
             </label>
-            <div class="col-md-1">
+            <div class="col-md-6">
               <input
-                v-model.number="config.p_pv"
-                type="number"
+                v-model.number="config.oltc_setpoint"
+                type="float"
                 class="form-control"
-                id="p_pv"
-                placeholder="p_pv"
+                id="oltc_setpoint"
+                placeholder="OLTC set point, e.g. 1.04"
               />
             </div>
           </div>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: oltc_bandwidth -->
+            <label for="oltc_bandwidth" class="col-md-6 col-form-label">
+              MV transformer on-load tap charger (OLTC) bandwidth
+            </label>
+            <div class="col-md-6">
+              <input
+                v-model.number="config.oltc_bandwidth"
+                type="float"
+                class="form-control"
+                id="oltc_bandwidth"
+                placeholder="OLTC bandwidth, e.g. 0.13"
+              />
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: rs_pen -->
+            <label for="rs_pen" class="col-md-6 col-form-label">
+              Percentage residential loads
+            </label>
+            <div class="col-md-6">
+              <input
+                v-model.number="config.rs_pen"
+                type="float"
+                class="form-control"
+                id="rs_pen"
+                placeholder="Percentage residential loads e.g. 0.8"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <h5>Low voltage (LV)</h5>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: lv_default (if custom, open lv_list option below) -->
+            <label for="lv_default" class="col-md-6 col-form-label">
+              IDs of up to 5 LV networks to model in detail
+            </label>
+            <div class="col-md-6">
+              <select v-model="config.lv_default" class="form-control">
+                <option>1101, 1105, 1103</option>
+                <option>1101, 1102, 1103</option>
+                <option>Custom</option>
+              </select>
+            </div>
+          </div>
+
+          <template v-if="config.lv_default == 'Custom'">
+            <div class="form-group row">
+              <!-- Experiment parameter: lv_list -->
+              <label for="lv_list" class="col-md-6 col-form-label">
+                Custom selection of up to 5 LV network IDs to model in detail
+              </label>
+              <div class="col-md-6">
+                <input
+                  v-model.number="config.lv_list"
+                  type="string"
+                  class="form-control"
+                  id="lv_list"
+                  placeholder="1101, 1105, 1103"
+                />
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-lg-6">
+          <h5>Provided profiles</h5>
 
           <!-- DUMMY Experiment upload -->
           <div class="form-group row">
-            <label for="c_load" class="col-md-2 col-form-label">
+            <label for="c_load" class="col-md-6 col-form-label">
               Custom load profile
             </label>
-            <div class="col-md-3">
+            <div class="col-md-6">
               <input
                 type="file"
                 class="form-control"
@@ -94,19 +156,14 @@
             </div>
           </div>
         </div>
-      </div>
 
-      <div class="row">
-        <div class="col-sm-6">
-          <h5>Provided profiles</h5>
-        </div>
-        <div class="col-sm-6">
+        <div class="col-lg-6">
           <h5>User custom profiles</h5>
         </div>
       </div>
 
       <div class="row">
-        <div class="col-sm-6">
+        <div class="col-lg-12">
           <button type="submit" class="btn btn-primary" @click="fetchAPIData">
             Submit
             <template v-if="isLoading">
@@ -117,7 +174,7 @@
       </div>
 
       <div class="row">
-        <div class="col-sm-12">
+        <div class="col-lg-12">
           <h5>Results</h5>
         </div>
       </div>
@@ -132,24 +189,6 @@
         <div class="card mt-3" style="width: 60rem;">
           <img v-bind:src="'data:image/jpeg;base64,' + plot2" />
         </div>
-        <!--
-    <h4>Voltages</h4>
-    <div>
-      <ol id="voltages">
-        <li v-for="(value, index) in voltages" :key="index">
-          {{ value }}
-        </li>
-      </ol>
-    </div>
-    <h4>Report</h4>
-    <div>
-      <ul id="report">
-        <li v-for="(value, index) in report" :key="index">
-          {{ value }}
-        </li>
-      </ul>
-    </div>
-    -->
         <div class="mt-3">
           <button class="btn btn-primary" @click="isShowJson = !isShowJson">
             <template v-if="isShowJson">Hide API json response</template>
@@ -172,9 +211,14 @@ export default {
     return {
       config: {
         n_id: 1060,
-        n_lv: 5,
+        xfmr_scale: 1.0,
+        oltc_setpoint: 1.04,
+        oltc_bandwidth: 0.13,
+        rs_pen: 0.8,
+        lv_default: "1101, 1105, 1103",
+        lv_list: "1101, 1105, 1103",
         p_ev: 10,
-        p_pv: 10,
+
         c_loads: ""
       },
       // voltages: [],
@@ -210,9 +254,18 @@ export default {
       url += "?n_id=1060&lv_list=1101,1105,1103&dry_run=true";
 
       let formData = new FormData();
-      formData.append("mv_solar_pv_csv", new Blob(["1, 2, 3"], { type: "text/csv" }));
-      formData.append("mv_ev_charger_csv", new Blob(["1, 2, 3"], { type: "text/csv" }));
-      formData.append("lv_smart_meter_csv", new Blob(["1, 2, 3"], { type: "text/csv" }));
+      formData.append(
+        "mv_solar_pv_csv",
+        new Blob(["1, 2, 3"], { type: "text/csv" })
+      );
+      formData.append(
+        "mv_ev_charger_csv",
+        new Blob(["1, 2, 3"], { type: "text/csv" })
+      );
+      formData.append(
+        "lv_smart_meter_csv",
+        new Blob(["1, 2, 3"], { type: "text/csv" })
+      );
       formData.append("lv_ev_csv", new Blob(["1, 2, 3"], { type: "text/csv" }));
       formData.append("lv_pv_csv", new Blob(["1, 2, 3"], { type: "text/csv" }));
       formData.append("lv_hp_csv", new Blob(["1, 2, 3"], { type: "text/csv" }));
