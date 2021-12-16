@@ -13,16 +13,14 @@ from azure.functions._http_wsgi import WsgiRequest
 
 
 class AsgiRequest(WsgiRequest):
-    def __init__(self, func_req: HttpRequest,
-                 func_ctx: Optional[Context] = None):
+    def __init__(self, func_req: HttpRequest, func_ctx: Optional[Context] = None):
         self.asgi_version = "2.1"
         self.asgi_spec_version = "2.1"
         self._headers = func_req.headers
         super().__init__(func_req, func_ctx)
 
     def _get_encoded_http_headers(self) -> List[Tuple[bytes, bytes]]:
-        return [(k.encode("utf8"), v.encode("utf8"))
-                for k, v in self._headers.items()]
+        return [(k.encode("utf8"), v.encode("utf8")) for k, v in self._headers.items()]
 
     def _get_server_address(self):
         if self.server_name is not None:
@@ -46,7 +44,7 @@ class AsgiRequest(WsgiRequest):
             "client": None,
             "azure_functions.function_directory": self.af_function_directory,
             "azure_functions.function_name": self.af_function_name,
-            "azure_functions.invocation_id": self.af_invocation_id
+            "azure_functions.invocation_id": self.af_invocation_id,
         }
         # Notes, missing client name, port
 
@@ -59,8 +57,7 @@ class AsgiResponse:
         self._request_body = b""
 
     @classmethod
-    async def from_app(cls, app, scope: Dict[str, Any],
-                       body: bytes) -> "AsgiResponse":
+    async def from_app(cls, app, scope: Dict[str, Any], body: bytes) -> "AsgiResponse":
         res = cls()
         res._request_body = body
         await app(scope, res._receive, res._send)
@@ -78,8 +75,8 @@ class AsgiResponse:
 
     def _handle_http_response_start(self, message: Dict[str, Any]):
         self._headers = Headers(
-            [(k.decode(), v.decode())
-             for k, v in message["headers"]])
+            [(k.decode(), v.decode()) for k, v in message["headers"]]
+        )
         self._status_code = message["status"]
 
     def _handle_http_response_body(self, message: Dict[str, Any]):
@@ -109,7 +106,8 @@ class AsgiMiddleware:
     framework into Azure Functions. It can be used by either calling the
     .handle() function or exposing the .main property in a HttpTrigger.
     """
-    _logger = logging.getLogger('azure.functions.AsgiMiddleware')
+
+    _logger = logging.getLogger("azure.functions.AsgiMiddleware")
     _usage_reported = False
 
     def __init__(self, app):
