@@ -74,7 +74,6 @@ async def simulate(
         le=1,
         description="Percentage residential loads",
     ),
-    # ToDo: add sensible regex
     lv_list: Optional[str] = Query(
         None,
         description="Provide a comma seperated list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
