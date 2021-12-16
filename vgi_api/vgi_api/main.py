@@ -239,9 +239,6 @@ async def lv_network_defaults(
 
 @app.get("/get-options", response_model=List[str])
 async def get_options(option_type: AllOptions):
-
-    # print([member.value for _, member in MVSolarPVOptions__members__.items()])
-
     def get_members(option: Any) -> List[str]:
 
         return [member.value for _, member in option.__members__.items()]
