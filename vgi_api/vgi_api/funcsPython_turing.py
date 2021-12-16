@@ -9,7 +9,7 @@
 #
 # =====
 
-import sys, os, csv, socket, shutil, pickle
+import sys, os, csv, socket, shutil, pickle, subprocess
 from matplotlib import rcParams
 import traceback
 import matplotlib.pyplot as plt
@@ -25,40 +25,27 @@ from collections import OrderedDict as odict
 
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Rectangle
+from matplotlib.colors import ListedColormap, LinearSegmentedColormap
 from numpy.random import MT19937, Generator, SeedSequence
 from govuk_bank_holidays.bank_holidays import BankHolidays
+from matplotlib import cm
+from cmocean import cm as cmo
+from hsluv import hsluv_to_rgb
+
 
 # A useful set of directories for saving/loading data from etc
 fd = os.path.dirname(__file__)
 
-# run exec(repl_import) to import a set of standard funcs from here
-repl_list = """from funcsPython_turing import es, csvIn, ppd, oss, tlps, saveFigFunc,\
- dds, set_day_label, openGallery, tl, mtDict, mtOdict, o2o, gDir, gdv, gdk,\
- ossf, ossm
-"""
-
-
 computerName = socket.gethostname()
 if computerName in ["20s-merz-201148", "19s-merz-100030"]:
     supergenDir = r"H:\supergen"
-    fnA = r"D:\codeD\supergenCode\lsSlesModels"
-    fnB = r"D:\codeD\supergenCode\sopCode"
-    fnC = r"D:\codeD\supergenCode\clearheads-entsoe"
-    fnD = r"D:\DocumentsD_l\turing_vgi\e4Future-collab\mtd-dss-digital-twins"
-    if fnA in sys.argv[0]:
-        fn_root = fnA
-    elif fnB in sys.argv[0]:
-        fn_root = fnB
-    elif fnC in sys.argv[0]:
-        fn_root = fnC
-    elif fnD in sys.argv[0]:
+    fnD = r"D:\DocumentsD_l\turing_vgi\e4Future-collab\mtd-dss-digital-twins".lower()
+    if fnD in sys.argv[0].lower():
         fn_root = fnD
     else:
-        fn_root = fnA
+        fn_root = fnD
 
     papersDir = r"D:\DocumentsD_l\papersWorking"
-# elif computerName==:
-# supergenDir = r'H:\supergen'
 elif computerName == "MattsPC":
     supergenDir = r"C:\Users\Matt\Documents\supergen"
 else:
@@ -83,8 +70,16 @@ fn_spnt = os.path.join(os.path.dirname(fd), "SenSprint", "processed")
 es = "exec( open(r'" + sys.argv[0] + "').read() )"
 
 
-def rngSeed():
-    return Generator(MT19937(SeedSequence(0)))
+def rngSeed(
+    seed=0,
+):
+    """Create a numpy random number generator, seeded with seed.
+
+    If seed is None, then return an unseeded random number generator."""
+    if seed is None:
+        return Generator(MT19937())
+    else:
+        return Generator(MT19937(SeedSequence(seed)))
 
 
 def oss(fn):
@@ -368,30 +363,48 @@ def saveFigFunc(sd=gDir, **kwargs):
     dpi: dpi for png
     pdf: if True, also save as pdf
     svg: if True, also save as svg
+    emf: if True, also save as an emf (saves both emf + svg)
     gOn: whether or not to save a (lo-res) png to the gallery folder
     pad_inches: inches to pad around fig, nominally 0.05
+    sd_mod: if passed in, modifies the sd to sd/sd_mod
 
     """
     kwd = {
         "dpi": 300,
         "pdf": False,
         "svg": False,
+        "emf": False,
         "gOn": True,
         "pad_inches": 0.05,
         "figname": None,
+        "sd_mod": None,
     }
     kwd.update(kwargs)
+    sd_mod = kwd["sd_mod"]
 
     # create the gallery directory if not existing
     if not os.path.exists(gDir):
-        os.makedirs(gDir)
+        os.mkdir(gDir)
         print("Created new gallery folder:", gDir)
+
+    # For sd_mod, create file if not existing (first checks for sd)
+    gDir_dn = gDir if sd_mod is None else os.path.join(gDir, sd_mod)
+
+    if not sd_mod is None:
+        if not os.path.exists(sd):
+            raise Exception("Create initial sd first!")
+
+        # Then create sd if it doesn't exist
+        sd = sd if sd_mod is None else os.path.join(sd, sd_mod)
+        _ = os.mkdir(sd) if not os.path.exists(sd) else None
+        _ = os.mkdir(gDir_dn) if not os.path.exists(gDir_dn) else None
 
     # simple script that, by default, uses the name of the function that
     # calls it to save to the file directory sd.
     print(whocalledme())
     if kwd["figname"] is None:
         kwd["figname"] = whocalledme(depth=3)
+
     fn = os.path.join(sd, kwd["figname"])
     print("\nSaved with saveFigFunc to\n ---->", fn)
     plt.savefig(fn + ".png", dpi=kwd["dpi"], pad_inches=kwd["pad_inches"])
@@ -399,10 +412,20 @@ def saveFigFunc(sd=gDir, **kwargs):
     # Then save extra copies as specified.
     if kwd["pdf"]:
         plt.savefig(fn + ".pdf", pad_inches=kwd["pad_inches"])
-    if kwd["svg"]:
+    if kwd["svg"] or kwd["emf"]:
         plt.savefig(fn + ".svg", pad_inches=kwd["pad_inches"])
+    if kwd["emf"]:
+        iscpPath = r"C:\Program Files\Inkscape\bin\inkscape.exe"
+        subprocess.run(
+            [
+                iscpPath,
+                fn + ".svg",
+                "--export-filename",
+                fn + ".emf",
+            ]
+        )
     if kwd["gOn"]:
-        fn_gallery = os.path.join(gDir, kwd["figname"])
+        fn_gallery = os.path.join(gDir_dn, kwd["figname"])
         if fn_gallery != fn:
             plt.savefig(fn_gallery + ".png", dpi=100, pad_inches=kwd["pad_inches"])
 
@@ -1025,19 +1048,30 @@ def tlps():
 def set_day_label(
     hr=3,
     t=False,
+    ax=None,
 ):
     """Convenience function for setting the x label/ticks for day plots.
 
     hr - number of hours to 'jump' in xticks
     t - 'tight' or not, if True then fit to (0,23), else (-0.3,23.3)
+    ax - the axis to plot on, if wanted.
     """
-    plt.xticks(np.arange(0, 24, hr))
-    if t:
-        plt.xlim((0, 23))
-    else:
-        plt.xlim((-0.3, 23.3))
+    if ax is None:
+        plt.xticks(np.arange(0, 24, hr))
+        if t:
+            plt.xlim((0, 23))
+        else:
+            plt.xlim((-0.3, 23.3))
 
-    plt.xlabel("Hour of the day")
+        plt.xlabel("Hour of the day")
+    else:
+        ax.set_xticks(np.arange(0, 24, hr))
+        if t:
+            ax.set_xlim((0, 23))
+        else:
+            ax.set_xlim((-0.3, 23.3))
+
+        ax.set_xlabel("Hour of the day")
 
 
 def gdv(dd, n=0):
@@ -1055,3 +1089,67 @@ def mtOdict(ll):
     od = odict()
     [od.__setitem__(k, []) for k in ll]
     return od
+
+
+# Colormap functions and data
+def cmsq(
+    cmap,
+    ds0=0,
+    ds1=1,
+    n=256,
+):
+    """Squash/squish/sqsh a colormap that runs between 0 and 1.
+
+    See:
+    https://matplotlib.org/stable/tutorials/colors/colormap-manipulation.html
+    """
+    return ListedColormap(cmap(np.linspace(ds0, ds1, n)))
+
+
+cmList0 = [
+    cm.Greys,
+    cm.Blues,
+    cmo.amp,
+    cm.Greens,
+    cm.Purples,
+    cmo.tempo,
+    cm.bone_r,
+    cm.PuRd,
+    cm.Oranges,
+]
+
+
+def make_hsl_colormaps(
+    nn=9,
+    ltnss_tpl=(87, 15, 256),
+    sat=100,
+):
+    """Use hsluv package to create equidistance colormaps for plotting.
+
+    Inputs
+    ---
+    nn - number of hues to get, integer
+    ltnss_tpl - the lightness tuple to get (hi,lo,N)
+    sat - saturation, between 0 and 100
+    """
+    cmaps_ = []
+    for hue in 360 * np.linspace(0, 1, nn)[::-1]:
+        cmaps_.append(
+            [hsluv_to_rgb((hue, sat, ltnss)) for ltnss in np.linspace(*ltnss_tpl)]
+        )
+
+    return [ListedColormap(cmap) for cmap in cmaps_]
+
+
+def new_hsl_map(
+    nn,
+    sat=80,
+    ll=50,
+):
+    """New hsluv colormap, cycling through nn colors."""
+    return [hsluv_to_rgb((v, sat, ll)) for v in np.arange(0, 360, 360 / nn)]
+
+
+def og():
+    """Run openGallery(). [See help(openGallery)]"""
+    return openGallery()

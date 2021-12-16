@@ -8,22 +8,25 @@ authors = ["Oscar Giles <ogiles@turing.ac.uk>, Louise Bowler <lbowler@turing.ac.
 python = ">=3.8,<3.11"
 azure-storage-blob = "^12.9.0"
 bunch = "^1.0.1"
+cmocean = "^2.0"
 govuk-bank-holidays = "^0.10"
+hsluv = "^5.0.2"
 matplotlib = "^3.5.0"
 scipy = "^1.7.2"
 fastapi = "^0.70.0"
+progress = "^1.6"
 python-multipart = "^0.0.5"
 pydantic = "^1.8.2"
 
+[tool.poetry.scripts]
+azure_mockup = "vgi_api.azure_mockup:run_dss_simulation"
 
 
 [tool.poetry.dev-dependencies]
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
 
-# Install normal dss-python on mac (because we don't have a build for it. But use the linux wheel in production)
-dss-python = [ { file = "../azure_funcs/dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", platform = "linux"}, 
-                {version = "^0.10.7", platform = "darwin"},
-                {version = "^0.10.7", platform = "windows"}]
+# Install normal dss-python in development. Install linux version manually on deployment
+dss-python =  "^0.10.7.post1"
                 
 httpie = "^2.6.0"
 black = "^21.11b1"

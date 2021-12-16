@@ -1,5 +1,7 @@
 import json
 import base64
+import os
+from pathlib import Path
 from vgi_api import azure_mockup
 from vgi_api import azureOptsXmpls as aox
 import pytest
@@ -31,8 +33,14 @@ def simrun(n_lv=15, n_id=1060):
 @pytest.mark.skip(reason="I'm not sure when this last passed")
 @pytest.mark.xfail(reason="I'm not sure when this last passed")
 def test_simrun():
-    with open("tests/dsssimulation_15_1060.json") as fp:
-        dsssimulation_15_1060 = fp.read()
+    with open(os.path.join(Path(__file__).parent, "dsssimulation_5_1060.json")) as fp:
+        dsssimulation_5_1060 = fp.read()
         ## compare the logical json, not the on disk representation
         ## formatting and line endings changes should not fail
-        assert json.loads(simrun(15, 1060)) == json.loads(dsssimulation_15_1060)
+
+        saved = json.loads(dsssimulation_5_1060)
+        simulated = json.loads(simrun(5, 1060))
+
+        assert saved["parameters"] == simulated["parameters"]
+        assert saved["plot1"] == simulated["plot1"]
+        assert saved["plot2"] == simulated["plot2"]
