@@ -27,7 +27,7 @@ from .funcsPython_turing import (
     csvIn,
     mtDict,
     rngSeed,
-    o2o
+    o2o,
 )
 from . import funcsDss_turing
 from .funcsMath_turing import vecSlc, tp2ar
@@ -987,6 +987,11 @@ class turingNet(snk.dNet):
             tsp["n"],
         )
 
+        # Load the USB fast charging station profiles
+        self.p.usb_fcs = self.load_usb_fcs_data(
+            tsp["n"],
+        )
+
         # Set the ic00 demand
         self.p.ic00 = dds(ic00_prof, 144 // tsp["n"])
 
@@ -1045,6 +1050,7 @@ class turingNet(snk.dNet):
         "ev_urban": "assign profiles from ev_urban dataset",
         "ev_acn": "EV workplace charging from Caltech for two weeks worth of weekdays. Data from https://ev.caltech.edu/dataset.",
         "ev_encc": 'Electric Nation "Crowd Charge" data from 2018 for one weeks worth of weekdays, for both 3.6 and 7 kW chargers.',
+        "usb_fcs": "fast charging station data from the USB, Newcastle Helix",
         "csv_in": "assign according to csv_in",
         "icev": "See rsev.",
         "ev_urban_": "See ev_urban",
@@ -1123,8 +1129,9 @@ class turingNet(snk.dNet):
         "fcs": {
             "lv": [],
             "mv": [
+                "usb_fcs",
                 None,
-            ],  # as DGs
+            ],  # usb_fcs as data from USB; None as dgs mv
         },
         "hps": {
             "lv": [pp for pp in dmnd_opts_readme.keys() if "hp" in pp],
@@ -1162,7 +1169,7 @@ class turingNet(snk.dNet):
         ---
         All can be set to None, which assigns the profiles zeros.
 
-        Use pprint(self.dmnd_opts_readme) for a description of the different load
+        Use pprint(self.dmnd_opts_readme) for a description of the different
         profiles, and pprint(self.dmnd_opts_dict) for the possible combinations
         that can beused with each load type.
 
@@ -1286,10 +1293,17 @@ class turingNet(snk.dNet):
             self.dmnd.dgs.mv = -np.outer(tsp["dgs"]["mv"][1], self.p.solar0)
 
         # FCS mv profiles - based on DG profiles
-        if type(tsp["fcs"]["mv"]) is list:
-            # only solar0 implemented so far as a profile.
-            assert tsp["fcs"]["mv"][0] == "uss24_urban_"
-            self.dmnd.fcs.mv = -np.outer(tsp["fcs"]["mv"][1], self.p.solar0)
+        if check_val("fcs", "mv"):
+            if tsp["fcs"]["mv"] == "usb_fcs":
+                imax = np.argsort(np.max(self.p.usb_fcs, axis=1))
+                self.dmnd.fcs.mv = self.p.usb_fcs[imax][-self.ldsi.fcs.nmv :]
+
+            if type(tsp["fcs"]["mv"]) is list:
+                # only solar0 implemented so far as a profile.
+                assert tsp["fcs"]["mv"][0] == "uss24_urban_"
+                self.dmnd.fcs.mv = np.outer(
+                    tsp["fcs"]["mv"][1], self.p.uss24_urban_
+                ) / max(self.p.uss24_urban_)
 
         # Heat pump LV profiles (at the moment these are only 1-d)
         if check_val("hps", "lv"):
@@ -1341,6 +1355,25 @@ class turingNet(snk.dNet):
             np.array(dd).astype("float")[:144, 1] / 1e3 for dd in [rsev_, icev_]
         ]
         return [dds(x, 144 // nn) for x in [rsev, icev]]
+
+    @staticmethod
+    def load_usb_fcs_data(
+        nn=144,
+    ):
+        """Load the fast charger station data from the USB.
+
+        As per email 10/12/21; these are in kW.
+        """
+        nday = 48
+        fnfcs = os.path.join(
+            data_dir,
+            "power_series.csv",
+        )
+        data = np.array([r[1:] for r in csvIn(fnfcs)[1]]).astype(float)
+        return dds(
+            data,
+            nday // nn,
+        ).T
 
     @staticmethod
     def load_hp_profiles(
