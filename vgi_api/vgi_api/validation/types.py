@@ -101,7 +101,7 @@ SOLAR_PROFILES: Dict[MVSolarPVOptions, Path] = {
     MVSolarPVOptions.OPTION3: DATA_FOLDER / "",
 }
 
-EV_PROFILES: Dict[MVSolarPVOptions, Path] = {
+EV_PROFILES: Dict[MVEVChargerOptions, Path] = {
     MVEVChargerOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
     MVEVChargerOptions.OPTION2: DATA_FOLDER / "",
     MVEVChargerOptions.OPTION3: DATA_FOLDER / "",
