@@ -138,7 +138,6 @@
       </div>
 
       <div class="row">
-
         <div class="col-lg-12">
           <h4>Demand and generation profiles</h4>
         </div>
@@ -146,90 +145,124 @@
         <div class="col-lg-6">
           <h5>MV connected</h5>
 
+          <div class="form-group row">
+            <!-- Experiment parameter: mv_solar_pv_profile (if custom, open upload csv option below) -->
+            <label for="mv_solar_pv_profile" class="col-md-6 col-form-label">
+              11kV connected solar PV profile
+            </label>
+            <div class="col-md-6">
+              <select v-model="config.mv_solar_pv_profile" class="form-control">
+                <option
+                  v-for="opt in profile_options.mv_solar_pv_list"
+                  :key="opt"
+                  >{{ opt }}</option
+                >
+              </select>
+            </div>
+          </div>
+
+          <template v-if="config.mv_solar_pv_profile == 'csv'">
+            <!-- Upload: mv_solar_pv_csv -->
             <div class="form-group row">
-              <!-- Experiment parameter: mv_solar_pv_profile (if custom, open upload csv option below) -->
-              <label for="mv_solar_pv_profile" class="col-md-6 col-form-label">
-                11kV connected solar PV profile
+              <label for="mv_solar_pv_csv" class="col-md-6 col-form-label">
+                Custom 11kV connected solar PV profile
               </label>
               <div class="col-md-6">
-                <select v-model="config.mv_solar_pv_profile" class="form-control">
-                  <option v-for="opt in profile_options.mv_solar_pv_list" :key="opt">{{opt}}</option>
-                </select>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="mv_solar_pv_csv"
+                  placeholder="mv_solar_pv_csv"
+                />
               </div>
             </div>
-
-            <template v-if="config.mv_solar_pv_profile == 'csv'">
-              <!-- Upload: mv_solar_pv_csv -->
-              <div class="form-group row">
-                <label for="mv_solar_pv_csv" class="col-md-6 col-form-label">
-                  Custom 11kV connected solar PV profile
-                </label>
-                <div class="col-md-6">
+            <div class="form-group row">
+              <label class="col-md-6 col-form-label">Units</label>
+              <div class="col-md-6">
+                <div class="form-check form-check-inline">
                   <input
-                    type="file"
-                    class="form-control"
-                    id="mv_solar_pv_csv"
-                    placeholder="mv_solar_pv_csv"
+                    v-model="config.mv_solar_pv_profile_units"
+                    type="radio"
+                    class="form-check-input"
+                    name="pv_unit_kW"
+                    value="kW"
                   />
+                  <label class="form-check-label" for="pv_unit_kW">kW</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    v-model="config.mv_solar_pv_profile_units"
+                    type="radio"
+                    class="form-check-input"
+                    name="pv_unit_kWh"
+                    value="kWh"
+                  />
+                  <label class="form-check-label" for="pv_unit_kWh">kWh</label>
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-md-6 col-form-label">Units</label>
-                <div class="col-md-6">
-                    <div class="form-check form-check-inline">
-                      <input v-model="config.mv_solar_pv_profile_units" type="radio" class="form-check-input" name="pv_unit_kW" value="kW">
-                      <label class="form-check-label" for="pv_unit_kW">kW</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input v-model="config.mv_solar_pv_profile_units" type="radio" class="form-check-input" name="pv_unit_kWh" value="kWh">
-                      <label class="form-check-label" for="pv_unit_kWh">kWh</label>
-                    </div>
-                </div>
-              </div>     
-            </template>
+            </div>
+          </template>
 
+          <div class="form-group row">
+            <!-- Experiment parameter: mv_ev_charger_profile (if custom, open upload csv option below) -->
+            <label for="mv_ev_charger_profile" class="col-md-6 col-form-label">
+              11kV connected electric vehicle charging profile
+            </label>
+            <div class="col-md-6">
+              <select
+                v-model="config.mv_ev_charger_profile"
+                class="form-control"
+              >
+                <option
+                  v-for="opt in profile_options.mv_ev_charger_list"
+                  :key="opt"
+                  >{{ opt }}</option
+                >
+              </select>
+            </div>
+          </div>
+
+          <template v-if="config.mv_ev_charger_profile == 'csv'">
+            <!-- Upload: mv_ev_charger_csv -->
             <div class="form-group row">
-              <!-- Experiment parameter: mv_ev_charger_profile (if custom, open upload csv option below) -->
-              <label for="mv_ev_charger_profile" class="col-md-6 col-form-label">
-                11kV connected electric vehicle charging profile
+              <label for="mv_ev_charger_csv" class="col-md-6 col-form-label">
+                Custom 11kV connected electric vehicle charging profile
               </label>
               <div class="col-md-6">
-                <select v-model="config.mv_ev_charger_profile" class="form-control">
-                  <option v-for="opt in profile_options.mv_ev_charger_list" :key="opt">{{opt}}</option>
-                </select>
+                <input
+                  type="file"
+                  class="form-control"
+                  id="mv_ev_charger_csv"
+                  placeholder="mv_ev_charger_csv"
+                />
               </div>
             </div>
-
-            <template v-if="config.mv_ev_charger_profile == 'csv'">
-              <!-- Upload: mv_ev_charger_csv -->
-              <div class="form-group row">
-                <label for="mv_ev_charger_csv" class="col-md-6 col-form-label">
-                  Custom 11kV connected electric vehicle charging profile
-                </label>
-                <div class="col-md-6">
+            <div class="form-group row">
+              <label class="col-md-6 col-form-label">Units</label>
+              <div class="col-md-6">
+                <div class="form-check form-check-inline">
                   <input
-                    type="file"
-                    class="form-control"
-                    id="mv_ev_charger_csv"
-                    placeholder="mv_ev_charger_csv"
+                    v-model="config.mv_ev_charger_profile_units"
+                    type="radio"
+                    class="form-check-input"
+                    name="ev_unit_kW"
+                    value="kW"
                   />
+                  <label class="form-check-label" for="ev_unit_kW">kW</label>
+                </div>
+                <div class="form-check form-check-inline">
+                  <input
+                    v-model="config.mv_ev_charger_profile_units"
+                    type="radio"
+                    class="form-check-input"
+                    name="ev_unit_kWh"
+                    value="kWh"
+                  />
+                  <label class="form-check-label" for="ev_unit_kWh">kWh</label>
                 </div>
               </div>
-              <div class="form-group row">
-                <label class="col-md-6 col-form-label">Units</label>
-                <div class="col-md-6">
-                    <div class="form-check form-check-inline">
-                      <input v-model="config.mv_ev_charger_profile_units" type="radio" class="form-check-input" name="ev_unit_kW" value="kW">
-                      <label class="form-check-label" for="ev_unit_kW">kW</label>
-                    </div>
-                    <div class="form-check form-check-inline">
-                      <input v-model="config.mv_ev_charger_profile_units" type="radio" class="form-check-input" name="ev_unit_kWh" value="kWh">
-                      <label class="form-check-label" for="ev_unit_kWh">kWh</label>
-                    </div>
-                </div>
-              </div>     
-            </template>
-
+            </div>
+          </template>
         </div>
 
         <div class="col-lg-6">
@@ -258,42 +291,58 @@
 
     <template v-if="responseAvailable">
       <div class="accordion" id="accordionResults">
-
         <div class="card">
           <div class="card-header">
             <h2 class="mb-0">
-              <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#jsonCollapse">
+              <button
+                class="btn btn-link btn-block text-left"
+                type="button"
+                data-toggle="collapse"
+                data-target="#jsonCollapse"
+              >
                 DEBUG: Show JSON response
               </button>
             </h2>
           </div>
-          <div id=jsonCollapse class="collapse" data-parent="#accordionResults">
+          <div
+            id="jsonCollapse"
+            class="collapse"
+            data-parent="#accordionResults"
+          >
             <div class="card-body">
               {{ rawJson }}
             </div>
           </div>
         </div>
-        
+
         <div v-for="(p, ind) in plots" :key="p.ind">
           <div class="card">
             <div class="card-header">
               <h2 class="mb-0">
-                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" :data-target="'#plotCollapse' + ind">
+                <button
+                  class="btn btn-link btn-block text-left"
+                  type="button"
+                  data-toggle="collapse"
+                  :data-target="'#plotCollapse' + ind"
+                >
                   {{ p.name }}
                 </button>
               </h2>
             </div>
-            <div :id="'plotCollapse' + ind" class="collapse" v-bind:class="{show: !ind}" data-parent="#accordionResults">
+            <div
+              :id="'plotCollapse' + ind"
+              class="collapse"
+              v-bind:class="{ show: !ind }"
+              data-parent="#accordionResults"
+            >
               <div class="card-body">
                 <img v-bind:src="'data:image/jpeg;base64,' + p.plot" />
               </div>
             </div>
           </div>
         </div>
-
       </div>
     </template>
-
   </div>
 </template>
 
@@ -323,8 +372,7 @@ export default {
         mv_ev_charger_profile_units: "kW",
         mv_ev_charger_csv: null,
         // LV
-        p_ev: 10,
-
+        p_ev: 10
       },
       profile_options: {
         mv_solar_pv_list: [],
@@ -344,20 +392,21 @@ export default {
   mounted() {
     // Populate the lists used in the dropdown menus with their options
     this.getProfileOptions("mv-solar-pv").then(p_list => {
-      this.profile_options.mv_solar_pv_list = p_list
-      this.config.mv_solar_pv_profile = p_list[0]})
+      this.profile_options.mv_solar_pv_list = p_list;
+      this.config.mv_solar_pv_profile = p_list[0];
+    });
     this.getProfileOptions("mv-ev-charger").then(p_list => {
-      this.profile_options.mv_ev_charger_list = p_list
-      this.config.mv_ev_charger_profile = p_list[0]})
+      this.profile_options.mv_ev_charger_list = p_list;
+      this.config.mv_ev_charger_profile = p_list[0];
+    });
   },
 
   methods: {
     fetchAPIData() {
-
       // Ask user to wait while API request is formed and made
       this.plot1 = "";
       this.plot2 = "";
-      this.plots = []
+      this.plots = [];
       this.rawJson = "wait...";
       this.isLoading = true;
       this.responseAvailable = false;
@@ -371,24 +420,34 @@ export default {
       // Convert config options into URL parameters
 
       // Electricity distribution network parameters / MV
-      let edn_params_mv = "n_id=" + this.config.n_id 
-                          "&xfmr_scale=" + this.config.xfmr_scale +
-                          "&oltc_setpoint=" + this.config.oltc_setpoint +
-                          "&oltc_bandwidth=" + this.config.oltc_bandwidth +
-                          "&rs_pen=" + this.config.rs_pen
+      let edn_params_mv = "n_id=" + this.config.n_id;
+      "&xfmr_scale=" +
+        this.config.xfmr_scale +
+        "&oltc_setpoint=" +
+        this.config.oltc_setpoint +
+        "&oltc_bandwidth=" +
+        this.config.oltc_bandwidth +
+        "&rs_pen=" +
+        this.config.rs_pen;
 
       // Electricity distribution network parameters / LV
-      let edn_params_lv = "lv_list=" + this.config.lv_list
+      let edn_params_lv = "lv_list=" + this.config.lv_list;
 
       // Demand and generation profiles / MV
-      let dag_params_mv = ""
+      let dag_params_mv = "";
 
-      url += "?" + edn_params_mv + "&" + edn_params_lv + dag_params_mv + "&dry_run=true";
-      console.log("url: ", url)
+      url +=
+        "?" +
+        edn_params_mv +
+        "&" +
+        edn_params_lv +
+        dag_params_mv +
+        "&dry_run=true";
+      console.log("url: ", url);
 
       // let formData = new FormData();
       fetch(url, {
-        method: "POST",
+        method: "POST"
         // body: formData  // don't try to upload any csv data for now
       })
         .then(response => {
@@ -416,8 +475,10 @@ export default {
           // Parse plot from json to image data
           this.plot1 = responseJson["plot1"];
           this.plot2 = responseJson["plot2"];
-          this.plots = [{name: "Network layout", plot: responseJson["plot1"]},
-                        {name: "MV load over time", plot: responseJson["plot2"]}];
+          this.plots = [
+            { name: "Network layout", plot: responseJson["plot1"] },
+            { name: "MV load over time", plot: responseJson["plot2"] }
+          ];
 
           this.responseAvailable = true;
           this.isLoading = false;
@@ -428,27 +489,31 @@ export default {
     },
 
     getProfileOptions(profile_name) {
-
-      return fetch(process.env.VUE_APP_API_URL + "/get-options?option_type=" + profile_name, {
-        method: "GET",
-      })
-      .then(response => {
-        if (response.ok) {
-          return response.text();
-        } else {
-          alert(
-            "Server returned " + response.status + " : " + response.statusText
-          );
+      return fetch(
+        process.env.VUE_APP_API_URL +
+          "/get-options?option_type=" +
+          profile_name,
+        {
+          method: "GET"
         }
-      })
+      )
         .then(response => {
-          console.log("Returning response ", response)
+          if (response.ok) {
+            return response.text();
+          } else {
+            alert(
+              "Server returned " + response.status + " : " + response.statusText
+            );
+          }
+        })
+        .then(response => {
+          console.log("Returning response ", response);
           return JSON.parse(response);
         })
         .catch(err => {
           console.log(err);
         });
-    },
+    }
   }
 };
 </script>
