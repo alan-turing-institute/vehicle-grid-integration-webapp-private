@@ -153,9 +153,7 @@
               </label>
               <div class="col-md-6">
                 <select v-model="config.mv_solar_pv_profile" class="form-control">
-                  <option>Option a</option>
-                  <option>Option b</option>
-                  <option>csv</option>
+                  <option v-for="opt in profile_options.mv_solar_pv_list" :key="opt">{{opt}}</option>
                 </select>
               </div>
             </div>
@@ -197,9 +195,7 @@
               </label>
               <div class="col-md-6">
                 <select v-model="config.mv_ev_charger_profile" class="form-control">
-                  <option>Option d</option>
-                  <option>Option e</option>
-                  <option>csv</option>
+                  <option v-for="opt in profile_options.mv_ev_charger_list" :key="opt">{{opt}}</option>
                 </select>
               </div>
             </div>
@@ -330,6 +326,10 @@ export default {
         p_ev: 10,
 
       },
+      profile_options: {
+        mv_solar_pv_list: [],
+        mv_ev_charger_list: []
+      },
       // voltages: [],
       // report: [],
       plot1: "",
@@ -339,6 +339,16 @@ export default {
       isLoading: false,
       responseAvailable: false
     };
+  },
+
+  mounted() {
+    // Populate the lists used in the dropdown menus with their options
+    this.getProfileOptions("mv-solar-pv").then(p_list => {
+      this.profile_options.mv_solar_pv_list = p_list
+      this.config.mv_solar_pv_profile = p_list[0]})
+    this.getProfileOptions("mv-ev-charger").then(p_list => {
+      this.profile_options.mv_ev_charger_list = p_list
+      this.config.mv_ev_charger_profile = p_list[0]})
   },
 
   methods: {
@@ -415,7 +425,30 @@ export default {
         .catch(err => {
           console.log(err);
         });
-    }
+    },
+
+    getProfileOptions(profile_name) {
+
+      return fetch(process.env.VUE_APP_API_URL + "/get-options?option_type=" + profile_name, {
+        method: "GET",
+      })
+      .then(response => {
+        if (response.ok) {
+          return response.text();
+        } else {
+          alert(
+            "Server returned " + response.status + " : " + response.statusText
+          );
+        }
+      })
+        .then(response => {
+          console.log("Returning response ", response)
+          return JSON.parse(response);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
   }
 };
 </script>
