@@ -16,15 +16,19 @@ python-multipart = "^0.0.5"
 pydantic = "^1.8.2"
 
 
+
 [tool.poetry.dev-dependencies]
 uvicorn = {extras = ["standard"], version = "^0.15.0"}
 
 # Install normal dss-python on mac (because we don't have a build for it. But use the linux wheel in production)
-dss_python = [ { file = "../azure_funcs/dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", platform = "linux"}, 
-                {version = "^0.10.7", platform = "darwin"}]
+dss-python = [ { file = "../azure_funcs/dependencies/dss_python-0.10.7.post1-cp38-cp38-manylinux_2_5_x86_64.manylinux1_x86_64.whl", platform = "linux"}, 
+                {version = "^0.10.7", platform = "darwin"},
+                {version = "^0.10.7", platform = "windows"}]
+                
 httpie = "^2.6.0"
 black = "^21.11b1"
 pytest = "^6.2.5"
+devtools = "^0.8.0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

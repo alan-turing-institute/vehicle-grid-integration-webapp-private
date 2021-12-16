@@ -190,14 +190,14 @@ export default {
       if (this.config.n_lv != Math.round(this.config.n_lv)) {
         this.config.n_lv = 5;
       }
-      url += "?n_lv=" + this.config.n_lv;
+      url += "?lv_list=1101,1105,1103";
 
       // Options for n_id are limited so simply add the selected one to the url
       url += "&n_id=" + this.config.n_id;
       console.log(url);
 
       fetch(url, {
-        method: "GET"
+        method: "POST"
       })
         .then(response => {
           if (response.ok) {
