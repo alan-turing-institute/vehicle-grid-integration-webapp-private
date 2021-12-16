@@ -164,6 +164,7 @@
 
       <div class="row">
         <div class="col-lg-12">
+          <h5>Run simulation</h5>
           <button type="submit" class="btn btn-primary" @click="fetchAPIData">
             Submit
             <template v-if="isLoading">
@@ -181,25 +182,43 @@
     </form>
 
     <template v-if="responseAvailable">
-      <div class="mt-3">
-        <h4>Plot(s)</h4>
-        <div class="card mt-3" style="width: 60rem;">
-          <img v-bind:src="'data:image/jpeg;base64,' + plot1" />
-        </div>
-        <div class="card mt-3" style="width: 60rem;">
-          <img v-bind:src="'data:image/jpeg;base64,' + plot2" />
-        </div>
-        <div class="mt-3">
-          <button class="btn btn-primary" @click="isShowJson = !isShowJson">
-            <template v-if="isShowJson">Hide API json response</template>
-            <template v-else>Show API json response</template>
-          </button>
-          <div v-if="isShowJson">
-            <code>{{ rawJson }}</code>
+      <div class="accordion" id="accordionResults">
+
+        <div class="card">
+          <div class="card-header">
+            <h2 class="mb-0">
+              <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" data-target="#jsonCollapse">
+                DEBUG: Show JSON response
+              </button>
+            </h2>
+          </div>
+          <div id=jsonCollapse class="collapse" data-parent="#accordionResults">
+            <div class="card-body">
+              {{ rawJson }}
+            </div>
           </div>
         </div>
+        
+        <div v-for="(p, ind) in plots" :key="p.ind">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button class="btn btn-link btn-block text-left" type="button" data-toggle="collapse" :data-target="'#plotCollapse' + ind">
+                  {{ p.name }}
+                </button>
+              </h2>
+            </div>
+            <div :id="'plotCollapse' + ind" class="collapse" v-bind:class="{show: !ind}" data-parent="#accordionResults">
+              <div class="card-body">
+                <img v-bind:src="'data:image/jpeg;base64,' + p.plot" />
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
     </template>
+
   </div>
 </template>
 
@@ -237,6 +256,7 @@ export default {
       // Ask user to wait while API request is formed and made
       this.plot1 = "";
       this.plot2 = "";
+      this.plots = []
       this.rawJson = "wait...";
       this.isLoading = true;
       this.responseAvailable = false;
@@ -299,6 +319,8 @@ export default {
           // Parse plot from json to image data
           this.plot1 = responseJson["plot1"];
           this.plot2 = responseJson["plot2"];
+          this.plots = [{name: "Network layout", plot: responseJson["plot1"]},
+                        {name: "MV load over time", plot: responseJson["plot2"]}];
 
           this.responseAvailable = true;
           this.isLoading = false;
