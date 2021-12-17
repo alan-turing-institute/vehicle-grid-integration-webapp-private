@@ -330,7 +330,7 @@
               data-parent="#accordionResults"
             >
               <div class="card-body">
-                <img v-bind:src="'data:image/jpeg;base64,' + p.plot" />
+                <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
               </div>
             </div>
           </div>
@@ -376,8 +376,6 @@ export default {
       },
       // voltages: [],
       // report: [],
-      plot1: "",
-      plot2: "",
       rawJson: "empty",
       isShowJson: false,
       isLoading: false,
@@ -406,8 +404,6 @@ export default {
 
     fetchAPIData() {
       // Ask user to wait while API request is formed and made
-      this.plot1 = "";
-      this.plot2 = "";
       this.plots = [];
       this.rawJson = "wait...";
       this.isLoading = true;
@@ -475,8 +471,6 @@ export default {
           // this.report = responseJson["report"];
 
           // Parse plot from json to image data
-          this.plot1 = responseJson["plot1"];
-          this.plot2 = responseJson["plot2"];
           this.plots = [
             { name: "Network layout", plot: responseJson["plot1"] },
             { name: "MV load over time", plot: responseJson["plot2"] }
