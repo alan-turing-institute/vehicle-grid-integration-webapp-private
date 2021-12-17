@@ -25,6 +25,7 @@ from vgi_api.validation import (
     validate_profile,
 )
 from vgi_api.validation.types import DEFAULT_LV_NETWORKS
+from vgi_api.validation.validators import ValidateLVParams
 
 app = fastapi.FastAPI()
 
@@ -78,6 +79,10 @@ async def simulate(
         None,
         description="Provide a comma seperated list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
         example="1101, 1105, 1103",
+    ),
+    lv_plot_list: Optional[str] = Query(
+        None,
+        description="Provide a comma seperated list of up to 2 Low Voltage Network ids to plot. They must be either in `lv_list` or the networks in the `default_lv` selection",
     ),
     lv_default: Optional[DefaultLV] = Query(
         None,
@@ -162,7 +167,7 @@ async def simulate(
 ):
 
     # MV parameters are already valid. LV parameters need additional validation
-    lv_list_validated = validate_lv_parameters(lv_list, lv_default, n_id)
+    lv_list_validated = validate_lv_parameters(lv_list, lv_default, lv_plot_list, n_id)
 
     # Validate Demand and Generation Profiles
     mv_solar_profile_array = validate_profile(mv_solar_pv_profile, mv_solar_pv_csv)
@@ -185,10 +190,22 @@ async def simulate(
     if dry_run:
         return "valid"
 
+    lv_plot_list = (
+        ValidateLVParams._parse_lv_list(lv_plot_list)
+        if lv_plot_list
+        else lv_list_validated[:2]
+    )
     # Pass parameters to dss
-    # ToDo: Wire up all parmaeters
     parameters = aox.run_dict0
+
     parameters["network_data"]["n_id"] = int(n_id.value)
+    parameters["network_data"]["xfmr_scale"] = xfmr_scale
+    parameters["network_data"]["oltc_setpoint"] = oltc_setpoint * 100
+    parameters["network_data"]["oltc_bandwidth"] = oltc_bandwidth * 100
+    parameters["network_data"]["lv_sel"] = "lv_list"
+    parameters["network_data"]["lv_list"] = [str(i) for i in lv_list_validated]
+    parameters["rs_pen"] = rs_pen * 100
+    parameters["plot_options"]["lv_voltages"] = [str(i) for i in lv_plot_list]
 
     fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
     resultdict = {

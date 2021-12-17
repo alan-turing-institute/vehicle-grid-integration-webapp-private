@@ -121,7 +121,7 @@ run_dict0 = {
                     ],
                 ],
             },  # powers in kW
-            "n": 12,  # samples per day; must satisfy (144 % n)==0
+            "n": 48,  # samples per day; must satisfy (144 % n)==0
             "hps": {
                 "lv": "hp_love_1",
                 "mv": "hp_love_1_",
@@ -131,7 +131,7 @@ run_dict0 = {
     },
     # Various plotting options to return to the user etc.
     "plot_options": {  # Using:
-        "lv_voltages": ["1101", "1164"],  # n only 2 numbers allowed.
+        "lv_voltages": ["1101", "1105"],  # n only 2 numbers allowed.
         "lv_comparison": True,  # y
         # use [k for k,v in self.p.items() if v.ndim==2] to see
         # what can be used with profile_sel
