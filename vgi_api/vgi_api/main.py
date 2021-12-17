@@ -26,6 +26,7 @@ from vgi_api.validation import (
     validate_profile,
 )
 from vgi_api.validation.types import DEFAULT_LV_NETWORKS, AllOptions
+from vgi_api.validation.validators import ValidateLVParams
 
 app = fastapi.FastAPI()
 
@@ -79,6 +80,10 @@ async def simulate(
         None,
         description="Provide a comma seperated list of up to 5 Low Voltage Network ids. If not provided you must select an option from `lv_default`",
         example="1101, 1105, 1103",
+    ),
+    lv_plot_list: Optional[str] = Query(
+        None,
+        description="Provide a comma seperated list of up to 2 Low Voltage Network ids to plot. They must be either in `lv_list` or the networks in the `default_lv` selection",
     ),
     lv_default: Optional[DefaultLV] = Query(
         None,
@@ -163,7 +168,7 @@ async def simulate(
 ):
 
     # MV parameters are already valid. LV parameters need additional validation
-    lv_list_validated = validate_lv_parameters(lv_list, lv_default, n_id)
+    lv_list_validated = validate_lv_parameters(lv_list, lv_default, lv_plot_list, n_id)
 
     # Validate Demand and Generation Profiles
     mv_solar_profile_array = validate_profile(mv_solar_pv_profile, mv_solar_pv_csv)
@@ -186,17 +191,65 @@ async def simulate(
     if dry_run:
         return "valid"
 
+    lv_plot_list = (
+        ValidateLVParams._parse_lv_list(lv_plot_list)
+        if lv_plot_list
+        else lv_list_validated[:2]
+    )
     # Pass parameters to dss
-    # ToDo: Wire up all parmaeters
     parameters = aox.run_dict0
-    parameters["network_data"]["n_id"] = int(n_id.value)
 
-    fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
+    parameters["network_data"]["n_id"] = int(n_id.value)
+    parameters["network_data"]["xfmr_scale"] = xfmr_scale
+    parameters["network_data"]["oltc_setpoint"] = oltc_setpoint * 100
+    parameters["network_data"]["oltc_bandwidth"] = oltc_bandwidth * 100
+    parameters["network_data"]["lv_sel"] = "lv_list"
+    parameters["network_data"]["lv_list"] = [str(i) for i in lv_list_validated]
+    parameters["rs_pen"] = rs_pen * 100
+    parameters["plot_options"]["lv_voltages"] = [str(i) for i in lv_plot_list]
+
+    (
+        mv_highlevel_buffer,
+        lv_voltages_buffer,
+        lv_comparison_buffer,
+        mv_voltages_buffer,
+        mv_powers_buffer,
+        mv_highlevel_buffer,
+        mv_highlevel_clean_buffer,
+        trn_powers_buffer,
+        profile_options_buffer,
+        pmry_loadings_buffer,
+        pmry_powers_buffer,
+        profile_sel_buffer,
+    ) = azure_mockup.run_dss_simulation(parameters)
+
     resultdict = {
         "parameters": parameters,
         "filename": file_name,
-        "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
-        "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
+        "mv_highlevel": base64.b64encode(mv_highlevel_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "lv_voltages": base64.b64encode(lv_voltages_buffer.getvalue()).decode("utf-8"),
+        "lv_comparison": base64.b64encode(lv_comparison_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "mv_voltages": base64.b64encode(mv_voltages_buffer.getvalue()).decode("utf-8"),
+        "mv_powers": base64.b64encode(mv_powers_buffer.getvalue()).decode("utf-8"),
+        "mv_highlevel": base64.b64encode(mv_highlevel_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "mv_highlevel_clean": base64.b64encode(
+            mv_highlevel_clean_buffer.getvalue()
+        ).decode("utf-8"),
+        "trn_powers": base64.b64encode(trn_powers_buffer.getvalue()).decode("utf-8"),
+        "profile_options": base64.b64encode(profile_options_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "pmry_loadings": base64.b64encode(pmry_loadings_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
+        "profile_sel": base64.b64encode(profile_sel_buffer.getvalue()).decode("utf-8"),
     }
 
     return resultdict

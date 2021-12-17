@@ -40,6 +40,7 @@ class ValidateLVParams(BaseModel):
 
     n_id: NetworkID
     lv_list: Optional[str]
+    lv_plot_list: Optional[str]
     lv_default: Optional[DefaultLV]
 
     @validator(
@@ -75,6 +76,22 @@ class ValidateLVParams(BaseModel):
 
         return v
 
+    @validator("lv_plot_list")
+    def validate_lv_plot_list(cls, v: Optional[str], values):
+
+        if v is None:
+            return v
+
+        lv_list = set(ValidateLVParams._parse_lv_list(values["lv_list"]))
+
+        plot_list = ValidateLVParams._parse_lv_list(v)
+
+        if len(plot_list) > 2:
+            raise ValueError("lv_plot_list must only contain two ids")
+
+        if not set(plot_list).issubset(lv_list):
+            raise ValueError("lv_plot_list contains ids not in `lv_list`")
+
     @validator("lv_default")
     def validate_lv_default(cls, v: Optional[DefaultLV], values):
 
@@ -94,14 +111,18 @@ class ValidateLVParams(BaseModel):
 
     def value(self):
 
+        if self.lv_list:
+            return ValidateLVParams._parse_lv_list(self.lv_list)
+
         if self.lv_default:
             return self._get_default_list()
-        if self.lv_list:
-            return
 
 
 def validate_lv_parameters(
-    lv_list: Optional[str], lv_default: Optional[DefaultLV], n_id: NetworkID
+    lv_list: Optional[str],
+    lv_default: Optional[DefaultLV],
+    lv_plot_list: Optional[str],
+    n_id: NetworkID,
 ) -> List[int]:
     """Validate the Low Voltage Network parameters and return a list of Low Voltage
     network ids.
@@ -118,10 +139,12 @@ def validate_lv_parameters(
     """
 
     try:
-        params = ValidateLVParams(n_id=n_id, lv_list=lv_list, lv_default=lv_default)
+        params = ValidateLVParams(
+            n_id=n_id, lv_list=lv_list, lv_plot_list=lv_plot_list, lv_default=lv_default
+        )
     except ValidationError as e:
         raise RequestValidationError(errors=e.raw_errors)
-    return params.value
+    return params.value()
 
 
 class ProfileBaseModel(BaseModel):
