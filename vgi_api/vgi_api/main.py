@@ -1,6 +1,6 @@
 import base64
 import logging
-from typing import Optional
+from typing import Optional, List, Any
 
 import fastapi
 from fastapi import File, Query, UploadFile
@@ -8,6 +8,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from vgi_api import azure_mockup
 from vgi_api import azureOptsXmpls as aox
+
 from vgi_api.validation import (
     VALID_LV_NETWORKS_RURAL,
     VALID_LV_NETWORKS_URBAN,
@@ -24,7 +25,7 @@ from vgi_api.validation import (
     validate_lv_parameters,
     validate_profile,
 )
-from vgi_api.validation.types import DEFAULT_LV_NETWORKS
+from vgi_api.validation.types import DEFAULT_LV_NETWORKS, AllOptions
 
 app = fastapi.FastAPI()
 
@@ -236,21 +237,32 @@ async def lv_network_defaults(
     return {"networks": DEFAULT_LV_NETWORKS[n_id][lv_default]}
 
 
-# def save_uploaded_file(file, save_name, size_limit):
-#     real_file_size = 0
-#     temp = NamedTemporaryFile(delete=False)
-#     for chunk in file.file:
-#         real_file_size += len(
-#             chunk
-#         )  # Chunk size (default 1MB) set by starlette https://github.com/encode/starlette/blob/master/starlette/datastructures.py#L412
-#         if real_file_size > size_limit:
-#             logging.info(
-#                 "File has reached size {} > limit {}".format(real_file_size, size_limit)
-#             )
-#             raise HTTPException(
-#                 status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
-#                 detail="{} is too large".format(file.filename),
-#             )
-#         temp.write(chunk)
-#     temp.close()
-#     shutil.move(temp.name, save_name)
+@app.get("/get-options", response_model=List[str])
+async def get_options(option_type: AllOptions):
+    def get_members(option: Any) -> List[str]:
+
+        return [member.value for _, member in option.__members__.items()]
+
+    if option_type == AllOptions.MVSolarPVOptions:
+
+        return get_members(MVSolarPVOptions)
+
+    elif option_type == AllOptions.MVEVChargerOptions:
+
+        return get_members(MVEVChargerOptions)
+
+    elif option_type == AllOptions.LVSmartMeterOptions:
+
+        return get_members(LVSmartMeterOptions)
+
+    elif option_type == AllOptions.LVElectricVehicleOptions:
+
+        return get_members(LVElectricVehicleOptions)
+
+    elif option_type == AllOptions.LVPVOptions:
+
+        return get_members(LVPVOptions)
+
+    elif option_type == AllOptions.LVHPOptions:
+
+        return get_members(LVHPOptions)
