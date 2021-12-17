@@ -27,7 +27,7 @@ from .funcsPython_turing import (
     csvIn,
     mtDict,
     rngSeed,
-    o2o
+    o2o,
 )
 from . import funcsDss_turing
 from .funcsMath_turing import vecSlc, tp2ar
