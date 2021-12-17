@@ -123,9 +123,18 @@
               Custom selection of IDs
             </label>
             <div class="col-md-6">
-              <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" @change="printLVSelected()" :disabled="lv_options.lv_default!=='custom'">
+              <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
                 <option v-for="lv_id in lv_options.lv_list" :key="lv_id">{{ lv_id }}</option>
               </select>
+            </div>
+          </div>
+
+          <div class="form group row">
+            <label for="lv_selected_output" class="col-md-6 col-form-label">
+              Currently selected LV networks
+            </label>
+            <div class="col-md-6 col-form-label">
+              {{ lv_options.lv_selected.join(", ") }}
             </div>
           </div>
         </div>
@@ -398,10 +407,6 @@ export default {
 
   methods: {
 
-    printLVSelected() {
-      console.log(this.lv_options.lv_selected)
-    },
-
     fetchAPIData() {
       // Ask user to wait while API request is formed and made
       this.plots = [];
@@ -409,16 +414,16 @@ export default {
       this.isLoading = true;
       this.responseAvailable = false;
 
+      // Initialise URL with parameters from config
       var url = new URL("/simulate", process.env.VUE_APP_API_URL);
       var url_params = JSON.parse(JSON.stringify(this.config));
-      if (this.lv_options.lv_default == "custom") {
-        console.log("Appending custom list of LV networks to url params")
-        console.log(toString(this.lv_options.lv_selected))
-        url_params.lv_list = toString(this.lv_options.lv_selected);
-        console.log("lv list in url params:", url_params.lv_list)
+      
+      // Add further parameters: named set of LV networks or custom list
+      var lv_params = JSON.parse(JSON.stringify(this.lv_options));
+      if (lv_params.lv_default == "custom") {
+        url_params.lv_list = lv_params.lv_selected;
       } else {
-        console.log("Appending name of list of LV networks to url params")
-        url_params.lv_default = this.lv_options.lv_default;
+        url_params.lv_default = lv_params.lv_default;
       }
 
       url_params.dry_run = false;
@@ -548,7 +553,6 @@ export default {
             }
           })
           .then(response => {
-            console.log("Preselected LV IDs for", this.config.n_id, "/", this.lv_options.lv_default, ": ", JSON.parse(response).networks)
             this.lv_options.lv_selected = JSON.parse(response).networks;
           })
           .catch(err => {
