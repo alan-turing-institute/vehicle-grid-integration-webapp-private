@@ -129,10 +129,12 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         )  # for now only compare two profiles
 
         fig, ax = plt.subplots()
+        print("Internal: ", rd["plot_options"]["lv_voltages"])
         lv_idxs = [
-            simulation.ckts.ldNo.index(nn)
-            for nn in rd["plot_options"]["lv_voltages"]
+            simulation.ckts.ldNo.index(nn) for nn in rd["plot_options"]["lv_voltages"]
         ]
+
+        print("IDS = ", lv_idxs)
 
         clrs = [
             "C0",
@@ -150,7 +152,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
         _ = [
             plt.plot(np.nan, np.nan, color=clr, label=lbl)
-            for lbl, clr in zip(simulation.ckts.ldNo, clrs)
+            for lbl, clr in zip(rd["plot_options"]["lv_voltages"], clrs)
         ]
         plt.legend(
             title="LV Network ID",
@@ -259,7 +261,6 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         mv_voltages_buffer = io.BytesIO()
         plt.gcf().savefig(mv_voltages_buffer, facecolor="LightGray")
 
-
         # PLOT: trn_powers
         plt.clf()
         spri = np.array([np.abs(s.Spri) for s in slns])
@@ -350,10 +351,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         # PLOT: pmry_loadings
         plt.clf()
         yy = (
-            1e2
-            * 1e-3
-            * splt
-            / np.array([v for v in simulation.fdr2pwr.values()])
+            1e2 * 1e-3 * splt / np.array([v for v in simulation.fdr2pwr.values()])
         )  # in %
         _ = [
             plt.plot(tt, yy[:, i], color=matplotlib.cm.tab20(i))
@@ -363,9 +361,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             f"F{i+1} (to {b}), {p} MVA"
             for i, (b, p) in enumerate(simulation.fdr2pwr.items())
         ]
-        plt.legend(
-            lgnd, loc=(1.03, 0.2), fontsize="small", title="Feeder (to), rating"
-        )
+        plt.legend(lgnd, loc=(1.03, 0.2), fontsize="small", title="Feeder (to), rating")
         plt.hlines(
             100,
             tt[0],
