@@ -129,12 +129,9 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         )  # for now only compare two profiles
 
         fig, ax = plt.subplots()
-        print("Internal: ", rd["plot_options"]["lv_voltages"])
         lv_idxs = [
             simulation.ckts.ldNo.index(nn) for nn in rd["plot_options"]["lv_voltages"]
         ]
-
-        print("IDS = ", lv_idxs)
 
         clrs = [
             "C0",
