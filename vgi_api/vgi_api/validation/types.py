@@ -71,10 +71,6 @@ class ProfileUnits(str, Enum):
     KWH = "kWh"
 
 
-# ToDo: Matt to give us full list of options
-VALID_LV_NETWORKS_URBAN: List[int] = [1101, 1102, 1103, 1104, 1105, 1106, 1107]
-VALID_LV_NETWORKS_RURAL: List[int] = []
-
 # These are defaults that could be selected
 DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
     NetworkID.RURAL: {
