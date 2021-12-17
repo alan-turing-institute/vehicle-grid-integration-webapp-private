@@ -9,9 +9,11 @@ from vgi_api.validation.types import (
     LVPVOptions,
     LVHPOptions,
     ProfileUnits,
+    DEFAULT_LV_NETWORKS,
+)
+from vgi_api.validation.network_ids import (
     VALID_LV_NETWORKS_RURAL,
     VALID_LV_NETWORKS_URBAN,
-    DEFAULT_LV_NETWORKS,
 )
 from vgi_api.validation.validators import (
     validate_lv_parameters,
