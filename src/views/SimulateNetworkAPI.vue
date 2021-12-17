@@ -409,39 +409,24 @@ export default {
       this.isLoading = true;
       this.responseAvailable = false;
 
-      var url = process.env.VUE_APP_API_URL + "/simulate";
-
-      if (process.env.NODE_ENV == "development") {
-        console.log("Using API URL:", url);
+      var url = new URL("/simulate", process.env.VUE_APP_API_URL);
+      var url_params = JSON.parse(JSON.stringify(this.config));
+      if (this.lv_options.lv_default == "custom") {
+        console.log("Appending custom list of LV networks to url params")
+        console.log(toString(this.lv_options.lv_selected))
+        url_params.lv_list = toString(this.lv_options.lv_selected);
+        console.log("lv list in url params:", url_params.lv_list)
+      } else {
+        console.log("Appending name of list of LV networks to url params")
+        url_params.lv_default = this.lv_options.lv_default;
       }
 
-      // Convert config options into URL parameters
+      url_params.dry_run = false;
 
-      // Electricity distribution network parameters / MV
-      let edn_params_mv = "n_id=" + this.config.n_id;
-      "&xfmr_scale=" +
-        this.config.xfmr_scale +
-        "&oltc_setpoint=" +
-        this.config.oltc_setpoint +
-        "&oltc_bandwidth=" +
-        this.config.oltc_bandwidth +
-        "&rs_pen=" +
-        this.config.rs_pen;
+      url.search = new URLSearchParams(url_params).toString();
 
-      // Electricity distribution network parameters / LV
-      let edn_params_lv = "lv_list=" + this.lv_options.lv_list;
-
-      // Demand and generation profiles / MV
-      let dag_params_mv = "";
-
-      url +=
-        "?" +
-        edn_params_mv +
-        "&" +
-        edn_params_lv +
-        dag_params_mv +
-        "&dry_run=true";
-      console.log("url: ", url);
+      console.log("URL params", url_params)
+      console.log(url)
 
       // let formData = new FormData();
       fetch(url, {
