@@ -28,7 +28,7 @@
               Network ID
             </label>
             <div class="col-sm-6">
-              <select v-model="config.n_id" class="form-control">
+              <select v-model="config.n_id" class="form-control" @change="updateLVNetworksList()">
                 <option value="1060">11kV urban network</option>
                 <option value="1061">11kV urban - rural network</option>
               </select>
@@ -105,35 +105,29 @@
 
           <div class="form-group row">
             <!-- Experiment parameter: lv_default (if custom, open lv_list option below) -->
-            <label for="lv_default" class="col-md-6 col-form-label">
+            <label for="lv_options.lv_default" class="col-md-6 col-form-label">
               IDs of up to 5 LV networks to model in detail
             </label>
             <div class="col-md-6">
-              <select v-model="config.lv_default" class="form-control">
-                <option>1101, 1105, 1103</option>
-                <option>1101, 1102, 1103</option>
-                <option>Custom</option>
+              <select v-model="lv_options.lv_default" class="form-control" @change="updatePreselectedLVNetworksList()">
+                <option>near-sub</option>
+                <option>near-edge</option>
+                <option>mixed</option>
+                <option>custom</option>
               </select>
             </div>
           </div>
 
-          <template v-if="config.lv_default == 'Custom'">
-            <div class="form-group row">
-              <!-- Experiment parameter: lv_list -->
-              <label for="lv_list" class="col-md-6 col-form-label">
-                Custom selection of up to 5 LV network IDs to model in detail
-              </label>
-              <div class="col-md-6">
-                <input
-                  v-model.number="config.lv_list"
-                  type="string"
-                  class="form-control"
-                  id="lv_list"
-                  placeholder="1101, 1105, 1103"
-                />
-              </div>
+          <div class="form-group row">
+            <label for="lv_list" class="col-md-6 col-form-label">
+              Custom selection of IDs
+            </label>
+            <div class="col-md-6">
+              <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" @change="printLVSelected()" :disabled="lv_options.lv_default!=='custom'">
+                <option v-for="lv_id in lv_options.lv_list" :key="lv_id">{{ lv_id }}</option>
+              </select>
             </div>
-          </template>
+          </div>
         </div>
       </div>
 
@@ -360,9 +354,6 @@ export default {
         oltc_setpoint: 1.04,
         oltc_bandwidth: 0.13,
         rs_pen: 0.8,
-        // LV
-        lv_default: "1101, 1105, 1103",
-        lv_list: "1101, 1105, 1103",
         // Demand and generation profiles
         // MV
         mv_solar_pv_profile: "Option a",
@@ -373,6 +364,11 @@ export default {
         mv_ev_charger_csv: null,
         // LV
         p_ev: 10
+      },
+      lv_options:{
+        lv_default: "near-sub",
+        lv_list: [],
+        lv_selected: []
       },
       profile_options: {
         mv_solar_pv_list: [],
@@ -399,9 +395,15 @@ export default {
       this.profile_options.mv_ev_charger_list = p_list;
       this.config.mv_ev_charger_profile = p_list[0];
     });
+    this.updateLVNetworksList()   // also updates preselected networks as nested function
   },
 
   methods: {
+
+    printLVSelected() {
+      console.log(this.lv_options.lv_selected)
+    },
+
     fetchAPIData() {
       // Ask user to wait while API request is formed and made
       this.plot1 = "";
@@ -431,7 +433,7 @@ export default {
         this.config.rs_pen;
 
       // Electricity distribution network parameters / LV
-      let edn_params_lv = "lv_list=" + this.config.lv_list;
+      let edn_params_lv = "lv_list=" + this.lv_options.lv_list;
 
       // Demand and generation profiles / MV
       let dag_params_mv = "";
@@ -507,12 +509,63 @@ export default {
           }
         })
         .then(response => {
-          console.log("Returning response ", response);
           return JSON.parse(response);
         })
         .catch(err => {
           console.log(err);
         });
+    },
+
+    updateLVNetworksList() {
+      return fetch(
+        process.env.VUE_APP_API_URL + "/lv-network?n_id=" + this.config.n_id,
+        {
+          method: "GET"
+        }
+      )
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          } else {
+            alert(
+              "Server returned " + response.status + " : " + response.statusText
+            );
+          }
+        })
+        .then(response => {
+          this.lv_options.lv_list = JSON.parse(response).networks;
+          this.updatePreselectedLVNetworksList()
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+
+    updatePreselectedLVNetworksList() {
+      if (this.lv_options.lv_default != "custom") {
+        return fetch(
+          process.env.VUE_APP_API_URL + "/lv-network-defaults?n_id=" + this.config.n_id + "&lv_default=" + this.lv_options.lv_default,
+          {
+            method: "GET"
+          }
+        )
+          .then(response => {
+            if (response.ok) {
+              return response.text();
+            } else {
+              alert(
+                "Server returned " + response.status + " : " + response.statusText
+              );
+            }
+          })
+          .then(response => {
+            console.log("Preselected LV IDs for", this.config.n_id, "/", this.lv_options.lv_default, ": ", JSON.parse(response).networks)
+            this.lv_options.lv_selected = JSON.parse(response).networks;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     }
   }
 };
