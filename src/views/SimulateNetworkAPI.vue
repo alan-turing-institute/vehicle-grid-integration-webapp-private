@@ -457,8 +457,18 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "Network layout", plot: responseJson["plot1"] },
-            { name: "MV load over time", plot: responseJson["plot2"] }
+            { name: "mv_highlevel", plot: responseJson["mv_highlevel"] },
+            { name: "lv_voltages", plot: responseJson["lv_voltages"] },
+            { name: "lv_comparison", plot: responseJson["lv_comparison"] },
+            { name: "mv_voltages", plot: responseJson["mv_voltages"] },
+            { name: "mv_powers", plot: responseJson["mv_powers"] },
+            { name: "mv_highlevel", plot: responseJson["mv_highlevel"] },
+            { name: "mv_highlevel_clean", plot: responseJson["mv_highlevel_clean"] },
+            { name: "trn_powers", plot: responseJson["trn_powers"] },
+            { name: "profile_options", plot: responseJson["profile_options"] },
+            { name: "pmry_loadings", plot: responseJson["pmry_loadings"] },
+            { name: "pmry_powers", plot: responseJson["pmry_powers"] },
+            { name: "profile_sel", plot: responseJson["profile_sel"] },
           ];
 
           this.responseAvailable = true;
