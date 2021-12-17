@@ -440,7 +440,20 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         profile_sel_buffer = io.BytesIO()
         plt.gcf().savefig(profile_sel_buffer, facecolor="LightGray")
 
-    return mv_highlevel_buffer, lv_voltages_buffer
+    return (
+        mv_highlevel_buffer,
+        lv_voltages_buffer,
+        lv_comparison_buffer,
+        mv_voltages_buffer,
+        mv_powers_buffer,
+        mv_highlevel_buffer,
+        mv_highlevel_clean_buffer,
+        trn_powers_buffer,
+        profile_options_buffer,
+        pmry_loadings_buffer,
+        pmry_powers_buffer,
+        profile_sel_buffer,
+    )
 
 
 if __name__ == "__main__":

@@ -207,12 +207,48 @@ async def simulate(
     parameters["rs_pen"] = rs_pen * 100
     parameters["plot_options"]["lv_voltages"] = [str(i) for i in lv_plot_list]
 
-    fig1, fig2 = azure_mockup.run_dss_simulation(parameters)
+    (
+        mv_highlevel_buffer,
+        lv_voltages_buffer,
+        lv_comparison_buffer,
+        mv_voltages_buffer,
+        mv_powers_buffer,
+        mv_highlevel_buffer,
+        mv_highlevel_clean_buffer,
+        trn_powers_buffer,
+        profile_options_buffer,
+        pmry_loadings_buffer,
+        pmry_powers_buffer,
+        profile_sel_buffer,
+    ) = azure_mockup.run_dss_simulation(parameters)
+
     resultdict = {
         "parameters": parameters,
         "filename": file_name,
-        "plot1": base64.b64encode(fig1.getvalue()).decode("utf-8"),
-        "plot2": base64.b64encode(fig2.getvalue()).decode("utf-8"),
+        "mv_highlevel": base64.b64encode(mv_highlevel_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "lv_voltages": base64.b64encode(lv_voltages_buffer.getvalue()).decode("utf-8"),
+        "lv_comparison": base64.b64encode(lv_comparison_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "mv_voltages": base64.b64encode(mv_voltages_buffer.getvalue()).decode("utf-8"),
+        "mv_powers": base64.b64encode(mv_powers_buffer.getvalue()).decode("utf-8"),
+        "mv_highlevel": base64.b64encode(mv_highlevel_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "mv_highlevel_clean": base64.b64encode(
+            mv_highlevel_clean_buffer.getvalue()
+        ).decode("utf-8"),
+        "trn_powers": base64.b64encode(trn_powers_buffer.getvalue()).decode("utf-8"),
+        "profile_options": base64.b64encode(profile_options_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "pmry_loadings": base64.b64encode(pmry_loadings_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
+        "profile_sel": base64.b64encode(profile_sel_buffer.getvalue()).decode("utf-8"),
     }
 
     return resultdict
