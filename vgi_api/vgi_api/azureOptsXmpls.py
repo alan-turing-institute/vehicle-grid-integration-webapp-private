@@ -113,15 +113,10 @@ run_dict0 = {
             },  # powers in kW / None
             "fcs": {
                 "lv": None,
-                "mv": [
-                    "uss24_urban_",
-                    [
-                        125,
-                        300,
-                    ],
-                ],
-            },  # powers in kW
+                "mv": "usb_fcs",
+            },  # powers in kW is using 'None'
             "n": 12,  # samples per day; must satisfy (144 % n)==0
+            # 'n':48, # samples per day; must satisfy (144 % n)==0
             "hps": {
                 "lv": "hp_love_1",
                 "mv": "hp_love_1_",
@@ -131,11 +126,28 @@ run_dict0 = {
     },
     # Various plotting options to return to the user etc.
     "plot_options": {  # Using:
-        "lv_voltages": ["1101", "1164"],  # n only 2 numbers allowed.
-        "lv_comparison": True,  # y
+        "mv_highlevel": False,  # y
+        "mv_highlevel_clean": False,  # No
+        "mv_voltage_ts": False,  # y
+        "mv_powers": False,  # ??
+        "trn_powers": False,  # y
+        "pmry_powers": False,  # No
+        "pmry_loadings": False,  # y
+        "profile_options": False,  # No
+        "lv_voltages": [
+            False,
+            [
+                "1101",
+                "1164",
+            ],
+        ],  # n only 2 numbers allowed.
+        "lv_comparison": False,  # y
         # use [k for k,v in self.p.items() if v.ndim==2] to see
         # what can be used with profile_sel
-        "profile_sel": ["hp_love_Jan"],  # No
+        "profile_sel": [
+            False,
+            "hp_love_Jan",
+        ],  # No
     },
 }
 
