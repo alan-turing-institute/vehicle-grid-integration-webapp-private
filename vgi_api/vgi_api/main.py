@@ -210,7 +210,7 @@ async def simulate(
 
     # Add profiles to parameters
     # ToDo: Make sure all csv uploads are in kw
-    parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_pv_csv
+    parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_profile_array
     parameters["simulation_data"]["mv_ev_profile_array"] = mv_ev_profile_array
     parameters["simulation_data"][
         "smart_meter_profile_array"
