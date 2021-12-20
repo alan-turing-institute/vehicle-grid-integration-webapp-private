@@ -208,6 +208,18 @@ async def simulate(
     parameters["rs_pen"] = rs_pen * 100
     parameters["plot_options"]["lv_voltages"] = [str(i) for i in lv_plot_list]
 
+    # Add profiles to parameters
+    # ToDo: Make sure all csv uploads are in kw
+    parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_pv_csv
+    parameters["simulation_data"]["mv_ev_profile_array"] = mv_ev_profile_array
+    parameters["simulation_data"][
+        "smart_meter_profile_array"
+    ] = smart_meter_profile_array
+    parameters["simulation_data"]["lv_ev_profile_array"] = lv_ev_profile_array
+    parameters["simulation_data"]["lv_pv_profile_array"] = lv_pv_profile_array
+    parameters["simulation_data"]["lv_hp_profile_array"] = lv_hp_profile_array
+
+    # Run simulation
     (
         mv_highlevel_buffer,
         lv_voltages_buffer,
@@ -319,3 +331,9 @@ async def get_options(option_type: AllOptions):
     elif option_type == AllOptions.LVHPOptions:
 
         return get_members(LVHPOptions)
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000)

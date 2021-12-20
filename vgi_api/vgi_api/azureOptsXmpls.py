@@ -80,54 +80,15 @@ run_dict0 = {
             "mv": "mv",
         },
     },
+    # These are either None or a numpy array with shape (48Xm)
     "simulation_data": {
-        # Time series profiles types. See help(turingNet.set_dmnd)
-        # to see options here.
-        "ts_profiles": {
-            "rs": {"lv": "uss24_urban", "mv": "uss24_urban_"},
-            "ic": {
-                "lv": None,
-                "mv": "ic00",
-            },
-            "ovnt": {
-                "lv": "ev_encc",
-                "mv": "ev_encc_",
-            },
-            "dytm": {
-                "lv": None,
-                "mv": "ev_acn_",
-            },
-            "slr": {
-                "lv": "solar0",
-                "mv": "solar0",
-            },
-            "dgs": {
-                "lv": None,
-                "mv": [
-                    "solar0",
-                    [
-                        250,
-                        50,
-                    ],
-                ],
-            },  # powers in kW / None
-            "fcs": {
-                "lv": None,
-                "mv": [
-                    "uss24_urban_",
-                    [
-                        125,
-                        300,
-                    ],
-                ],
-            },  # powers in kW
-            "n": 48,  # samples per day; must satisfy (144 % n)==0
-            "hps": {
-                "lv": "hp_love_1",
-                "mv": "hp_love_1_",
-            },
-        },
-        "sim_type": None,  # type of simulation, e.g., da-ahead v2g, etc
+        "mv_solar_profile_array": None,
+        "mv_ev_profile_array": None,
+        "smart_meter_profile_array": None,
+        "lv_ev_profile_array": None,
+        "lv_pv_profile_array": None,
+        "lv_hp_profile_array": None
+        # "sim_type": None,  # type of simulation, e.g., da-ahead v2g, etc
     },
     # Various plotting options to return to the user etc.
     "plot_options": {  # Using:
@@ -208,14 +169,12 @@ rd_xmpl.update(
     }
 )  # without
 # rd_xmpl.update({'slr_pen':0,'hps_pen':33,'ev_pen':33,}) # with
-rd_xmpl["simulation_data"]["ts_profiles"]["n"] = 48
+# rd_xmpl["simulation_data"]["ts_profiles"]["n"] = 48
 rd_xmpl["network_data"]["lv_list"] = lv_list
 
 # Choose the network mods - no FCS or DGs
 rd_xmpl["dmnd_gen_data"]["dgs"]["mv"] = None
-rd_xmpl["simulation_data"]["ts_profiles"]["dgs"]["mv"] = None
 rd_xmpl["dmnd_gen_data"]["fcs"]["mv"] = None
-rd_xmpl["simulation_data"]["ts_profiles"]["fcs"]["mv"] = None
 
 # Network plotting
 rd_xmpl["plot_options"]["mv_highlevel"] = False
