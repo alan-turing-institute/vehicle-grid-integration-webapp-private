@@ -16,14 +16,14 @@ from vgi_api.validation import (
 )
 from vgi_api.validation import types
 from vgi_api.validation.types import (
-    MVEVChargerOptions,
+    MVFCSOptions,
     MVSolarPVOptions,
     LVSmartMeterOptions,
     LVElectricVehicleOptions,
     ProfileUnits,
-    SOLAR_PROFILES,
-    EV_PROFILES,
-    SMART_METER_PROFILES,
+    MV_SOLAR_PROFILES,
+    MV_FCS_PROFILES,
+    LV_SMART_METER_PROFILES,
     LV_EV_PROFILES,
     LV_PV_PROFILES,
     LV_HP_PROFILES,
@@ -247,14 +247,14 @@ class MVSolarProfile(ProfileBaseModel):
         return csv_to_array(self.mv_solar_pv_csv)
 
 
-class MVEVProfile(ProfileBaseModel):
-    mv_ev_charger_csv: tempfile.SpooledTemporaryFile
+class MVFCSProfile(ProfileBaseModel):
+    mv_fcs_charger_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("mv_ev_charger_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("mv_fcs_charger_csv", allow_reuse=True)(validate_csv)
 
     def to_array(self) -> np.array:
 
-        return csv_to_array(self.mv_ev_charger_csv)
+        return csv_to_array(self.mv_fcs_charger_csv)
 
 
 class LVSmartMeterProfile(ProfileBaseModel):
@@ -304,7 +304,7 @@ class LVHPProfile(ProfileBaseModel):
 def validate_profile(
     options: Union[
         MVSolarPVOptions,
-        MVEVChargerOptions,
+        MVFCSOptions,
         LVSmartMeterOptions,
         LVElectricVehicleOptions,
         LVPVOptions,
@@ -321,7 +321,7 @@ def validate_profile(
     If the variant is anything else it will load a profile and return it
 
     Args:
-        options (Union[MVSolarPVOptions, MVEVChargerOptions]): A profile option
+        options (Union[MVSolarPVOptions, MVFCSOptions]): A profile option
         csv_file (Optional[UploadFile]): An optional csv file. Only used if options is set to CSV
 
     Returns:
@@ -338,20 +338,20 @@ def validate_profile(
         elif options == MVSolarPVOptions.NONE:
             return None
         else:
-            return csv_to_array(SOLAR_PROFILES[options])
+            return csv_to_array(MV_SOLAR_PROFILES[options])
 
-    elif isinstance(options, MVEVChargerOptions):
+    elif isinstance(options, MVFCSOptions):
 
-        if options == MVEVChargerOptions.CSV:
+        if options == MVFCSOptions.CSV:
             try:
-                profile = MVEVProfile(mv_ev_charger_csv=csv_file.file)
+                profile = MVFCSProfile(mv_fcs_charger_csv=csv_file.file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
-        elif options == MVEVChargerOptions.NONE:
+        elif options == MVFCSOptions.NONE:
             return None
         else:
-            return csv_to_array(EV_PROFILES[options])
+            return csv_to_array(MV_FCS_PROFILES[options])
 
     elif isinstance(options, LVSmartMeterOptions):
 
@@ -361,10 +361,8 @@ def validate_profile(
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
-        elif options == LVSmartMeterOptions.NONE:
-            return None
         else:
-            return csv_to_array(SMART_METER_PROFILES[options])
+            return csv_to_array(LV_SMART_METER_PROFILES[options])
 
     elif isinstance(options, LVElectricVehicleOptions):
 

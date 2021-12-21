@@ -15,7 +15,7 @@ from vgi_api.validation import (
     VALID_LV_NETWORKS_URBAN,
     DefaultLV,
     LVSmartMeterOptions,
-    MVEVChargerOptions,
+    MVFCSOptions,
     MVSolarPVOptions,
     NetworkID,
     ValidateLVParams,
@@ -202,7 +202,7 @@ def upload_csv(file: io.BytesIO, param_key, option, csv_name) -> requests.Respon
     "param_key, option, csv_name",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
-        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("mv_fcs_charger_profile", MVFCSOptions.CSV, "mv_fcs_charger_csv"),
         ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
         ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
         ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
@@ -220,7 +220,7 @@ def test_valid_csv(valid_profile_csv: io.BytesIO, param_key, option, csv_name):
     "param_key, option, csv_name",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
-        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
         ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
         ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
         ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
@@ -240,7 +240,7 @@ def test_invalid_csv_long(
     "param_key, option, csv_name",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
-        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
         ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
         ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
         ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
@@ -260,7 +260,7 @@ def test_invalid_csv_short(
     "param_key, option, csv_name",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
-        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
         ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
         ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
         ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
@@ -280,7 +280,7 @@ def test_invalid_csv_wrong_time(
     "param_key, option, csv_name",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
-        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
         ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
         ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
         ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
@@ -300,7 +300,7 @@ def test_invalid_csv_offset(
     "param_key, option, csv_name",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
-        ("mv_ev_charger_profile", MVEVChargerOptions.CSV, "mv_ev_charger_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
         ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
         ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
         ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
@@ -321,7 +321,7 @@ def test_invalid_csv_not_float(
     "param_key, option",
     [
         ("mv_solar_pv_profile", MVSolarPVOptions.OPTION1),
-        ("mv_ev_charger_profile", MVEVChargerOptions.OPTION1),
+        ("mv_fcs_charger_profile", MVFCSOptions.OPTION1),
         ("lv_smart_meter_profile", LVSmartMeterOptions.OPTION1),
         ("lv_ev_profile", LVElectricVehicleOptions.OPTION1),
         ("lv_pv_profile", LVPVOptions.OPTION1),
