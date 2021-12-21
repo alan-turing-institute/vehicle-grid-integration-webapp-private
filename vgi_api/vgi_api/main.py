@@ -216,7 +216,9 @@ async def simulate(
     parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_profile_array
     # parameters["simulation_data"]["mv_fcs_profile_array"] = mv_ev_profile_array
     parameters["simulation_data"]["mv_fcs_profile_array"] = mv_fcs_profile_array
-    parameters["simulation_data"]["smart_meter_profile_array"] = smart_meter_profile_array
+    parameters["simulation_data"][
+        "smart_meter_profile_array"
+    ] = smart_meter_profile_array
     parameters["simulation_data"]["lv_ev_profile_array"] = lv_ev_profile_array
     parameters["simulation_data"]["lv_pv_profile_array"] = lv_pv_profile_array
     parameters["simulation_data"]["lv_hp_profile_array"] = lv_hp_profile_array
@@ -263,7 +265,6 @@ async def simulate(
             "utf-8"
         ),
         "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
-
     }
 
     return resultdict

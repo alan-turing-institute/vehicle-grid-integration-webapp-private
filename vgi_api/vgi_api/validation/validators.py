@@ -6,6 +6,7 @@ from pathlib import Path
 from fastapi.exceptions import RequestValidationError
 from pydantic import BaseModel, validator
 from pydantic.error_wrappers import ValidationError
+from starlette.datastructures import UploadFile as StarletteUploadFile
 from vgi_api import validation
 from vgi_api.validation import (
     NetworkID,
@@ -14,13 +15,11 @@ from vgi_api.validation import (
     VALID_LV_NETWORKS_URBAN,
     DEFAULT_LV_NETWORKS,
 )
-from vgi_api.validation import types
 from vgi_api.validation.types import (
     MVFCSOptions,
     MVSolarPVOptions,
     LVSmartMeterOptions,
     LVElectricVehicleOptions,
-    ProfileUnits,
     MV_SOLAR_PROFILES,
     MV_FCS_PROFILES,
     LV_SMART_METER_PROFILES,
@@ -29,7 +28,6 @@ from vgi_api.validation.types import (
     LV_HP_PROFILES,
     LVHPOptions,
     LVPVOptions,
-    DATA_FOLDER,
 )
 import tempfile
 import numpy as np
@@ -177,7 +175,7 @@ def csv_to_array(file: Union[tempfile.SpooledTemporaryFile, Path]) -> np.array:
         raise NotImplementedError(f"Not implemented for type {type(file)}")
 
 
-def validate_csv(v: Optional[UploadFile]):
+def validate_csv(v: Optional[Union[IO, UploadFile]]):
     """Validate an uploaded csv
 
     Args:
@@ -195,8 +193,8 @@ def validate_csv(v: Optional[UploadFile]):
     if v is None:
         raise IOError("A CSV file was not uploaded or did not have the correct name")
 
-    v = v.file
-
+    if isinstance(v, StarletteUploadFile):
+        v: IO = v.file
 
     # Check we have the right number of lines
     expected_n_lines_excluding_header = 24 * 2
@@ -247,7 +245,9 @@ def validate_csv(v: Optional[UploadFile]):
 class MVSolarProfile(ProfileBaseModel):
     mv_solar_pv_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True, pre = True)(validate_csv)
+    _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True, pre=True)(
+        validate_csv
+    )
 
     def to_array(self) -> np.array:
 
@@ -258,7 +258,9 @@ class MVFCSProfile(ProfileBaseModel):
 
     mv_fcs_charger_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("mv_fcs_charger_csv", allow_reuse=True, pre = True)(validate_csv)
+    _validate_csv = validator("mv_fcs_charger_csv", allow_reuse=True, pre=True)(
+        validate_csv
+    )
 
     def to_array(self) -> np.array:
 
@@ -269,7 +271,9 @@ class LVSmartMeterProfile(ProfileBaseModel):
 
     lv_smart_meter_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_smart_meter_csv", allow_reuse=True, pre = True)(validate_csv)
+    _validate_csv = validator("lv_smart_meter_csv", allow_reuse=True, pre=True)(
+        validate_csv
+    )
 
     def to_array(self) -> np.array:
 
@@ -280,7 +284,7 @@ class LVEVProfile(ProfileBaseModel):
 
     lv_ev_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_ev_csv", allow_reuse=True, pre = True)(validate_csv)
+    _validate_csv = validator("lv_ev_csv", allow_reuse=True, pre=True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -291,7 +295,7 @@ class LVPVProfile(ProfileBaseModel):
 
     lv_pv_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_pv_csv", allow_reuse=True, pre = True)(validate_csv)
+    _validate_csv = validator("lv_pv_csv", allow_reuse=True, pre=True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -302,7 +306,7 @@ class LVHPProfile(ProfileBaseModel):
 
     lv_hp_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_hp_csv", allow_reuse=True, pre = True)(validate_csv)
+    _validate_csv = validator("lv_hp_csv", allow_reuse=True, pre=True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -335,8 +339,6 @@ def validate_profile(
     Returns:
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
-
-    
 
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:

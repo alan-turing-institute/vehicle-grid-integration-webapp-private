@@ -9,18 +9,12 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from vgi_api import app
-from vgi_api.validation import (
-    DEFAULT_LV_NETWORKS,
-    VALID_LV_NETWORKS_RURAL,
-    VALID_LV_NETWORKS_URBAN,
-    DefaultLV,
-    LVSmartMeterOptions,
-    MVFCSOptions,
-    MVSolarPVOptions,
-    NetworkID,
-    ValidateLVParams,
-)
-from vgi_api.validation.types import LVElectricVehicleOptions, LVHPOptions, LVPVOptions
+from vgi_api.validation import (DEFAULT_LV_NETWORKS, VALID_LV_NETWORKS_RURAL,
+                                VALID_LV_NETWORKS_URBAN, DefaultLV,
+                                LVSmartMeterOptions, MVFCSOptions,
+                                MVSolarPVOptions, NetworkID, ValidateLVParams)
+from vgi_api.validation.types import (LVElectricVehicleOptions, LVHPOptions,
+                                      LVPVOptions)
 
 client = TestClient(app)
 
@@ -342,4 +336,3 @@ def test_csv_options(param_key: str, option: Enum):
     )
     debug(resp.json())
     assert resp.status_code == 200
-

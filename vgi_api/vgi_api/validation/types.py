@@ -1,6 +1,6 @@
 """Types used for validating API query parameters"""
 from enum import Enum
-from typing import List, Dict
+from typing import List, Dict, Union
 from pathlib import Path
 
 
@@ -113,8 +113,10 @@ LV_SMART_METER_PROFILES: Dict[LVSmartMeterOptions, Path] = {
 }
 
 LV_EV_PROFILES: Dict[LVElectricVehicleOptions, Path] = {
-    LVElectricVehicleOptions.OPTION1: LV_PROFILES / "EV-crowdCharge--3.6kW--start-2018-01-01--end-2018-12-17--30min.csv",
-    LVElectricVehicleOptions.OPTION2: LV_PROFILES / "EV-crowdCharge--7kW--start-2018-01-01--end-2018-12-17--30min.csv",
+    LVElectricVehicleOptions.OPTION1: LV_PROFILES
+    / "EV-crowdCharge--3.6kW--start-2018-01-01--end-2018-12-17--30min.csv",
+    LVElectricVehicleOptions.OPTION2: LV_PROFILES
+    / "EV-crowdCharge--7kW--start-2018-01-01--end-2018-12-17--30min.csv",
 }
 
 LV_PV_PROFILES: Dict[LVPVOptions, Path] = {
