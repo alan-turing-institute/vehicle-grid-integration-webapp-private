@@ -237,9 +237,10 @@ async def simulate(
         pmry_powers_buffer,
     ) = azure_mockup.run_dss_simulation(parameters)
 
+    # Remove simulation data as can't be serialised
+    parameters.pop("simulation_data")
     resultdict = {
         "parameters": parameters,
-        "filename": file_name,
         "mv_highlevel": base64.b64encode(mv_highlevel_buffer.getvalue()).decode(
             "utf-8"
         ),
