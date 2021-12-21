@@ -177,7 +177,7 @@ def csv_to_array(file: Union[tempfile.SpooledTemporaryFile, Path]) -> np.array:
         raise NotImplementedError(f"Not implemented for type {type(file)}")
 
 
-def validate_csv(v: IO):
+def validate_csv(v: Optional[UploadFile]):
     """Validate an uploaded csv
 
     Args:
@@ -191,6 +191,13 @@ def validate_csv(v: IO):
     Returns:
         IO: Return v
     """
+
+    if v is None:
+        raise IOError("A CSV file was not uploaded or did not have the correct name")
+
+    v = v.file
+
+
     # Check we have the right number of lines
     expected_n_lines_excluding_header = 24 * 2
     expect_n_lines = expected_n_lines_excluding_header + 1
@@ -240,7 +247,7 @@ def validate_csv(v: IO):
 class MVSolarProfile(ProfileBaseModel):
     mv_solar_pv_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True, pre = True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -248,9 +255,10 @@ class MVSolarProfile(ProfileBaseModel):
 
 
 class MVFCSProfile(ProfileBaseModel):
+
     mv_fcs_charger_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("mv_fcs_charger_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("mv_fcs_charger_csv", allow_reuse=True, pre = True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -261,7 +269,7 @@ class LVSmartMeterProfile(ProfileBaseModel):
 
     lv_smart_meter_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_smart_meter_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("lv_smart_meter_csv", allow_reuse=True, pre = True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -272,7 +280,7 @@ class LVEVProfile(ProfileBaseModel):
 
     lv_ev_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_ev_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("lv_ev_csv", allow_reuse=True, pre = True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -283,7 +291,7 @@ class LVPVProfile(ProfileBaseModel):
 
     lv_pv_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_pv_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("lv_pv_csv", allow_reuse=True, pre = True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -294,7 +302,7 @@ class LVHPProfile(ProfileBaseModel):
 
     lv_hp_csv: tempfile.SpooledTemporaryFile
 
-    _validate_csv = validator("lv_hp_csv", allow_reuse=True)(validate_csv)
+    _validate_csv = validator("lv_hp_csv", allow_reuse=True, pre = True)(validate_csv)
 
     def to_array(self) -> np.array:
 
@@ -328,10 +336,12 @@ def validate_profile(
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
 
+    
+
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:
             try:
-                profile = MVSolarProfile(mv_solar_pv_csv=csv_file.file)
+                profile = MVSolarProfile(mv_solar_pv_csv=csv_file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
@@ -344,7 +354,7 @@ def validate_profile(
 
         if options == MVFCSOptions.CSV:
             try:
-                profile = MVFCSProfile(mv_fcs_charger_csv=csv_file.file)
+                profile = MVFCSProfile(mv_fcs_charger_csv=csv_file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
@@ -357,7 +367,7 @@ def validate_profile(
 
         if options == LVSmartMeterOptions.CSV:
             try:
-                profile = LVSmartMeterProfile(lv_smart_meter_csv=csv_file.file)
+                profile = LVSmartMeterProfile(lv_smart_meter_csv=csv_file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
@@ -368,7 +378,7 @@ def validate_profile(
 
         if options == LVElectricVehicleOptions.CSV:
             try:
-                profile = LVEVProfile(lv_ev_csv=csv_file.file)
+                profile = LVEVProfile(lv_ev_csv=csv_file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
@@ -381,7 +391,7 @@ def validate_profile(
 
         if options == LVPVOptions.CSV:
             try:
-                profile = LVPVProfile(lv_pv_csv=csv_file.file)
+                profile = LVPVProfile(lv_pv_csv=csv_file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
@@ -394,7 +404,7 @@ def validate_profile(
 
         if options == LVHPOptions.CSV:
             try:
-                profile = LVHPProfile(lv_hp_csv=csv_file.file)
+                profile = LVHPProfile(lv_hp_csv=csv_file)
                 return profile.to_array()
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
