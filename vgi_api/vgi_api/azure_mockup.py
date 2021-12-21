@@ -50,11 +50,11 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
         frid0 = rd["network_data"]["n_id"]
         simulation = ft.turingNet(frId=1000, frId0=frid0, rundict=rd, mod_dir=temp_dir)
-        tsp_n = rd["simulation_data"]["ts_profiles"]["n"]
-        tt = np.arange(0, 24, 24 / tsp_n)  # get the clock
+        # tsp_n = rd["simulation_data"]["ts_profiles"]["n"]
+        tt = np.arange(0, 24, 24 / 48)  # get the clock
 
         # Get the solutions
-        lds = simulation.get_lds_kva(tsp_n)
+        lds = simulation.get_lds_kva(48)
         slns, _ = simulation.run_dss_lds(lds)
 
         # From here: create all plots
@@ -236,7 +236,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         plt.clf()
         smv2pu = lambda s: np.abs(s.Vmv) / simulation.vKvbase[simulation.mvIdx]
         vb = np.array([smv2pu(s) for s in slns])
-        fillplot(vb, np.linspace(0, 24, tsp_n))
+        fillplot(vb, np.linspace(0, 24, 48))
         set_day_label()
         xlm = plt.xlim()
         plt.hlines([0.94, 1.06], *xlm, linestyle="dashed", color="r", lw=0.8)
@@ -391,51 +391,51 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         pmry_powers_buffer = io.BytesIO()
         plt.gcf().savefig(pmry_powers_buffer, facecolor="LightGray")
 
-        # PLOT: profile_sel
-        plt.clf()
-        # ksel_opts = [k for k,v in simulation.p.items() if v.ndim==2] # list the options
-        ksel = rd["plot_options"]["profile_sel"][0]
-        nplt = 10
-        fig, [ax0, ax1] = plt.subplots(
-            figsize=(8, 3.6),
-            ncols=2,
-            nrows=1,
-            sharey=True,
-            sharex=True,
-        )
-        clrs = new_hsl_map(nplt)
+        # # PLOT: profile_sel
+        # plt.clf()
+        # # ksel_opts = [k for k,v in simulation.p.items() if v.ndim==2] # list the options
+        # ksel = rd["plot_options"]["profile_sel"][0]
+        # nplt = 10
+        # fig, [ax0, ax1] = plt.subplots(
+        #     figsize=(8, 3.6),
+        #     ncols=2,
+        #     nrows=1,
+        #     sharey=True,
+        #     sharex=True,
+        # )
+        # clrs = new_hsl_map(nplt)
 
-        _ = [
-            ax0.plot(
-                tt,
-                simulation.p[ksel][i],
-                ".-",
-                color=clrs[i],
-            )
-            for i in range(nplt)
-        ]
-        ax0.set_title(
-            f'Plotting {nplt} of {len(simulation.p[ksel])} "{ksel}" profiles\n'
-        )
-        ax0.set_ylabel("Power, kW")
-        ax0.set_xlabel("Hour of the day")
+        # _ = [
+        #     ax0.plot(
+        #         tt,
+        #         simulation.p[ksel][i],
+        #         ".-",
+        #         color=clrs[i],
+        #     )
+        #     for i in range(nplt)
+        # ]
+        # ax0.set_title(
+        #     f'Plotting {nplt} of {len(simulation.p[ksel])} "{ksel}" profiles\n'
+        # )
+        # ax0.set_ylabel("Power, kW")
+        # ax0.set_xlabel("Hour of the day")
 
-        fillplot(
-            simulation.p[ksel].T,
-            tt,
-            ax=ax1,
-        )
-        plt.plot(tt, np.median(simulation.p[ksel], axis=0), "k", label="Median")
-        plt.plot(tt, np.mean(simulation.p[ksel], axis=0), "b--", label="Mean")
-        ax1.set_title(f'Range, Quartiles, Median\nand Mean of "{ksel}" profiles')
-        ax1.legend()
-        set_day_label()
-        plt.tight_layout()
-        if sf:
-            sff(f"profile_sel_{ksel}")
+        # fillplot(
+        #     simulation.p[ksel].T,
+        #     tt,
+        #     ax=ax1,
+        # )
+        # plt.plot(tt, np.median(simulation.p[ksel], axis=0), "k", label="Median")
+        # plt.plot(tt, np.mean(simulation.p[ksel], axis=0), "b--", label="Mean")
+        # ax1.set_title(f'Range, Quartiles, Median\nand Mean of "{ksel}" profiles')
+        # ax1.legend()
+        # set_day_label()
+        # plt.tight_layout()
+        # if sf:
+        #     sff(f"profile_sel_{ksel}")
 
-        profile_sel_buffer = io.BytesIO()
-        plt.gcf().savefig(profile_sel_buffer, facecolor="LightGray")
+        # profile_sel_buffer = io.BytesIO()
+        # plt.gcf().savefig(profile_sel_buffer, facecolor="LightGray")
 
     return (
         mv_highlevel_buffer,
@@ -449,7 +449,6 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         profile_options_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
-        profile_sel_buffer,
     )
 
 

@@ -206,15 +206,18 @@ async def simulate(
     parameters["network_data"]["lv_sel"] = "lv_list"
     parameters["network_data"]["lv_list"] = [str(i) for i in lv_list_validated]
     parameters["rs_pen"] = rs_pen * 100
-    parameters["plot_options"]["lv_voltages"] = [str(i) for i in lv_plot_list]
+    
+    parameters["slr_pen"] = lv_pv_pen * 100
+    parameters["ev_pen"] = lv_ev_pen * 100
+    parameters["hps_pen"] = lv_hp_pen * 100
 
+    parameters["plot_options"]["lv_voltages"] = [str(i) for i in lv_plot_list]
     # Add profiles to parameters
     # ToDo: Make sure all csv uploads are in kw
     parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_profile_array
-    parameters["simulation_data"]["mv_ev_profile_array"] = mv_ev_profile_array
-    parameters["simulation_data"][
-        "smart_meter_profile_array"
-    ] = smart_meter_profile_array
+    parameters["simulation_data"]["mv_fcs_profile_array"] = mv_ev_profile_array
+    # parameters["simulation_data"]["mv_fcs_profile_array"] = mv_fcs_profile_array
+    parameters["simulation_data"]["smart_meter_profile_array"] = smart_meter_profile_array
     parameters["simulation_data"]["lv_ev_profile_array"] = lv_ev_profile_array
     parameters["simulation_data"]["lv_pv_profile_array"] = lv_pv_profile_array
     parameters["simulation_data"]["lv_hp_profile_array"] = lv_hp_profile_array
@@ -232,7 +235,6 @@ async def simulate(
         profile_options_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
-        profile_sel_buffer,
     ) = azure_mockup.run_dss_simulation(parameters)
 
     resultdict = {
@@ -261,7 +263,7 @@ async def simulate(
             "utf-8"
         ),
         "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
-        "profile_sel": base64.b64encode(profile_sel_buffer.getvalue()).decode("utf-8"),
+
     }
 
     return resultdict
