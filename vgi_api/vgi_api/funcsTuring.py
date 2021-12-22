@@ -961,16 +961,23 @@ class turingNet(snk.dNet):
         self.p = Bunch()
 
         # Set the ic00 demand
-        self.p.ic00 = np.expand_dims(ic00_prof, axis = 1)
-        
-        for k,v in simulation_data.items():
+        self.p.ic00 = np.expand_dims(ic00_prof, axis=1)
+
+        for k, v in simulation_data.items():
             if v is not None:
                 self.p[k] = v
-        
+
         # Collapse 2-dimensional profiles to a mean and append.
-        means = {k: np.mean(v,axis=1,)for k, v in self.p.items() if v.ndim == 2}
+        means = {
+            k: np.mean(
+                v,
+                axis=1,
+            )
+            for k, v in self.p.items()
+            if v.ndim == 2
+        }
         _ = [setattr(self.p, k + "_", v) for k, v in means.items()]
-    
+
     def set_dmnd(
         self,
     ):
@@ -996,10 +1003,7 @@ class turingNet(snk.dNet):
         self.dmnd = Bunch(
             {
                 k: Bunch(
-                    {
-                        vv: np.zeros((self.ldsi[k]["n" + vv],48))
-                        for vv in self.str_lvmv
-                    }
+                    {vv: np.zeros((self.ldsi[k]["n" + vv], 48)) for vv in self.str_lvmv}
                 )
                 for k in self.ldsi.kw
             }
@@ -1015,38 +1019,49 @@ class turingNet(snk.dNet):
         nhses = lds0 / self.s_to_nhouses  # no houses per lds0
 
         ld2sd = {
-            'rs':'smart_meter_profile_array',
-            'ovnt':'lv_ev_profile_array', # EV
-            'slr':'lv_pv_profile_array',
-            'hps':'lv_hp_profile_array',
-            'ic':'ic00',
-            'fcs':'mv_fcs_profile_array',
-            'dgs':'mv_solar_profile_array',
+            "rs": "smart_meter_profile_array",
+            "ovnt": "lv_ev_profile_array",  # EV
+            "slr": "lv_pv_profile_array",
+            "hps": "lv_hp_profile_array",
+            "ic": "ic00",
+            "fcs": "mv_fcs_profile_array",
+            "dgs": "mv_solar_profile_array",
         }
-        
+
         # Low voltage
-        for ld,sdn in ld2sd.items():
-            if self.ldsi[ld]['nlv']>0 and sdn in self.p.keys():
+        for ld, sdn in ld2sd.items():
+            if self.ldsi[ld]["nlv"] > 0 and sdn in self.p.keys():
                 pp = self.p[sdn]
                 self.dmnd[ld].lv = np.array(
-                    [pp[:,i % pp.shape[1]] for i in range(self.ldsi[ld].nlv)]
-            )
-        
+                    [pp[:, i % pp.shape[1]] for i in range(self.ldsi[ld].nlv)]
+                )
+
         # MV 'residential' means
-        for ld in ['rs','ovnt','slr','hps',]:
-            if self.ldsi[ld]['nmv']>0 and ld2sd[ld] in self.p.keys():
-                pp = self.p[sdn]
-                frac = self.ldsi[ld].nlv/self.mvlvi.nlv
-                self.dmnd[ld].mv = np.array([pp*nhses[i]*frac[i] 
-                                                for i in self.ldsi[ld].mv])
-        
+        for ld in [
+            "rs",
+            "ovnt",
+            "slr",
+            "hps",
+        ]:
+            if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
+                pp = self.p[ld2sd[ld]]
+                frac = self.ldsi[ld].nlv / self.mvlvi.nlv
+                self.dmnd[ld].mv = np.array(
+                    [pp * nhses[i] * frac[i] for i in self.ldsi[ld].mv]
+                )
+
         # MV DGs, FCS, IC
-        for ld in ['ic','fcs','dgs',]:
-            if self.ldsi[ld]['nmv']>0 and ld2sd[ld] in self.p.keys():
-                pp = self.p[sdn]
-                self.dmnd[ld].mv = np.array([pp[:,i % pp.shape[1]]
-                                                for i in self.ldsi[ld].mv])
-        
+        for ld in [
+            "ic",
+            "fcs",
+            "dgs",
+        ]:
+            if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
+                pp = self.p[ld2sd[ld]]
+                self.dmnd[ld].mv = np.array(
+                    [pp[:, i % pp.shape[1]] for i in self.ldsi[ld].mv]
+                )
+
         # if check_val("rs", "mv"):
         #     # Assign the mean profile to all loads
         #     pp = self.p[tsp["rs"]["mv"]]
