@@ -28,6 +28,7 @@ from vgi_api.validation.types import (
     LV_HP_PROFILES,
     LVHPOptions,
     LVPVOptions,
+    ProfileUnits,
 )
 import tempfile
 import numpy as np
@@ -343,6 +344,7 @@ def validate_profile(
         LVHPOptions,
     ],
     csv_file: Optional[UploadFile],
+    units: ProfileUnits,
 ) -> Optional[Path]:
     """Pass an enum of profile options: `options`. If the options enum variant is `NONE`
     will return None.
@@ -364,7 +366,11 @@ def validate_profile(
         if options == MVSolarPVOptions.CSV:
             try:
                 profile = MVSolarProfile(mv_solar_pv_csv=csv_file)
-                return profile.to_array() * -1
+                return (
+                    profile.to_array()
+                    * -1.0
+                    * (2.0 if units == ProfileUnits.KWH else 1.0)
+                )
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == MVSolarPVOptions.NONE:
@@ -377,7 +383,7 @@ def validate_profile(
         if options == MVFCSOptions.CSV:
             try:
                 profile = MVFCSProfile(mv_fcs_charger_csv=csv_file)
-                return profile.to_array()
+                return profile.to_array() * (2.0 if units == ProfileUnits.KWH else 1.0)
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == MVFCSOptions.NONE:
@@ -390,7 +396,7 @@ def validate_profile(
         if options == LVSmartMeterOptions.CSV:
             try:
                 profile = LVSmartMeterProfile(lv_smart_meter_csv=csv_file)
-                return profile.to_array()
+                return profile.to_array() * (2.0 if units == ProfileUnits.KWH else 1.0)
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         else:
@@ -401,7 +407,7 @@ def validate_profile(
         if options == LVElectricVehicleOptions.CSV:
             try:
                 profile = LVEVProfile(lv_ev_csv=csv_file)
-                return profile.to_array()
+                return profile.to_array() * (2.0 if units == ProfileUnits.KWH else 1.0)
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == LVElectricVehicleOptions.NONE:
@@ -414,7 +420,11 @@ def validate_profile(
         if options == LVPVOptions.CSV:
             try:
                 profile = LVPVProfile(lv_pv_csv=csv_file)
-                return profile.to_array() * -1
+                return (
+                    profile.to_array()
+                    * -1
+                    * (2.0 if units == ProfileUnits.KWH else 1.0)
+                )
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == LVPVOptions.NONE:
@@ -427,7 +437,7 @@ def validate_profile(
         if options == LVHPOptions.CSV:
             try:
                 profile = LVHPProfile(lv_hp_csv=csv_file)
-                return profile.to_array()
+                return profile.to_array() * (2.0 if units == ProfileUnits.KWH else 1.0)
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == LVHPOptions.NONE:

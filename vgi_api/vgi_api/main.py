@@ -171,18 +171,28 @@ async def simulate(
     lv_list_validated = validate_lv_parameters(lv_list, lv_default, lv_plot_list, n_id)
 
     # Validate Demand and Generation Profiles
-    mv_solar_profile_array = validate_profile(mv_solar_pv_profile, mv_solar_pv_csv)
-
-    mv_fcs_profile_array = validate_profile(mv_fcs_profile, mv_fcs_csv)
-
-    smart_meter_profile_array = validate_profile(
-        lv_smart_meter_profile, lv_smart_meter_csv
+    mv_solar_profile_array = validate_profile(
+        mv_solar_pv_profile, mv_solar_pv_csv, mv_solar_pv_profile_units
     )
 
-    lv_ev_profile_array = validate_profile(lv_ev_profile, lv_ev_csv)
+    mv_fcs_profile_array = validate_profile(
+        mv_fcs_profile, mv_fcs_csv, mv_fcs_profile_units
+    )
 
-    lv_pv_profile_array = validate_profile(lv_pv_profile, lv_pv_csv)
-    lv_hp_profile_array = validate_profile(lv_hp_profile, lv_hp_csv)
+    smart_meter_profile_array = validate_profile(
+        lv_smart_meter_profile, lv_smart_meter_csv, lv_smart_meter_profile_units
+    )
+
+    lv_ev_profile_array = validate_profile(
+        lv_ev_profile, lv_ev_csv, lv_ev_profile_units
+    )
+
+    lv_pv_profile_array = validate_profile(
+        lv_pv_profile, lv_pv_csv, lv_pv_profile_units
+    )
+    lv_hp_profile_array = validate_profile(
+        lv_hp_profile, lv_hp_csv, lv_hp_profile_units
+    )
 
     logging.info("Passing params to dss")
     file_name = None
