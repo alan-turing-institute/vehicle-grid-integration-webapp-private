@@ -244,10 +244,20 @@ def validate_csv(v: Optional[Union[IO, UploadFile]]):
 
 class MVSolarProfile(ProfileBaseModel):
     mv_solar_pv_csv: tempfile.SpooledTemporaryFile
+    positive_val: bool = True
 
     _validate_csv = validator("mv_solar_pv_csv", allow_reuse=True, pre=True)(
         validate_csv
     )
+
+    @validator("positive_val", always=True)
+    def check_positive(cls, v, values):
+
+        if v:
+            if np.any(csv_to_array(values["mv_solar_pv_csv"]) < 0):
+                raise ValueError("All values in mv_solar_pv_csv must be greater than 0")
+
+        return v
 
     def to_array(self) -> np.array:
 
@@ -294,8 +304,18 @@ class LVEVProfile(ProfileBaseModel):
 class LVPVProfile(ProfileBaseModel):
 
     lv_pv_csv: tempfile.SpooledTemporaryFile
+    positive_val: bool = True
 
     _validate_csv = validator("lv_pv_csv", allow_reuse=True, pre=True)(validate_csv)
+
+    @validator("positive_val", always=True)
+    def check_positive(cls, v, values):
+
+        if v:
+            if np.any(csv_to_array(values["lv_pv_csv"]) < 0):
+                raise ValueError("All values in lv_pv_csv must be greater than 0")
+
+        return v
 
     def to_array(self) -> np.array:
 
@@ -340,7 +360,6 @@ def validate_profile(
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
 
-    # ToDo: Make sure all passed values are positive and return negative values
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:
             try:
@@ -390,7 +409,6 @@ def validate_profile(
         else:
             return csv_to_array(LV_EV_PROFILES[options])
 
-    # ToDo: Make sure all passed values are positive and return negative values
     elif isinstance(options, LVPVOptions):
 
         if options == LVPVOptions.CSV:

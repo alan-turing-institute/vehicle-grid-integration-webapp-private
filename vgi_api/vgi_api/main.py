@@ -173,7 +173,6 @@ async def simulate(
     # Validate Demand and Generation Profiles
     mv_solar_profile_array = validate_profile(mv_solar_pv_profile, mv_solar_pv_csv)
 
-    ## ToDo: Add validation for all other files types
     mv_fcs_profile_array = validate_profile(mv_fcs_profile, mv_fcs_csv)
 
     smart_meter_profile_array = validate_profile(
@@ -239,9 +238,6 @@ async def simulate(
         pmry_powers_buffer,
     ) = azure_mockup.run_dss_simulation(parameters)
 
-    # Remove simulation data as can't be serialised
-
-    # ToDo: Need to copy these parameters to return them
     parameters.pop("simulation_data")
     resultdict = {
         "parameters": parameters,
