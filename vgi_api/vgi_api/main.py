@@ -1,7 +1,7 @@
 import base64
 import logging
 from typing import Optional, List, Any
-
+import copy
 import fastapi
 from fastapi import File, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -196,8 +196,9 @@ async def simulate(
         if lv_plot_list
         else lv_list_validated[:2]
     )
+
     # Pass parameters to dss
-    parameters = aox.run_dict0
+    parameters = copy.deepcopy(aox.run_dict0)
 
     parameters["network_data"]["n_id"] = int(n_id.value)
     parameters["network_data"]["xfmr_scale"] = xfmr_scale
@@ -239,6 +240,8 @@ async def simulate(
     ) = azure_mockup.run_dss_simulation(parameters)
 
     # Remove simulation data as can't be serialised
+
+    # ToDo: Need to copy these parameters to return them
     parameters.pop("simulation_data")
     resultdict = {
         "parameters": parameters,
