@@ -183,7 +183,7 @@ def validate_csv(v: Optional[Union[IO, UploadFile]]):
 
     Raises:
         ValueError: Must be 48 rows of data excluding header
-        ValueError: Time deltas must be in 30 minute intervals
+        ValueError: Time deltas must be in 30 minute intervals in HH-MM-SS
         ValueError: All non header element in column 1 onwards must be parsable as floats
 
     Returns:
@@ -340,17 +340,18 @@ def validate_profile(
         Optional[np.array]: A 2D numpy array with 48 rows (30 min intervals). Each column is a profile
     """
 
+    # ToDo: Make sure all passed values are positive and return negative values
     if isinstance(options, MVSolarPVOptions):
         if options == MVSolarPVOptions.CSV:
             try:
                 profile = MVSolarProfile(mv_solar_pv_csv=csv_file)
-                return profile.to_array()
+                return profile.to_array() * -1
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == MVSolarPVOptions.NONE:
             return None
         else:
-            return csv_to_array(MV_SOLAR_PROFILES[options])
+            return csv_to_array(MV_SOLAR_PROFILES[options]) * -1
 
     elif isinstance(options, MVFCSOptions):
 
@@ -389,18 +390,19 @@ def validate_profile(
         else:
             return csv_to_array(LV_EV_PROFILES[options])
 
+    # ToDo: Make sure all passed values are positive and return negative values
     elif isinstance(options, LVPVOptions):
 
         if options == LVPVOptions.CSV:
             try:
                 profile = LVPVProfile(lv_pv_csv=csv_file)
-                return profile.to_array()
+                return profile.to_array() * -1
             except ValidationError as e:
                 raise RequestValidationError(errors=e.raw_errors)
         elif options == LVPVOptions.NONE:
             return None
         else:
-            return csv_to_array(LV_PV_PROFILES[options])
+            return csv_to_array(LV_PV_PROFILES[options]) * -1
 
     elif isinstance(options, LVHPOptions):
 
