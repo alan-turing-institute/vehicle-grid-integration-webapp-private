@@ -1,7 +1,7 @@
 import base64
 import logging
 from typing import Optional, List, Any
-
+import copy
 import fastapi
 from fastapi import File, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -196,8 +196,9 @@ async def simulate(
         if lv_plot_list
         else lv_list_validated[:2]
     )
+
     # Pass parameters to dss
-    parameters = aox.run_dict0
+    parameters = copy.deepcopy(aox.run_dict0)
 
     parameters["network_data"]["n_id"] = int(n_id.value)
     parameters["network_data"]["xfmr_scale"] = xfmr_scale
@@ -206,7 +207,7 @@ async def simulate(
     parameters["network_data"]["lv_sel"] = "lv_list"
     parameters["network_data"]["lv_list"] = [str(i) for i in lv_list_validated]
     parameters["rs_pen"] = rs_pen * 100
-    
+
     parameters["slr_pen"] = lv_pv_pen * 100
     parameters["ev_pen"] = lv_ev_pen * 100
     parameters["hps_pen"] = lv_hp_pen * 100
@@ -217,7 +218,9 @@ async def simulate(
     parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_profile_array
     parameters["simulation_data"]["mv_fcs_profile_array"] = mv_ev_profile_array
     # parameters["simulation_data"]["mv_fcs_profile_array"] = mv_fcs_profile_array
-    parameters["simulation_data"]["smart_meter_profile_array"] = smart_meter_profile_array
+    parameters["simulation_data"][
+        "smart_meter_profile_array"
+    ] = smart_meter_profile_array
     parameters["simulation_data"]["lv_ev_profile_array"] = lv_ev_profile_array
     parameters["simulation_data"]["lv_pv_profile_array"] = lv_pv_profile_array
     parameters["simulation_data"]["lv_hp_profile_array"] = lv_hp_profile_array
@@ -238,6 +241,8 @@ async def simulate(
     ) = azure_mockup.run_dss_simulation(parameters)
 
     # Remove simulation data as can't be serialised
+
+    # ToDo: Need to copy these parameters to return them
     parameters.pop("simulation_data")
     resultdict = {
         "parameters": parameters,
@@ -264,7 +269,6 @@ async def simulate(
             "utf-8"
         ),
         "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
-
     }
 
     return resultdict
