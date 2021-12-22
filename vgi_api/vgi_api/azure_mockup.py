@@ -139,6 +139,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         ]
         for idx, clr in zip(lv_idxs, clrs):
             Vsec = np.array([s["VlvLds"][idx] for s in slns])[:, :, 0]
+            # ToDo: Return data in csv file
             fillplot(
                 np.abs(Vsec) / 230,
                 tt,
@@ -156,7 +157,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             fontsize="small",
         )
         set_day_label()
-        plt.ylabel("Voltage, pu")
+        plt.ylabel("Voltage, pu (230 V base)")
         xlm = plt.xlim()
         plt.hlines(
             [0.94, 1.10],
