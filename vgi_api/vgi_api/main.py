@@ -65,9 +65,9 @@ async def simulate(
         description="Medium Voltage transformer on-load tap charger (OLTC) set point. Change the set point (in % pu) of the oltc",
     ),
     oltc_bandwidth: float = Query(
-        0.13,
-        ge=0.1,
-        le=0.5,
+        0.013,
+        ge=0.01,
+        le=0.05,
         description="Change the bandwidth (in % pu) of the oltc",
     ),
     rs_pen: float = Query(
