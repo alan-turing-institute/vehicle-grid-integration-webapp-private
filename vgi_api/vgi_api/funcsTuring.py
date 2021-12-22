@@ -1044,10 +1044,10 @@ class turingNet(snk.dNet):
             "hps",
         ]:
             if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
-                pp = self.p[ld2sd[ld]]
+                pp = self.p[ld2sd[ld] + "_"]
                 frac = self.ldsi[ld].nlv / self.mvlvi.nlv
                 self.dmnd[ld].mv = np.array(
-                    [pp * nhses[i] * frac[i] for i in self.ldsi[ld].mv]
+                    [pp * nhses[i] * frac for i in self.ldsi[ld].mv]
                 )
 
         # MV DGs, FCS, IC

@@ -17,7 +17,7 @@ from vgi_api.validation import (
     LVHPOptions,
     LVPVOptions,
     LVSmartMeterOptions,
-    MVEVChargerOptions,
+    MVFCSOptions,
     MVSolarPVOptions,
     NetworkID,
     ProfileUnits,
@@ -65,9 +65,9 @@ async def simulate(
         description="Medium Voltage transformer on-load tap charger (OLTC) set point. Change the set point (in % pu) of the oltc",
     ),
     oltc_bandwidth: float = Query(
-        0.13,
-        ge=0.1,
-        le=0.5,
+        0.013,
+        ge=0.01,
+        le=0.05,
         description="Change the bandwidth (in % pu) of the oltc",
     ),
     rs_pen: float = Query(
@@ -100,19 +100,19 @@ async def simulate(
         ProfileUnits.KW,
         description="If `mv_solar_pv_csv` provided gives the units",
     ),
-    mv_ev_charger_profile: MVEVChargerOptions = Query(
-        MVEVChargerOptions.NONE,
-        description="Select a example ev profile or select CSV to upload your own. If CSV selected you must provide `mv_ev_charger_csv`",
+    mv_fcs_profile: MVFCSOptions = Query(
+        MVFCSOptions.NONE,
+        description="Select a example ev profile or select CSV to upload your own. If CSV selected you must provide `mv_fcs_charger_csv`",
     ),
-    mv_ev_charger_csv: Optional[UploadFile] = File(
+    mv_fcs_csv: Optional[UploadFile] = File(
         None, description="11kV connected EV fast chargers' stations"
     ),
-    mv_ev_charger_profile_units: ProfileUnits = Query(
+    mv_fcs_profile_units: ProfileUnits = Query(
         ProfileUnits.KW,
-        description="If `mv_ev_charger` provided gives the units",
+        description="If `mv_fcs_charger` provided gives the units",
     ),
     lv_smart_meter_profile: LVSmartMeterOptions = Query(
-        LVSmartMeterOptions.NONE,
+        LVSmartMeterOptions.OPTION1,
         description="",
     ),
     lv_smart_meter_csv: Optional[UploadFile] = File(None, description=""),
@@ -171,19 +171,28 @@ async def simulate(
     lv_list_validated = validate_lv_parameters(lv_list, lv_default, lv_plot_list, n_id)
 
     # Validate Demand and Generation Profiles
-    mv_solar_profile_array = validate_profile(mv_solar_pv_profile, mv_solar_pv_csv)
-
-    ## ToDo: Add validation for all other files types
-    mv_ev_profile_array = validate_profile(mv_ev_charger_profile, mv_ev_charger_csv)
-
-    smart_meter_profile_array = validate_profile(
-        lv_smart_meter_profile, lv_smart_meter_csv
+    mv_solar_profile_array = validate_profile(
+        mv_solar_pv_profile, mv_solar_pv_csv, mv_solar_pv_profile_units
     )
 
-    lv_ev_profile_array = validate_profile(lv_ev_profile, lv_ev_csv)
+    mv_fcs_profile_array = validate_profile(
+        mv_fcs_profile, mv_fcs_csv, mv_fcs_profile_units
+    )
 
-    lv_pv_profile_array = validate_profile(lv_pv_profile, lv_pv_csv)
-    lv_hp_profile_array = validate_profile(lv_hp_profile, lv_hp_csv)
+    smart_meter_profile_array = validate_profile(
+        lv_smart_meter_profile, lv_smart_meter_csv, lv_smart_meter_profile_units
+    )
+
+    lv_ev_profile_array = validate_profile(
+        lv_ev_profile, lv_ev_csv, lv_ev_profile_units
+    )
+
+    lv_pv_profile_array = validate_profile(
+        lv_pv_profile, lv_pv_csv, lv_pv_profile_units
+    )
+    lv_hp_profile_array = validate_profile(
+        lv_hp_profile, lv_hp_csv, lv_hp_profile_units
+    )
 
     logging.info("Passing params to dss")
     file_name = None
@@ -207,7 +216,6 @@ async def simulate(
     parameters["network_data"]["lv_sel"] = "lv_list"
     parameters["network_data"]["lv_list"] = [str(i) for i in lv_list_validated]
     parameters["rs_pen"] = rs_pen * 100
-
     parameters["slr_pen"] = lv_pv_pen * 100
     parameters["ev_pen"] = lv_ev_pen * 100
     parameters["hps_pen"] = lv_hp_pen * 100
@@ -216,8 +224,8 @@ async def simulate(
     # Add profiles to parameters
     # ToDo: Make sure all csv uploads are in kw
     parameters["simulation_data"]["mv_solar_profile_array"] = mv_solar_profile_array
-    parameters["simulation_data"]["mv_fcs_profile_array"] = mv_ev_profile_array
-    # parameters["simulation_data"]["mv_fcs_profile_array"] = mv_fcs_profile_array
+    # parameters["simulation_data"]["mv_fcs_profile_array"] = mv_ev_profile_array
+    parameters["simulation_data"]["mv_fcs_profile_array"] = mv_fcs_profile_array
     parameters["simulation_data"][
         "smart_meter_profile_array"
     ] = smart_meter_profile_array
@@ -240,9 +248,6 @@ async def simulate(
         pmry_powers_buffer,
     ) = azure_mockup.run_dss_simulation(parameters)
 
-    # Remove simulation data as can't be serialised
-
-    # ToDo: Need to copy these parameters to return them
     parameters.pop("simulation_data")
     resultdict = {
         "parameters": parameters,
@@ -319,9 +324,9 @@ async def get_options(option_type: AllOptions):
 
         return get_members(MVSolarPVOptions)
 
-    elif option_type == AllOptions.MVEVChargerOptions:
+    elif option_type == AllOptions.MVFCSOptions:
 
-        return get_members(MVEVChargerOptions)
+        return get_members(MVFCSOptions)
 
     elif option_type == AllOptions.LVSmartMeterOptions:
 
