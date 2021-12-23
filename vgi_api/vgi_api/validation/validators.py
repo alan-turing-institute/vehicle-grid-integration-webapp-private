@@ -254,7 +254,7 @@ class MVSolarProfile(ProfileBaseModel):
     @validator("positive_val", always=True)
     def check_positive(cls, v, values):
 
-        if v:
+        if v and values.get("mv_solar_pv_csv"):
             if np.any(csv_to_array(values["mv_solar_pv_csv"]) < 0):
                 raise ValueError("All values in mv_solar_pv_csv must be greater than 0")
 
@@ -312,7 +312,7 @@ class LVPVProfile(ProfileBaseModel):
     @validator("positive_val", always=True)
     def check_positive(cls, v, values):
 
-        if v:
+        if v and values.get("lv_pv_csv"):
             if np.any(csv_to_array(values["lv_pv_csv"]) < 0):
                 raise ValueError("All values in lv_pv_csv must be greater than 0")
 

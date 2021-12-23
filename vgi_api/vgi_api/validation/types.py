@@ -126,8 +126,8 @@ LV_PV_PROFILES: Dict[LVPVOptions, Path] = {
 
 
 LV_HP_PROFILES: Dict[LVHPOptions, Path] = {
-    LVHPOptions.OPTION1: LV_PROFILES / "hp_mid_weekday.csv",
-    LVHPOptions.OPTION2: LV_PROFILES / "hp_mid_weekend.csv",
-    LVHPOptions.OPTION3: LV_PROFILES / "hp_weekday.csv",
-    LVHPOptions.OPTION4: LV_PROFILES / "hp_weekend.csv",
+    LVHPOptions.OPTION1: LV_PROFILES / "hp_mid_weekday_48ts.csv",
+    LVHPOptions.OPTION2: LV_PROFILES / "hp_mid_weekend_48ts.csv",
+    LVHPOptions.OPTION3: LV_PROFILES / "hp_weekday_48ts.csv",
+    LVHPOptions.OPTION4: LV_PROFILES / "hp_weekend_48ts.csv",
 }
