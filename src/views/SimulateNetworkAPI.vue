@@ -148,7 +148,7 @@
         <div class="col-lg-6">
           <h5>MV connected</h5>
           <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
-          <select-profile v-model:profileOptions="profile_options.mv_ev_charger" title="11kV connected electric vehicle charging profile"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected electric vehicle charging profile"></select-profile>
         </div>
 
         <div class="col-lg-6">
@@ -253,7 +253,7 @@ export default {
         n_id: 1060,
         xfmr_scale: 1.0,
         oltc_setpoint: 1.04,
-        oltc_bandwidth: 0.13,
+        oltc_bandwidth: 0.013,
         rs_pen: 0.8,
       },
       lv_options:{
@@ -268,7 +268,7 @@ export default {
           units: "kW",
           csv: null,
         },
-        mv_ev_charger: {
+        mv_fcs: {
           list: [],
           profile: null,
           units: "kW",
@@ -318,9 +318,9 @@ export default {
       this.profile_options.mv_solar_pv.list = p_list;
       this.profile_options.mv_solar_pv.profile = p_list[0];
     });
-    this.getProfileOptions("mv-ev-charger").then(p_list => {
-      this.profile_options.mv_ev_charger.list = p_list;
-      this.profile_options.mv_ev_charger.profile = p_list[0];
+    this.getProfileOptions("mv-fcs").then(p_list => {
+      this.profile_options.mv_fcs.list = p_list;
+      this.profile_options.mv_fcs.profile = p_list[0];
     });
     this.getProfileOptions("lv-smartmeter").then(p_list => {
       this.profile_options.lv_smart_meter.list = p_list;
@@ -365,19 +365,19 @@ export default {
       // Add MV and LV profiles to URL (middle panel, left/right for MV/LV)
       let formData = new FormData();
       url_params, formData = this.appendProfileParams(url_params, formData, "mv_solar_pv", this.profile_options.mv_solar_pv)
-      url_params, formData = this.appendProfileParams(url_params, formData, "mv_ev_charger", this.profile_options.mv_ev_charger)
+      url_params, formData = this.appendProfileParams(url_params, formData, "mv_fcs", this.profile_options.mv_fcs)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_smart_meter", this.profile_options.lv_smart_meter)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_ev", this.profile_options.lv_electric_vehicle)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_pv", this.profile_options.lv_photovoltaic)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_hp", this.profile_options.lv_heat_pump)
 
-      url_params.dry_run = true;
+      url_params.dry_run = false;
 
       url.search = new URLSearchParams(url_params).toString();
 
       console.log("URL params", url_params)
-      for (let csv of formData.keys()) {
-        console.log("formData contains", csv)
+      for (let kv of formData.entries()) {
+        console.log("formData contains", kv[0], kv[1])
       }
       console.log(url)
 
@@ -385,7 +385,7 @@ export default {
 
       fetch(url, {
         method: "POST",
-        body: [check_csv_to_upload ? formData : null]
+        body: check_csv_to_upload ? formData : null
       })
         .then(response => {
           if (response.ok) {
@@ -437,7 +437,7 @@ export default {
       url_params[name + "_profile"] = params.profile;
       if (params.profile == "csv") {
         url_params[name + "_units"] = params.units;
-        form_data.append(name + "_csv", params.csv);
+        form_data.set(name + "_csv", params.csv[0]);
       }
       if (params.penetration !== undefined) {
         url_params[name + "_pen"] = params.penetration;
