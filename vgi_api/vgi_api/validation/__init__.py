@@ -3,7 +3,7 @@ from vgi_api.validation.types import (
     NetworkID,
     DefaultLV,
     MVSolarPVOptions,
-    MVEVChargerOptions,
+    MVFCSOptions,
     LVSmartMeterOptions,
     LVElectricVehicleOptions,
     LVPVOptions,
