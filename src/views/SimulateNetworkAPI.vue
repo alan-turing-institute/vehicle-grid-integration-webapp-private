@@ -28,7 +28,7 @@
               Network ID
             </label>
             <div class="col-sm-6">
-              <select v-model="config.n_id" class="form-control" @change="updateLVNetworksList()">
+              <select v-model="network_options.n_id" class="form-control" @change="updateLVNetworksList()">
                 <option value="1060">11kV urban network</option>
                 <option value="1061">11kV urban - rural network</option>
               </select>
@@ -42,7 +42,7 @@
             </label>
             <div class="col-md-6">
               <input
-                v-model.number="config.xfmr_scale"
+                v-model.number="network_options.xfmr_scale"
                 type="float"
                 class="form-control"
                 id="xfmr_scale"
@@ -58,7 +58,7 @@
             </label>
             <div class="col-md-6">
               <input
-                v-model.number="config.oltc_setpoint"
+                v-model.number="network_options.oltc_setpoint"
                 type="float"
                 class="form-control"
                 id="oltc_setpoint"
@@ -74,7 +74,7 @@
             </label>
             <div class="col-md-6">
               <input
-                v-model.number="config.oltc_bandwidth"
+                v-model.number="network_options.oltc_bandwidth"
                 type="float"
                 class="form-control"
                 id="oltc_bandwidth"
@@ -90,7 +90,7 @@
             </label>
             <div class="col-md-6">
               <input
-                v-model.number="config.rs_pen"
+                v-model.number="network_options.rs_pen"
                 type="float"
                 class="form-control"
                 id="rs_pen"
@@ -147,129 +147,16 @@
 
         <div class="col-lg-6">
           <h5>MV connected</h5>
-
-          <div class="form-group row">
-            <!-- Experiment parameter: mv_solar_pv_profile (if custom, open upload csv option below) -->
-            <label for="mv_solar_pv_profile" class="col-md-6 col-form-label">
-              11kV connected solar PV profile
-            </label>
-            <div class="col-md-6">
-              <select v-model="config.mv_solar_pv_profile" class="form-control">
-                <option
-                  v-for="opt in profile_options.mv_solar_pv_list"
-                  :key="opt"
-                  >{{ opt }}</option
-                >
-              </select>
-            </div>
-          </div>
-
-          <template v-if="config.mv_solar_pv_profile == 'csv'">
-            <!-- Upload: mv_solar_pv_csv -->
-            <div class="form-group row">
-              <label for="mv_solar_pv_csv" class="col-md-6 col-form-label">
-                Custom 11kV connected solar PV profile
-              </label>
-              <div class="col-md-6">
-                <input
-                  type="file"
-                  class="form-control"
-                  id="mv_solar_pv_csv"
-                  placeholder="mv_solar_pv_csv"
-                />
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-md-6 col-form-label">Units</label>
-              <div class="col-md-6">
-                <div class="form-check form-check-inline">
-                  <input
-                    v-model="config.mv_solar_pv_profile_units"
-                    type="radio"
-                    class="form-check-input"
-                    name="pv_unit_kW"
-                    value="kW"
-                  />
-                  <label class="form-check-label" for="pv_unit_kW">kW</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input
-                    v-model="config.mv_solar_pv_profile_units"
-                    type="radio"
-                    class="form-check-input"
-                    name="pv_unit_kWh"
-                    value="kWh"
-                  />
-                  <label class="form-check-label" for="pv_unit_kWh">kWh</label>
-                </div>
-              </div>
-            </div>
-          </template>
-
-          <div class="form-group row">
-            <!-- Experiment parameter: mv_ev_charger_profile (if custom, open upload csv option below) -->
-            <label for="mv_ev_charger_profile" class="col-md-6 col-form-label">
-              11kV connected electric vehicle charging profile
-            </label>
-            <div class="col-md-6">
-              <select
-                v-model="config.mv_ev_charger_profile"
-                class="form-control"
-              >
-                <option
-                  v-for="opt in profile_options.mv_ev_charger_list"
-                  :key="opt"
-                  >{{ opt }}</option
-                >
-              </select>
-            </div>
-          </div>
-
-          <template v-if="config.mv_ev_charger_profile == 'csv'">
-            <!-- Upload: mv_ev_charger_csv -->
-            <div class="form-group row">
-              <label for="mv_ev_charger_csv" class="col-md-6 col-form-label">
-                Custom 11kV connected electric vehicle charging profile
-              </label>
-              <div class="col-md-6">
-                <input
-                  type="file"
-                  class="form-control"
-                  id="mv_ev_charger_csv"
-                  placeholder="mv_ev_charger_csv"
-                />
-              </div>
-            </div>
-            <div class="form-group row">
-              <label class="col-md-6 col-form-label">Units</label>
-              <div class="col-md-6">
-                <div class="form-check form-check-inline">
-                  <input
-                    v-model="config.mv_ev_charger_profile_units"
-                    type="radio"
-                    class="form-check-input"
-                    name="ev_unit_kW"
-                    value="kW"
-                  />
-                  <label class="form-check-label" for="ev_unit_kW">kW</label>
-                </div>
-                <div class="form-check form-check-inline">
-                  <input
-                    v-model="config.mv_ev_charger_profile_units"
-                    type="radio"
-                    class="form-check-input"
-                    name="ev_unit_kWh"
-                    value="kWh"
-                  />
-                  <label class="form-check-label" for="ev_unit_kWh">kWh</label>
-                </div>
-              </div>
-            </div>
-          </template>
+          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_ev_charger" title="11kV connected electric vehicle charging profile"></select-profile>
         </div>
 
         <div class="col-lg-6">
           <h5>LV connected</h5>
+            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" title="Smart meter"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" title="Electric vehicles"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" title="Photovoltaic"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" title="Heat pump"></select-profile>
         </div>
       </div>
 
@@ -350,12 +237,17 @@
 </template>
 
 <script>
+import SelectProfile from "../components/SelectProfile.vue"
 export default {
   el: "#main",
 
+  components: {
+    SelectProfile
+  },
+
   data() {
     return {
-      config: {
+      network_options: {
         // Electricity distribution network parameters
         // MV
         n_id: 1060,
@@ -363,16 +255,6 @@ export default {
         oltc_setpoint: 1.04,
         oltc_bandwidth: 0.13,
         rs_pen: 0.8,
-        // Demand and generation profiles
-        // MV
-        mv_solar_pv_profile: "Option a",
-        mv_solar_pv_profile_units: "kW",
-        mv_solar_pv_csv: null,
-        mv_ev_charger_profile: "Option d",
-        mv_ev_charger_profile_units: "kW",
-        mv_ev_charger_csv: null,
-        // LV
-        p_ev: 10
       },
       lv_options:{
         lv_default: "near-sub",
@@ -380,8 +262,46 @@ export default {
         lv_selected: []
       },
       profile_options: {
-        mv_solar_pv_list: [],
-        mv_ev_charger_list: []
+        mv_solar_pv: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+        },
+        mv_ev_charger: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+        },
+        lv_smart_meter: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        },
+        lv_electric_vehicle: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        },
+        lv_photovoltaic: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        },
+        lv_heat_pump: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        }
       },
       // voltages: [],
       // report: [],
@@ -395,12 +315,28 @@ export default {
   mounted() {
     // Populate the lists used in the dropdown menus with their options
     this.getProfileOptions("mv-solar-pv").then(p_list => {
-      this.profile_options.mv_solar_pv_list = p_list;
-      this.config.mv_solar_pv_profile = p_list[0];
+      this.profile_options.mv_solar_pv.list = p_list;
+      this.profile_options.mv_solar_pv.profile = p_list[0];
     });
     this.getProfileOptions("mv-ev-charger").then(p_list => {
-      this.profile_options.mv_ev_charger_list = p_list;
-      this.config.mv_ev_charger_profile = p_list[0];
+      this.profile_options.mv_ev_charger.list = p_list;
+      this.profile_options.mv_ev_charger.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-smartmeter").then(p_list => {
+      this.profile_options.lv_smart_meter.list = p_list;
+      this.profile_options.lv_smart_meter.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-ev").then(p_list => {
+      this.profile_options.lv_electric_vehicle.list = p_list;
+      this.profile_options.lv_electric_vehicle.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-pv").then(p_list => {
+      this.profile_options.lv_photovoltaic.list = p_list;
+      this.profile_options.lv_photovoltaic.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-hp").then(p_list => {
+      this.profile_options.lv_heat_pump.list = p_list;
+      this.profile_options.lv_heat_pump.profile = p_list[0];
     });
     this.updateLVNetworksList()   // also updates preselected networks as nested function
   },
@@ -414,11 +350,11 @@ export default {
       this.isLoading = true;
       this.responseAvailable = false;
 
-      // Initialise URL with parameters from config
+      // Initialise URL with parameters from network options (top left panel)
       var url = new URL("/simulate", process.env.VUE_APP_API_URL);
-      var url_params = JSON.parse(JSON.stringify(this.config));
+      var url_params = JSON.parse(JSON.stringify(this.network_options));
       
-      // Add further parameters: named set of LV networks or custom list
+      // Add named set of LV networks or custom list to URL (top right panel)
       var lv_params = JSON.parse(JSON.stringify(this.lv_options));
       if (lv_params.lv_default == "custom") {
         url_params.lv_list = lv_params.lv_selected;
@@ -426,17 +362,30 @@ export default {
         url_params.lv_default = lv_params.lv_default;
       }
 
-      url_params.dry_run = false;
+      // Add MV and LV profiles to URL (middle panel, left/right for MV/LV)
+      let formData = new FormData();
+      url_params, formData = this.appendProfileParams(url_params, formData, "mv_solar_pv", this.profile_options.mv_solar_pv)
+      url_params, formData = this.appendProfileParams(url_params, formData, "mv_ev_charger", this.profile_options.mv_ev_charger)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_smart_meter", this.profile_options.lv_smart_meter)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_ev", this.profile_options.lv_electric_vehicle)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_pv", this.profile_options.lv_photovoltaic)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_hp", this.profile_options.lv_heat_pump)
+
+      url_params.dry_run = true;
 
       url.search = new URLSearchParams(url_params).toString();
 
       console.log("URL params", url_params)
+      for (let csv of formData.keys()) {
+        console.log("formData contains", csv)
+      }
       console.log(url)
 
-      // let formData = new FormData();
+      let check_csv_to_upload = Object.values(this.profile_options).reduce((any_csv, {profile}) => any_csv || profile=="csv", false)
+
       fetch(url, {
-        method: "POST"
-        // body: formData  // don't try to upload any csv data for now
+        method: "POST",
+        body: [check_csv_to_upload ? formData : null]
       })
         .then(response => {
           if (response.ok) {
@@ -484,6 +433,18 @@ export default {
         });
     },
 
+    appendProfileParams(url_params, form_data, name, params) {
+      url_params[name + "_profile"] = params.profile;
+      if (params.profile == "csv") {
+        url_params[name + "_units"] = params.units;
+        form_data.append(name + "_csv", params.csv);
+      }
+      if (params.penetration !== undefined) {
+        url_params[name + "_pen"] = params.penetration;
+      }
+      return url_params, form_data
+    },
+
     getProfileOptions(profile_name) {
       return fetch(
         process.env.VUE_APP_API_URL +
@@ -512,7 +473,7 @@ export default {
 
     updateLVNetworksList() {
       return fetch(
-        process.env.VUE_APP_API_URL + "/lv-network?n_id=" + this.config.n_id,
+        process.env.VUE_APP_API_URL + "/lv-network?n_id=" + this.network_options.n_id,
         {
           method: "GET"
         }
@@ -538,7 +499,7 @@ export default {
     updatePreselectedLVNetworksList() {
       if (this.lv_options.lv_default != "custom") {
         return fetch(
-          process.env.VUE_APP_API_URL + "/lv-network-defaults?n_id=" + this.config.n_id + "&lv_default=" + this.lv_options.lv_default,
+          process.env.VUE_APP_API_URL + "/lv-network-defaults?n_id=" + this.network_options.n_id + "&lv_default=" + this.lv_options.lv_default,
           {
             method: "GET"
           }
