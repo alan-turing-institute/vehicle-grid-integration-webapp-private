@@ -1,6 +1,6 @@
 """Types used for validating API query parameters"""
 from enum import Enum
-from typing import List, Dict
+from typing import List, Dict, Union
 from pathlib import Path
 
 
@@ -13,7 +13,7 @@ class NetworkID(str, Enum):
 class AllOptions(str, Enum):
 
     MVSolarPVOptions = "mv-solar-pv"
-    MVEVChargerOptions = "mv-ev-charger"
+    MVFCSOptions = "mv-fcs"
     LVSmartMeterOptions = "lv-smartmeter"
     LVElectricVehicleOptions = "lv-ev"
     LVPVOptions = "lv-pv"
@@ -30,38 +30,44 @@ class DefaultLV(str, Enum):
 class MVSolarPVOptions(str, Enum):
 
     NONE = "None"
-    OPTION1 = "Option a"
+    OPTION1 = "Solar Plant Summer"
+    OPTION2 = "Solar Plant Winter"
     CSV = "csv"
 
 
-class MVEVChargerOptions(str, Enum):
+class MVFCSOptions(str, Enum):
 
     NONE = "None"
-    OPTION1 = "Option a"
+    OPTION1 = "FC Stations"
     CSV = "csv"
 
 
 class LVSmartMeterOptions(str, Enum):
-    NONE = "None"
-    OPTION1 = "Option a"
+    OPTION1 = "CLNR"
+    OPTION2 = "Crest"
     CSV = "csv"
 
 
 class LVElectricVehicleOptions(str, Enum):
     NONE = "None"
-    OPTION1 = "Option a"
+    OPTION1 = "Crowdcharge—3.6kW"
+    OPTION2 = "Crowdcharge—7kW"
     CSV = "csv"
 
 
 class LVPVOptions(str, Enum):
     NONE = "None"
-    OPTION1 = "a"
+    OPTION1 = "Summer"
+    OPTION2 = "Winter"
     CSV = "csv"
 
 
 class LVHPOptions(str, Enum):
     NONE = "None"
-    OPTION1 = "a"
+    OPTION1 = "Mid weekday"
+    OPTION2 = "Mid weekend"
+    OPTION3 = "Week"
+    OPTION4 = "Weekend"
     CSV = "csv"
 
 
@@ -86,30 +92,42 @@ DEFAULT_LV_NETWORKS: Dict[NetworkID, Dict[DefaultLV, List[int]]] = {
 }
 
 
-DATA_FOLDER = Path(__file__).parent.parent / "data"
+DATA_FOLDER = Path(__file__).parent.parent / "data" / "default_profiles"
+MV_PROFILES = DATA_FOLDER / "MV_data"
+LV_PROFILES = DATA_FOLDER / "LV_data"
 
-# ToDo: Get all profiles, stick in data folder and put file name here
-SOLAR_PROFILES: Dict[MVSolarPVOptions, Path] = {
-    MVSolarPVOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+
+MV_SOLAR_PROFILES: Dict[MVSolarPVOptions, Path] = {
+    MVSolarPVOptions.OPTION1: MV_PROFILES / "MV_solar_plant_summer.csv",
+    MVSolarPVOptions.OPTION2: MV_PROFILES / "MV_solar_plant_winter.csv",
 }
 
-EV_PROFILES: Dict[MVEVChargerOptions, Path] = {
-    MVEVChargerOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+MV_FCS_PROFILES: Dict[MVFCSOptions, Path] = {
+    MVFCSOptions.OPTION1: MV_PROFILES / "fc_stations.csv",
 }
 
-SMART_METER_PROFILES: Dict[LVSmartMeterOptions, Path] = {
-    LVSmartMeterOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+
+LV_SMART_METER_PROFILES: Dict[LVSmartMeterOptions, Path] = {
+    LVSmartMeterOptions.OPTION1: LV_PROFILES / "sm_CLNR.csv",
+    LVSmartMeterOptions.OPTION2: LV_PROFILES / "sm_CREST_CIRED.csv",
 }
 
 LV_EV_PROFILES: Dict[LVElectricVehicleOptions, Path] = {
-    LVElectricVehicleOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVElectricVehicleOptions.OPTION1: LV_PROFILES
+    / "EV-crowdCharge--3.6kW--start-2018-01-01--end-2018-12-17--30min.csv",
+    LVElectricVehicleOptions.OPTION2: LV_PROFILES
+    / "EV-crowdCharge--7kW--start-2018-01-01--end-2018-12-17--30min.csv",
 }
 
 LV_PV_PROFILES: Dict[LVPVOptions, Path] = {
-    LVPVOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVPVOptions.OPTION1: LV_PROFILES / "PV_output_UK_southwest_summer_2021.csv",
+    LVPVOptions.OPTION2: LV_PROFILES / "PV_output_UK_southwest_winter_2020_2021.csv",
 }
 
 
 LV_HP_PROFILES: Dict[LVHPOptions, Path] = {
-    LVHPOptions.OPTION1: DATA_FOLDER / "example_profile.csv",
+    LVHPOptions.OPTION1: LV_PROFILES / "hp_mid_weekday_48ts.csv",
+    LVHPOptions.OPTION2: LV_PROFILES / "hp_mid_weekend_48ts.csv",
+    LVHPOptions.OPTION3: LV_PROFILES / "hp_weekday_48ts.csv",
+    LVHPOptions.OPTION4: LV_PROFILES / "hp_weekend_48ts.csv",
 }

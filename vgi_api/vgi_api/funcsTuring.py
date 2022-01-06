@@ -49,7 +49,7 @@ data_dir = os.path.join(Path(__file__).parent, "data")
 d = funcsDss_turing.dssIfc(dss.DSS)
 
 # Based on trial and error, loosely based on I&C profiles, pp25 of T. Short
-xx = np.linspace(0, 1, 144)
+xx = np.linspace(0, 1, 48)
 pi2 = np.pi * 2
 ps = pi2 / 10
 ic00_prof = 0.8 + 0.15 * (
@@ -176,11 +176,9 @@ class turingNet(snk.dNet):
 
             # Set the profiles self.p and then the demand self.dmnd
             self.set_prfs(
-                tsp=rundict["simulation_data"]["ts_profiles"],
+                simulation_data=rundict["simulation_data"],
             )
-            self.set_dmnd(
-                tsp=rundict["simulation_data"]["ts_profiles"],
-            )
+            self.set_dmnd()
 
             # Set circuit power limits
             self.set_powers()
@@ -314,14 +312,14 @@ class turingNet(snk.dNet):
             ],
         },
         "ic": {
-            "lv": [],  # lumped I&C only
+            "lv": [],
             "mv": [
                 "mv",
                 "odds",
                 "evens",
                 "not_rs",
             ],
-        },
+        },  # lumped I&C only
         "ovnt": {
             "lv": [
                 "rs",
@@ -362,17 +360,17 @@ class turingNet(snk.dNet):
             ],
         },
         "dgs": {
-            "lv": [],  # Lumped DGs only
+            "lv": [],
             "mv": [
                 list,
             ],
-        },
+        },  # Lumped DGs only
         "fcs": {
-            "lv": [],  # Lumped DGs only
+            "lv": [],
             "mv": [
                 list,
             ],
-        },
+        },  # Lumped DGs only
     }
 
     def set_ldsi(
@@ -950,191 +948,38 @@ class turingNet(snk.dNet):
 
     def set_prfs(
         self,
-        tsp,
+        simulation_data,
     ):
         """Set the profiles Bunch self.p or 'raw' temporal profiles.
 
-        The rows of each profile correspond to different loads, whilst the
-        columns correspond to different time instances.
-
-        Each of the profiles are assumed to correspond to one day's operation,
-        and the scale is EITHER in kW or normalised.
+        The columns of each profile correspond to different loads, whilst the
+        rows correspond to different time instances.
 
         At the end of this function we also collapse any profiles with multiple
         values to a single mean, called "*_", for use when setting the profiles.
         """
         self.p = Bunch()
 
-        assert (144 % tsp["n"]) == 0
-
-        # Load the CREST model
-        fndemand = os.path.join(data_dir, "ciredData.pkl")
-        with open(fndemand, "rb") as file:
-            crestData = pickle.load(file)
-
-        ddsn = len(crestData[1]["peNet"]) // tsp["n"]  # downsample no
-        self.p.crest = dds(crestData[1]["peNet"], ddsn).T / 1e3  # W to kW
-
-        # Similarly load the Element Energy data;
-        self.p.rsev, self.p.icev = self.load_ee_data(
-            tsp["n"],
-        )
-        assert len(self.p.rsev) == tsp["n"]
-        assert len(self.p.icev) == tsp["n"]
-
-        # Then the NREL solar data
-        self.p.solar0 = self.load_solar0(
-            tsp["n"],
-        )
-
         # Set the ic00 demand
-        self.p.ic00 = dds(ic00_prof, 144 // tsp["n"])
+        self.p.ic00 = np.expand_dims(ic00_prof, axis=1)
 
-        # Load the four heat pump profiles
-        hp_profiles = self.load_hp_profiles(
-            nn=tsp["n"],
-        )
-        _ = [setattr(self.p, "hp_" + k, v) for k, v in hp_profiles.items()]
-
-        # Load the heat pump profiles from Love et al
-        hp_profiles_love = self.load_hp_love_profiles(
-            nn=tsp["n"],
-        )
-        _ = [
-            setattr(self.p, "hp_love_" + calendar.month_abbr[int(k[-1])], v)
-            for k, v in hp_profiles_love.items()
-        ]
-
-        # Load the EV_urbanprofiles data
-        self.p.ev_urban = self.load_ev_urbanprofiles(tsp["n"])
-
-        # Load the EV ACN data
-        self.p.ev_acn = self.load_ev_acn(tsp["n"])
-
-        # Laod the Electric Nation EV data
-        self.p.ev_encc = self.load_ev_encc(tsp["n"])
-
-        # Load the smart meter data
-        self.p.uss24_urban = self.load_uss24_urban(tsp["n"])
-
-        # Load the csv_in data:
-        self.p.csv_in = self.load_csv_in(tsp["n"])
+        for k, v in simulation_data.items():
+            if v is not None:
+                self.p[k] = v
 
         # Collapse 2-dimensional profiles to a mean and append.
         means = {
             k: np.mean(
                 v,
-                axis=0,
+                axis=1,
             )
             for k, v in self.p.items()
             if v.ndim == 2
         }
         _ = [setattr(self.p, k + "_", v) for k, v in means.items()]
 
-        # Check that the dimensions are all equal
-        assert len(set([len(x.T) for x in self.p.values()])) == 1
-
-    # Explanation of all options in dmnd_opts_dict
-    dmnd_opts_readme = {
-        "crest": "a set of generic profiles created by the CREST tool from Loughborough univeristy.",
-        "uss24_urban": "smart meter data from CLNR",
-        "crest_": "See crest.",
-        "uss24_urban_": "See uss24_urban",
-        "ic00": "An I&C profile loosely based on I&C profiles from the T. Short's 'Electric Power Distribution Handbook', 2014, Ch 1.",
-        "rsev": "estimated profile from Element Energy report (data in directory ./data/ev-profile-data),",
-        "ev_urban": "assign profiles from ev_urban dataset",
-        "ev_acn": "EV workplace charging from Caltech for two weeks worth of weekdays. Data from https://ev.caltech.edu/dataset.",
-        "ev_encc": 'Electric Nation "Crowd Charge" data from 2018 for one weeks worth of weekdays, for both 3.6 and 7 kW chargers.',
-        "csv_in": "assign according to csv_in",
-        "icev": "See rsev.",
-        "ev_urban_": "See ev_urban",
-        "csv_in_": "See csv_in",
-        "solar0": "a nominal profile based on a (>100 MW) solar plant in New York, USA, scaled down to 2 kW panels.",
-        "[_profile_,[pwrA, pwrB, ...]]": """[dgs.mv, fcs.mv]
-        use _profile_ for the profile,
-        but use pwr0, pwr1, ... for kW of each DG/FCS. Is intend for use
-        only when there are a small number of powers (e.g. when selecting
-        individual, large DGs or FCSs on given feeders)
-        _profile_: 
-        - 'solar0', as slr. [DGs],
-        - 'uss24_urban_', See uss24_urban. [FCSs]
-        """,
-        "hp_mid_weekday": "Profiles based on the profiles of J. Love et al.",
-        "hp_mid_weekend": "See hp_mid_weekday.",
-        "hp_weekday": "See hp_mid_weekday.",
-        "hp_weekend": "See hp_mid_weekday.",
-    }
-
-    # The big dict of options!
-    dmnd_opts_dict = {
-        "rs": {
-            "lv": [
-                "crest",
-                "uss24_urban",
-            ],
-            "mv": [
-                "crest_",
-                "uss24_urban_",
-            ],
-        },
-        "ic": {
-            "lv": [],
-            "mv": [
-                "ic00",
-            ],
-        },
-        "ovnt": {
-            "lv": [
-                "rsev",
-                "ev_urban",
-                "csv_in",
-                "ev_encc",
-            ],
-            "mv": [
-                "rsev",
-                "ev_urban_",
-                "csv_in_",
-                "ev_encc_",
-            ],
-        },
-        "dytm": {
-            "lv": [],
-            "mv": [
-                "icev",
-                "ev_urban_",
-                "csv_in_",
-                "ev_acn_",
-            ],
-        },
-        "slr": {
-            "lv": [
-                "solar0",
-            ],
-            "mv": [
-                "solar0",
-            ],
-        },
-        "dgs": {
-            "lv": [],
-            "mv": [
-                None,
-            ],  # None for [_profile_,[pwrA, pwrB, ...]]
-        },
-        "fcs": {
-            "lv": [],
-            "mv": [
-                None,
-            ],  # as DGs
-        },
-        "hps": {
-            "lv": [pp for pp in dmnd_opts_readme.keys() if "hp" in pp],
-            "mv": [pp for pp in dmnd_opts_readme.keys() if "hp" in pp],
-        },
-    }
-
     def set_dmnd(
         self,
-        tsp,
     ):
         """Load the underlying demand curves for all specified loads.
 
@@ -1147,34 +992,18 @@ class turingNet(snk.dNet):
         self.get_lds_kva.
 
         ***NB***: this function is sometimes dependent on the the current state
-                  of d.LDS (which changes if opendss is changed.
+                  of d.LDS (which changes if opendss is changed).
 
-
-        Inputs
-        ---
-        tsp: ts_profiles (time series profiles dict) from runDict.
 
         Sets
         ---
         self.dmnd, a bunch-of-bunches for each of the load types in self.ldsi.kw
-
-        Options in tsp
-        ---
-        All can be set to None, which assigns the profiles zeros.
-
-        Use pprint(self.dmnd_opts_readme) for a description of the different load
-        profiles, and pprint(self.dmnd_opts_dict) for the possible combinations
-        that can beused with each load type.
-
         """
         # Initialise all as zeros of an appropriate dimension
         self.dmnd = Bunch(
             {
                 k: Bunch(
-                    {
-                        vv: np.zeros((self.ldsi[k]["n" + vv], tsp["n"]))
-                        for vv in self.str_lvmv
-                    }
+                    {vv: np.zeros((self.ldsi[k]["n" + vv], 48)) for vv in self.str_lvmv}
                 )
                 for k in self.ldsi.kw
             }
@@ -1189,122 +1018,108 @@ class turingNet(snk.dNet):
         )
         nhses = lds0 / self.s_to_nhouses  # no houses per lds0
 
-        # Utility func - check option and non-zero no of loads for given voltage
-        check_val = (
-            lambda ld, vv: tsp[ld][vv] in self.dmnd_opts_dict[ld][vv]
-            and self.ldsi[ld]["n" + vv]
-        )
+        ld2sd = {
+            "rs": "smart_meter_profile_array",
+            "ovnt": "lv_ev_profile_array",  # EV
+            "slr": "lv_pv_profile_array",
+            "hps": "lv_hp_profile_array",
+            "ic": "ic00",
+            "fcs": "mv_fcs_profile_array",
+            "dgs": "mv_solar_profile_array",
+        }
 
-        # Residential demand rs
-        if check_val("rs", "lv"):
-            pp = self.p[tsp["rs"]["lv"]]
-            assert pp.ndim == 2
-            self.dmnd.rs.lv = np.array(
-                [pp[i % pp.shape[0]] for i in range(self.ldsi.rs.nlv)]
-            )
-
-        if check_val("rs", "mv"):
-            # Assign the mean profile to all loads
-            pp = self.p[tsp["rs"]["mv"]]
-            self.dmnd.rs.mv = np.array([pp * nhses[i] for i in self.ldsi.rs.mv])
-
-        # I&C demand ic
-        pass  # ic lv demand
-
-        if check_val("ic", "mv"):
-            # Assign the I&C profile
-            pp = self.p[tsp["ic"]["mv"]]
-            ic00 = pp / max(pp)
-            self.dmnd.ic.mv = np.array([lds0[i] * ic00 for i in self.ldsi.ic.mv])
-
-        # Set the overnight charging profiles
-        if check_val("ovnt", "lv"):
-            pp = self.p[tsp["ovnt"]["lv"]]
-            if pp.ndim == 1:
-                self.dmnd.ovnt.lv = np.array([pp for i in range(self.ldsi.ovnt.nlv)])
-            else:
-                self.dmnd.ovnt.lv = np.array(
-                    [pp[i % pp.shape[0]] for i in range(self.ldsi.ovnt.nlv)]
+        # Low voltage
+        for ld, sdn in ld2sd.items():
+            if self.ldsi[ld]["nlv"] > 0 and sdn in self.p.keys():
+                pp = self.p[sdn]
+                self.dmnd[ld].lv = np.array(
+                    [pp[:, i % pp.shape[1]] for i in range(self.ldsi[ld].nlv)]
                 )
 
-        # overnight mv charging
-        if check_val("ovnt", "mv"):
-            pp = self.p[tsp["ovnt"]["mv"]]
-            frac = self.ldsi.ovnt.nlv / self.mvlvi.nlv
-            self.dmnd.ovnt.mv = np.array(
-                [frac * nhses[i] * pp for i in range(self.ldsi.ovnt.nmv)]
-            )
-
-        # Set the daytime charging profiles
-        pass  # daytime lv charging
-
-        if check_val("dytm", "mv"):
-            pp = self.p[tsp["dytm"]["mv"]]
-
-            # Add daytime charging location demand
-            dytm_dist = getattr(self.rng, self.rd["dytm_dist"])
-            self.dmnd.dytm.mv = np.array(
-                [
-                    pp * lds0[i] * dytm_dist(*self.rd["dytm_dist_params"]) / max(pp)
-                    for i in self.ldsi.dytm.mv
-                ]
-            )
-
-        # solar lv profiles [negative as these are demands]
-        solar_rng = getattr(self.rng, self.rd["solar_dist"])
-        if check_val("slr", "lv"):
-            pp = self.p[tsp["slr"]["lv"]]
-            if tsp["slr"]["lv"] == "solar0":
-                slr0 = solar_rng(*self.rd["solar_dist_params"], size=self.ldsi.slr.nlv)
-            self.dmnd.slr.lv = -np.outer(slr0, pp)
-
-        # solar mv profiles
-        if check_val("slr", "mv"):
-            # It seems self.rng does not have an obvious way of returning
-            # the mean programmatically.
-            solar_mean = np.mean(solar_rng(*self.rd["solar_dist_params"], size=10000))
-
-            # First infer the fraction of solar LV demands (avoids using
-            # self.slr_pen, in case this option isn't used)
-            pp = self.p[tsp["slr"]["mv"]]
-            frac = self.ldsi.slr.nlv / self.mvlvi.nlv
-
-            # Then, set the solar values.
-            if tsp["slr"]["mv"] == "solar0":
-                slr0 = np.array(
-                    [frac * nhses[i] * solar_mean for i in self.ldsi.slr.mv]
+        # MV 'residential' means
+        for ld in [
+            "rs",
+            "ovnt",
+            "slr",
+            "hps",
+        ]:
+            if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
+                pp = self.p[ld2sd[ld] + "_"]
+                frac = self.ldsi[ld].nlv / self.mvlvi.nlv
+                self.dmnd[ld].mv = np.array(
+                    [pp * nhses[i] * frac for i in self.ldsi[ld].mv]
                 )
-            self.dmnd.slr.mv = -np.outer(
-                slr0,
-                pp,
-            )
 
-        # DG mv profiles
-        if type(tsp["dgs"]["mv"]) is list:
-            # only solar0 implemented so far as a profile.
-            assert tsp["dgs"]["mv"][0] == "solar0"
-            self.dmnd.dgs.mv = -np.outer(tsp["dgs"]["mv"][1], self.p.solar0)
+        # MV DGs, FCS, IC
+        for ld in [
+            "ic",
+            "fcs",
+            "dgs",
+        ]:
+            if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
+                pp = self.p[ld2sd[ld]]
+                self.dmnd[ld].mv = np.array(
+                    [pp[:, i % pp.shape[1]] for i in self.ldsi[ld].mv]
+                )
 
-        # FCS mv profiles - based on DG profiles
-        if type(tsp["fcs"]["mv"]) is list:
-            # only solar0 implemented so far as a profile.
-            assert tsp["fcs"]["mv"][0] == "uss24_urban_"
-            self.dmnd.fcs.mv = -np.outer(tsp["fcs"]["mv"][1], self.p.solar0)
+        # if check_val("rs", "mv"):
+        #     # Assign the mean profile to all loads
+        #     pp = self.p[tsp["rs"]["mv"]]
+        #     self.dmnd.rs.mv = np.array([pp * nhses[i] for i in self.ldsi.rs.mv])
 
-        # Heat pump LV profiles (at the moment these are only 1-d)
-        if check_val("hps", "lv"):
-            self.dmnd.hps.lv = np.outer(
-                np.ones(self.ldsi.hps.nlv), self.p[tsp["hps"]["lv"]]
-            )
+        # if check_val("ic", "mv"):
+        #     # Assign the I&C profile
+        #     pp = self.p[tsp["ic"]["mv"]]
+        #     ic00 = pp / max(pp)
+        #     self.dmnd.ic.mv = np.array([lds0[i] * ic00 for i in self.ldsi.ic.mv])
 
-        # hps mv profiles
-        if check_val("hps", "mv"):
-            frac = self.ldsi.hps.nlv / self.mvlvi.nlv
-            pp = self.p[tsp["hps"]["mv"]]
-            self.dmnd.hps.mv = np.outer(
-                frac * nhses[self.ldsi.hps.mv],
-                pp,
-            )
+        # # solar mv profiles
+        # if check_val("slr", "mv"):
+        #     # It seems self.rng does not have an obvious way of returning
+        #     # the mean programmatically.
+        #     solar_mean = np.mean(solar_rng(*self.rd["solar_dist_params"], size=10000))
+
+        #     # First infer the fraction of solar LV demands (avoids using
+        #     # self.slr_pen, in case this option isn't used)
+        #     pp = self.p[tsp["slr"]["mv"]]
+        #     frac = self.ldsi.slr.nlv / self.mvlvi.nlv
+
+        #     # Then, set the solar values.
+        #     if tsp["slr"]["mv"] == "solar0":
+        #         slr0 = np.array(
+        #             [frac * nhses[i] * solar_mean for i in self.ldsi.slr.mv]
+        #         )
+        #     self.dmnd.slr.mv = -np.outer(
+        #         slr0,
+        #         pp,
+        #     )
+        # # hps mv profiles
+        # if check_val("hps", "mv"):
+        #     frac = self.ldsi.hps.nlv / self.mvlvi.nlv
+        #     pp = self.p[tsp["hps"]["mv"]]
+        #     self.dmnd.hps.mv = np.outer(
+        #         frac * nhses[self.ldsi.hps.mv],
+        #         pp,
+        #     )
+
+        # # overnight mv charging
+        # if check_val("ovnt", "mv"):
+        #     pp = self.p[tsp["ovnt"]["mv"]]
+        #     frac = self.ldsi.ovnt.nlv / self.mvlvi.nlv
+        #     self.dmnd.ovnt.mv = np.array(
+        #         [frac * nhses[i] * pp for i in range(self.ldsi.ovnt.nmv)]
+        #     )
+        # # DG mv profiles
+        # if type(tsp["dgs"]["mv"]) is list:
+        #     # only solar0 implemented so far as a profile.
+        #     assert tsp["dgs"]["mv"][0] == "solar0"
+        #     self.dmnd.dgs.mv = -np.outer(tsp["dgs"]["mv"][1], self.p.solar0)
+
+        # # FCS mv profiles - based on DG profiles
+        # if type(tsp["fcs"]["mv"]) is list:
+        #     # only solar0 implemented so far as a profile.
+        #     assert tsp["fcs"]["mv"][0] == "uss24_urban_"
+        #     self.dmnd.fcs.mv = -np.outer(tsp["fcs"]["mv"][1], self.p.solar0)
 
     @staticmethod
     def load_solar0(
