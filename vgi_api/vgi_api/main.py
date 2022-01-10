@@ -262,10 +262,7 @@ async def simulate(
 
         handle = io.StringIO()
         np.savetxt(
-            handle,
-            X=plot_data,
-            header=",".join(header),
-            delimiter=",",
+            handle, X=plot_data, header=",".join(header), delimiter=",", comments=""
         )
 
         handle.seek(0)
