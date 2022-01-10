@@ -6,3 +6,8 @@
     margin-bottom: 20px;
     overflow: hidden;
 }
+
+.card-results{
+    border-color: #00897B;
+    background-color: white;
+}

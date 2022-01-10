@@ -160,79 +160,72 @@
         </div>
       </div>
 
-      <div class="row box-main">
+      <div class="row box-main" style="border-color: #00897B">
+        <div class="col-lg-12" style="background-color: #B2DFDB">
+          <h3>Simulation</h3>
+        </div>
+
         <div class="col-lg-12">
-          <h5>Run simulation</h5>
-          <button type="submit" class="btn btn-primary" @click="fetchAPIData">
-            Submit
-            <template v-if="isLoading">
-              <div class="spinner-border spinner-border-sm" role="status"></div>
-            </template>
-          </button>
+          <div class="form-group row">
+            <label for="button_submit" class="col-md-3 col-form-label">
+              Run simulation
+            </label>
+            <div class="col-md-3">
+            <button type="submit" name="button_submit" class="btn btn-primary btn-block" @click="fetchAPIData">
+              Submit
+              <template v-if="isLoading">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+              </template>
+            </button>
+            </div>
+          </div>       
+          <template v-if="isLoading">
+            <div class="form-group row col-md-6">
+              Simulation in progress...<br>
+              Usually complete in less than one minute
+            </div>
+          </template>
         </div>
-      </div>
 
-      <div class="row box-main">
         <div class="col-lg-12">
-          <h5>Results</h5>
-        </div>
-      </div>
-    </form>
 
-    <template v-if="responseAvailable">
-      <div class="accordion" id="accordionResults">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="mb-0">
-              <button
-                class="btn btn-link btn-block text-left"
-                type="button"
-                data-toggle="collapse"
-                data-target="#jsonCollapse"
-              >
-                DEBUG: Show JSON response
-              </button>
-            </h2>
-          </div>
-          <div
-            id="jsonCollapse"
-            class="collapse"
-            data-parent="#accordionResults"
-          >
-            <div class="card-body">
-              {{ rawJson }}
-            </div>
-          </div>
-        </div>
-
-        <div v-for="(p, ind) in plots" :key="p.ind">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="mb-0">
-                <button
-                  class="btn btn-link btn-block text-left"
-                  type="button"
-                  data-toggle="collapse"
-                  :data-target="'#plotCollapse' + ind"
-                >
-                  {{ p.name }}
-                </button>
-              </h2>
-            </div>
-            <div
-              :id="'plotCollapse' + ind"
-              class="collapse"
-              v-bind:class="{ show: !ind }"
-              data-parent="#accordionResults"
-            >
-              <div class="card-body">
-                <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+          <template v-if="responseAvailable">
+            <h4>Results</h4>
+            <div class="accordion" id="accordionResults" style="margin-bottom: 1rem">
+              <div v-for="(p, ind) in plots" :key="p.ind">
+                <div class="card card-results">
+                  <div class="card-header">
+                    <h2 class="mb-0">
+                      <button
+                        class="btn btn-link btn-block text-left"
+                        type="button"
+                        data-toggle="collapse"
+                        :data-target="'#plotCollapse' + ind"
+                      >
+                        {{ p.name }}
+                      </button>
+                    </h2>
+                  </div>
+                  <div
+                    :id="'plotCollapse' + ind"
+                    class="collapse"
+                    v-bind:class="{ show: !ind }"
+                    data-parent="#accordionResults"
+                  >
+                    <div class="card-body">
+                      <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
+
       </div>
-    </template>
+      
+
+    </form>
   </div>
 </template>
 
