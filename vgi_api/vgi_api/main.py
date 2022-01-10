@@ -284,12 +284,6 @@ async def simulate(
         "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
     }
 
-    # ToDo: Return csv files for:
-    # pmry_loadings
-    # mv_voltage_ts
-    # trn_powers
-    # lv_comparison
-
     return resultdict
 
 
