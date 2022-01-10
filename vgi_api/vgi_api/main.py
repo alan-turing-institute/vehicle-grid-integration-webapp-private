@@ -1,10 +1,12 @@
 import base64
+import io
 import logging
 from typing import Optional, List, Any
 import copy
 import fastapi
 from fastapi import File, Query, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+import numpy as np
 
 from vgi_api import azure_mockup
 from vgi_api import azureOptsXmpls as aox
@@ -246,7 +248,25 @@ async def simulate(
         profile_options_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
+        head_primary_loadings,
+        data_out_primary_loadings,
+        head_mv_voltages,
+        data_out_mv_voltages,
+        head_trn_powers,
+        data_out_trn_powers,
+        head_lv_comparison,
+        data_out_lv_comparison,
     ) = azure_mockup.run_dss_simulation(parameters)
+
+    def prepare_csv(header: List[str], plot_data: np.array) -> str:
+
+        handle = io.StringIO()
+        np.savetxt(
+            handle, X=plot_data, header=",".join(header), delimiter=",", comments=""
+        )
+
+        handle.seek(0)
+        return handle.read()
 
     parameters.pop("simulation_data")
     resultdict = {
@@ -274,6 +294,12 @@ async def simulate(
             "utf-8"
         ),
         "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
+        "primary_loadings_data": prepare_csv(
+            head_primary_loadings, data_out_primary_loadings
+        ),
+        "mv_voltages_data": prepare_csv(head_mv_voltages, data_out_mv_voltages),
+        "trn_powers_data": prepare_csv(head_trn_powers, data_out_trn_powers),
+        "lv_comparison_data": prepare_csv(head_lv_comparison, data_out_lv_comparison),
     }
 
     return resultdict
