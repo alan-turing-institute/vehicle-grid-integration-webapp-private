@@ -15,7 +15,7 @@
 
     <form id="config" ref="config" @submit.prevent>
       <div class="row box-main" style="border-color: #039BE5">
-        <div class="col-lg-12" style="background-color: #B3E5FC">
+        <div class="col-lg-12 box-title" style="background-color: #B3E5FC">
           <h3>Electricity distribution network parameters</h3>
         </div>
 
@@ -141,7 +141,7 @@
       </div>
 
       <div class="row box-main" style="border-color: #00ACC1">
-        <div class="col-lg-12" style="background-color: #B2EBF2">
+        <div class="col-lg-12 box-title" style="background-color: #B2EBF2">
           <h3>Demand and generation profiles</h3>
         </div>
 
@@ -161,7 +161,7 @@
       </div>
 
       <div class="row box-main" style="border-color: #00897B">
-        <div class="col-lg-12" style="background-color: #B2DFDB">
+        <div class="col-lg-12 box-title" style="background-color: #B2DFDB">
           <h3>Simulation</h3>
         </div>
 
