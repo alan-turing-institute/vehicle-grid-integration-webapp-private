@@ -246,6 +246,14 @@ async def simulate(
         profile_options_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
+        head_primary_loadings,
+        data_out_primary_loadings,
+        head_mv_voltages,
+        data_out_mv_voltage,
+        head_trn_powers,
+        data_out_trn_powers,
+        head_lv_comparison,
+        data_out_lv_comparison,
     ) = azure_mockup.run_dss_simulation(parameters)
 
     parameters.pop("simulation_data")
@@ -275,6 +283,12 @@ async def simulate(
         ),
         "pmry_powers": base64.b64encode(pmry_powers_buffer.getvalue()).decode("utf-8"),
     }
+
+    # ToDo: Return csv files for:
+    # pmry_loadings
+    # mv_voltage_ts
+    # trn_powers
+    # lv_comparison
 
     return resultdict
 

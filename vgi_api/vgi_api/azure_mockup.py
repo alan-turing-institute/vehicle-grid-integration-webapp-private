@@ -140,7 +140,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         for idx, clr in zip(lv_idxs, clrs):
             Vsec = np.array([s["VlvLds"][idx] for s in slns])[:, :, 0]
             # ToDo: Return data in csv file
-            fillplot(
+            _, dplt = fillplot(
                 np.abs(Vsec) / 230,
                 tt,
                 ax=ax,
@@ -185,9 +185,15 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             sharex=True,
         )
 
+        data_out_lv_comparison = np.zeros(
+            (
+                48,
+                0,
+            )
+        )
         for ii, ax in enumerate(axs):
             Vsec = np.array([s["VlvLds"][ii] for s in slns])[:, :, 0]
-            fillplot(
+            _, dplt = fillplot(
                 np.abs(Vsec) / 230,
                 tt,
                 ax=ax,
@@ -208,6 +214,13 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 fontsize="medium",
             )
             set_day_label()
+            data_out_lv_comparison = np.c_[data_out_lv_comparison, dplt.T]
+
+        head_lv_comparison = [
+            f"{int(q)}% quantile, LV Network: {simulation.ckts.ldNo[ii]}"
+            for ii in range(simulation.ckts.N)
+            for q in np.linspace(0, 100, 5)
+        ]
 
         axs[0].text(
             0.1,
@@ -237,7 +250,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         plt.clf()
         smv2pu = lambda s: np.abs(s.Vmv) / simulation.vKvbase[simulation.mvIdx]
         vb = np.array([smv2pu(s) for s in slns])
-        fillplot(vb, np.linspace(0, 24, 48))
+        _, dplt = fillplot(vb, np.linspace(0, 24, 48))
         set_day_label()
         xlm = plt.xlim()
         plt.hlines([0.94, 1.06], *xlm, linestyle="dashed", color="r", lw=0.8)
@@ -258,6 +271,11 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
         mv_voltages_buffer = io.BytesIO()
         plt.gcf().savefig(mv_voltages_buffer, facecolor="LightGray")
+
+        head_mv_voltages = [
+            f"MV voltage, {qq}% quantile" for qq in np.linspace(0, 100, 5)
+        ]
+        data_out_mv_voltage = dplt.T
 
         # PLOT: trn_powers
         plt.clf()
@@ -313,6 +331,11 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
         trn_powers_buffer = io.BytesIO()
         plt.gcf().savefig(trn_powers_buffer, facecolor="LightGray")
+
+        head_trn_powers = ["Prmy. Sub. Util."] + ["Sdry. Sub. Util." + l for l in lgns]
+        data_out_trn_powers = np.c_[
+            np.expand_dims(100 * spri / spri_rating, axis=1), 100 * ssec / ssec_ratings
+        ]
 
         # PLOT: profile_options
         # Plot each of the profiles which only has a dimension of 1. [The profiles
@@ -376,6 +399,10 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         pmry_loadings_buffer = io.BytesIO()
         plt.gcf().savefig(pmry_loadings_buffer, facecolor="LightGray")
 
+        # Todo: Return from API
+        head_primary_loadings = lgnd
+        data_out_primary_loadings = yy
+
         # PLOT: pmry_powers
         plt.clf()
         plt.plot(tt, splt / 1e3)
@@ -421,7 +448,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         # ax0.set_ylabel("Power, kW")
         # ax0.set_xlabel("Hour of the day")
 
-        # fillplot(
+        # _, dplt = fillplot(
         #     simulation.p[ksel].T,
         #     tt,
         #     ax=ax1,
@@ -450,6 +477,14 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         profile_options_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
+        head_primary_loadings,
+        data_out_primary_loadings,
+        head_mv_voltages,
+        data_out_mv_voltage,
+        head_trn_powers,
+        data_out_trn_powers,
+        head_lv_comparison,
+        data_out_lv_comparison,
     )
 
 

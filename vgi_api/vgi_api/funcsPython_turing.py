@@ -806,7 +806,7 @@ def fillplot(data, t, qntls=None, **kwargs):
         ax.fill_between(pltStf[0]._x, iMedian, iValA, **fillKwargs)
         ax.fill_between(pltStf[0]._x, iMedian, iValB, **fillKwargs)
 
-    return ax
+    return ax, iSet
 
 
 # ================================ developed alongside 'workflowRiskday.py'
