@@ -1,169 +1,310 @@
 <template>
-  <div>
-    <h3>Build and simulate an electricity distribution network API</h3>
-    <p>
-      You can find more information on OpenDSS parameters below in the
-      <a
-        href="http://svn.code.sf.net/p/electricdss/code/trunk/Distrib/Doc/OpenDSSManual.pdf"
-        >OpenDSS Manual</a
-      >.
-    </p>
-  </div>
-  <div>
+  <div class="container">
+    <div class="row">
+      <div class="col-sm-12">
+        <h3>Build and simulate an electricity distribution network API</h3>
+        <p>
+          You can find more information on OpenDSS parameters below in the
+          <a
+            href="http://svn.code.sf.net/p/electricdss/code/trunk/Distrib/Doc/OpenDSSManual.pdf"
+            >OpenDSS Manual</a
+          >.
+        </p>
+      </div>
+    </div>
+
     <form id="config" ref="config" @submit.prevent>
-      <!-- Experiment parameter: n_lv -->
-      <div class="form-group row">
-        <label for="n_lv" class="col-md-2 col-form-label">
-          Number of LV circuits
-        </label>
-        <div class="col-md-1">
-          <input
-            v-model.number="config.n_lv"
-            type="number"
-            class="form-control"
-            id="n_lv"
-            placeholder="n_lv"
-          />
+      <div class="row">
+        <div class="col-lg-12">
+          <h4>Electricity distribution network parameters</h4>
         </div>
-      </div>
-      <!-- Experiment parameter: n_id -->
-      <div class="form-group row">
-        <label for="n_id" class="col-md-2 col-form-label">
-          Network ID
-        </label>
-        <div class="col-md-3">
-          <select v-model="config.n_id">
-            <option value="1060">11kV urban network</option>
-            <option value="1061">11kV urban - rural network</option>
-          </select>
+
+        <div class="col-lg-6">
+          <h5>Medium voltage (MV)</h5>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: n_id, network ID -->
+            <label for="n_id" class="col-sm-6 col-form-label">
+              Network ID
+            </label>
+            <div class="col-sm-6">
+              <select v-model="network_options.n_id" class="form-control" @change="updateLVNetworksList()">
+                <option value="1060">11kV urban network</option>
+                <option value="1061">11kV urban - rural network</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: xfmr_scale, MV transformer scaling -->
+            <label for="xfmr_scale" class="col-md-6 col-form-label">
+              MV transformer scaling
+            </label>
+            <div class="col-md-6">
+              <input
+                v-model.number="network_options.xfmr_scale"
+                type="float"
+                class="form-control"
+                id="xfmr_scale"
+                placeholder="xfmr_scale"
+              />
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: oltc_setpoint -->
+            <label for="oltc_setpoint" class="col-md-6 col-form-label">
+              MV transformer on-load tap charger (OLTC) set point
+            </label>
+            <div class="col-md-6">
+              <input
+                v-model.number="network_options.oltc_setpoint"
+                type="float"
+                class="form-control"
+                id="oltc_setpoint"
+                placeholder="OLTC set point, e.g. 1.04"
+              />
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: oltc_bandwidth -->
+            <label for="oltc_bandwidth" class="col-md-6 col-form-label">
+              MV transformer on-load tap charger (OLTC) bandwidth
+            </label>
+            <div class="col-md-6">
+              <input
+                v-model.number="network_options.oltc_bandwidth"
+                type="float"
+                class="form-control"
+                id="oltc_bandwidth"
+                placeholder="OLTC bandwidth, e.g. 0.13"
+              />
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: rs_pen -->
+            <label for="rs_pen" class="col-md-6 col-form-label">
+              Percentage residential loads
+            </label>
+            <div class="col-md-6">
+              <input
+                v-model.number="network_options.rs_pen"
+                type="float"
+                class="form-control"
+                id="rs_pen"
+                placeholder="Percentage residential loads e.g. 0.8"
+              />
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <h5>Low voltage (LV)</h5>
+
+          <div class="form-group row">
+            <!-- Experiment parameter: lv_default (if custom, open lv_list option below) -->
+            <label for="lv_options.lv_default" class="col-md-6 col-form-label">
+              IDs of up to 5 LV networks to model in detail
+            </label>
+            <div class="col-md-6">
+              <select v-model="lv_options.lv_default" class="form-control" @change="updatePreselectedLVNetworksList()">
+                <option>near-sub</option>
+                <option>near-edge</option>
+                <option>mixed</option>
+                <option>custom</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group row">
+            <label for="lv_list" class="col-md-6 col-form-label">
+              Custom selection of IDs
+            </label>
+            <div class="col-md-6">
+              <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
+                <option v-for="lv_id in lv_options.lv_list" :key="lv_id">{{ lv_id }}</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form group row">
+            <label for="lv_selected_output" class="col-md-6 col-form-label">
+              Currently selected LV networks
+            </label>
+            <div class="col-md-6 col-form-label">
+              {{ lv_options.lv_selected.join(", ") }}
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- DUMMY Experiment parameter: p_ev -->
-      <div class="form-group row">
-        <label for="p_ev" class="col-md-2 col-form-label">
-          Percentage penetration EV
-        </label>
-        <div class="col-md-1">
-          <input
-            v-model.number="config.p_ev"
-            type="number"
-            class="form-control"
-            id="p_ev"
-            placeholder="p_ev"
-          />
+      <div class="row">
+        <div class="col-lg-12">
+          <h4>Demand and generation profiles</h4>
+        </div>
+
+        <div class="col-lg-6">
+          <h5>MV connected</h5>
+          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected electric vehicle charging profile"></select-profile>
+        </div>
+
+        <div class="col-lg-6">
+          <h5>LV connected</h5>
+            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" title="Smart meter"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" title="Electric vehicles"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" title="Photovoltaic"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" title="Heat pump"></select-profile>
         </div>
       </div>
 
-      <!-- DUMMY Experiment parameter: p_pv -->
-      <div class="form-group row">
-        <label for="p_pv" class="col-md-2 col-form-label">
-          Percentage penetration PV
-        </label>
-        <div class="col-md-1">
-          <input
-            v-model.number="config.p_pv"
-            type="number"
-            class="form-control"
-            id="p_pv"
-            placeholder="p_pv"
-          />
+      <div class="row">
+        <div class="col-lg-12">
+          <h5>Run simulation</h5>
+          <button type="submit" class="btn btn-primary" @click="fetchAPIData">
+            Submit
+            <template v-if="isLoading">
+              <div class="spinner-border spinner-border-sm" role="status"></div>
+            </template>
+          </button>
         </div>
       </div>
 
-      <!-- DUMMY Experiment upload -->
-      <div class="form-group row">
-        <label for="c_load" class="col-md-2 col-form-label">
-          Custom load profile
-        </label>
-        <div class="col-md-3">
-          <input
-            type="file"
-            class="form-control"
-            id="c_load"
-            placeholder="c_load"
-          />
+      <div class="row">
+        <div class="col-lg-12">
+          <h5>Results</h5>
         </div>
       </div>
-
-      <!-- Save  -->
-      <!--
-      <div class="form-check">
-        <input
-          v-model="config.save"
-          type="checkbox"
-          class="form-check-input"
-          id="save"
-        />
-        <label class="form-check-label" for="save">Save configuration</label>
-      </div>
-      -->
-      <!-- Submit Button  -->
-      <button type="submit" class="btn btn-primary" @click="fetchAPIData">
-        Submit
-        <template v-if="isLoading">
-          <div class="spinner-border spinner-border-sm" role="status"
-        /></template>
-      </button>
     </form>
-  </div>
-  <template v-if="responseAvailable">
-    <div class="mt-3">
-      <h4>Plot(s)</h4>
-      <div class="card mt-3" style="width: 60rem;">
-        <img v-bind:src="'data:image/jpeg;base64,' + plot1" />
-      </div>
-      <div class="card mt-3" style="width: 60rem;">
-        <img v-bind:src="'data:image/jpeg;base64,' + plot2" />
-      </div>
-      <!--
-    <h4>Voltages</h4>
-    <div>
-      <ol id="voltages">
-        <li v-for="(value, index) in voltages" :key="index">
-          {{ value }}
-        </li>
-      </ol>
-    </div>
-    <h4>Report</h4>
-    <div>
-      <ul id="report">
-        <li v-for="(value, index) in report" :key="index">
-          {{ value }}
-        </li>
-      </ul>
-    </div>
-    -->
-      <div class="mt-3">
-        <button class="btn btn-primary" @click="isShowJson = !isShowJson">
-          <template v-if="isShowJson">Hide API json response</template>
-          <template v-else>Show API json response</template>
-        </button>
-        <div v-if="isShowJson">
-          <code>{{ rawJson }}</code>
+
+    <template v-if="responseAvailable">
+      <div class="accordion" id="accordionResults">
+        <div class="card">
+          <div class="card-header">
+            <h2 class="mb-0">
+              <button
+                class="btn btn-link btn-block text-left"
+                type="button"
+                data-toggle="collapse"
+                data-target="#jsonCollapse"
+              >
+                DEBUG: Show JSON response
+              </button>
+            </h2>
+          </div>
+          <div
+            id="jsonCollapse"
+            class="collapse"
+            data-parent="#accordionResults"
+          >
+            <div class="card-body">
+              {{ rawJson }}
+            </div>
+          </div>
+        </div>
+
+        <div v-for="(p, ind) in plots" :key="p.ind">
+          <div class="card">
+            <div class="card-header">
+              <h2 class="mb-0">
+                <button
+                  class="btn btn-link btn-block text-left"
+                  type="button"
+                  data-toggle="collapse"
+                  :data-target="'#plotCollapse' + ind"
+                >
+                  {{ p.name }}
+                </button>
+              </h2>
+            </div>
+            <div
+              :id="'plotCollapse' + ind"
+              class="collapse"
+              v-bind:class="{ show: !ind }"
+              data-parent="#accordionResults"
+            >
+              <div class="card-body">
+                <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-    </div>
-  </template>
+    </template>
+  </div>
 </template>
 
 <script>
+import SelectProfile from "../components/SelectProfile.vue"
 export default {
   el: "#main",
 
+  components: {
+    SelectProfile
+  },
+
   data() {
     return {
-      config: {
+      network_options: {
+        // Electricity distribution network parameters
+        // MV
         n_id: 1060,
-        n_lv: 5,
-        p_ev: 10,
-        p_pv: 10,
-        c_loads: ""
+        xfmr_scale: 1.0,
+        oltc_setpoint: 1.04,
+        oltc_bandwidth: 0.013,
+        rs_pen: 0.8,
+      },
+      lv_options:{
+        lv_default: "near-sub",
+        lv_list: [],
+        lv_selected: []
+      },
+      profile_options: {
+        mv_solar_pv: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+        },
+        mv_fcs: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+        },
+        lv_smart_meter: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        },
+        lv_electric_vehicle: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        },
+        lv_photovoltaic: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        },
+        lv_heat_pump: {
+          list: [],
+          profile: null,
+          units: "kW",
+          csv: null,
+          penetration: 1
+        }
       },
       // voltages: [],
       // report: [],
-      plot1: "",
-      plot2: "",
       rawJson: "empty",
       isShowJson: false,
       isLoading: false,
@@ -171,33 +312,80 @@ export default {
     };
   },
 
+  mounted() {
+    // Populate the lists used in the dropdown menus with their options
+    this.getProfileOptions("mv-solar-pv").then(p_list => {
+      this.profile_options.mv_solar_pv.list = p_list;
+      this.profile_options.mv_solar_pv.profile = p_list[0];
+    });
+    this.getProfileOptions("mv-fcs").then(p_list => {
+      this.profile_options.mv_fcs.list = p_list;
+      this.profile_options.mv_fcs.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-smartmeter").then(p_list => {
+      this.profile_options.lv_smart_meter.list = p_list;
+      this.profile_options.lv_smart_meter.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-ev").then(p_list => {
+      this.profile_options.lv_electric_vehicle.list = p_list;
+      this.profile_options.lv_electric_vehicle.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-pv").then(p_list => {
+      this.profile_options.lv_photovoltaic.list = p_list;
+      this.profile_options.lv_photovoltaic.profile = p_list[0];
+    });
+    this.getProfileOptions("lv-hp").then(p_list => {
+      this.profile_options.lv_heat_pump.list = p_list;
+      this.profile_options.lv_heat_pump.profile = p_list[0];
+    });
+    this.updateLVNetworksList()   // also updates preselected networks as nested function
+  },
+
   methods: {
+
     fetchAPIData() {
       // Ask user to wait while API request is formed and made
-      this.plot1 = "";
-      this.plot2 = "";
+      this.plots = [];
       this.rawJson = "wait...";
       this.isLoading = true;
       this.responseAvailable = false;
 
-      var url = process.env.VUE_APP_API_URL + "/simulate";
-
-      if (process.env.NODE_ENV == "development") {
-        console.log("Using API URL:", url);
+      // Initialise URL with parameters from network options (top left panel)
+      var url = new URL("/simulate", process.env.VUE_APP_API_URL);
+      var url_params = JSON.parse(JSON.stringify(this.network_options));
+      
+      // Add named set of LV networks or custom list to URL (top right panel)
+      var lv_params = JSON.parse(JSON.stringify(this.lv_options));
+      if (lv_params.lv_default == "custom") {
+        url_params.lv_list = lv_params.lv_selected;
+      } else {
+        url_params.lv_default = lv_params.lv_default;
       }
 
-      // If given a non-integer, switch back to 5
-      if (this.config.n_lv != Math.round(this.config.n_lv)) {
-        this.config.n_lv = 5;
-      }
-      url += "?lv_list=1101,1105,1103";
+      // Add MV and LV profiles to URL (middle panel, left/right for MV/LV)
+      let formData = new FormData();
+      url_params, formData = this.appendProfileParams(url_params, formData, "mv_solar_pv", this.profile_options.mv_solar_pv)
+      url_params, formData = this.appendProfileParams(url_params, formData, "mv_fcs", this.profile_options.mv_fcs)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_smart_meter", this.profile_options.lv_smart_meter)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_ev", this.profile_options.lv_electric_vehicle)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_pv", this.profile_options.lv_photovoltaic)
+      url_params, formData = this.appendProfileParams(url_params, formData, "lv_hp", this.profile_options.lv_heat_pump)
 
-      // Options for n_id are limited so simply add the selected one to the url
-      url += "&n_id=" + this.config.n_id;
-      console.log(url);
+      url_params.dry_run = false;
+
+      url.search = new URLSearchParams(url_params).toString();
+
+      console.log("URL params", url_params)
+      for (let kv of formData.entries()) {
+        console.log("formData contains", kv[0], kv[1])
+      }
+      console.log(url)
+
+      let check_csv_to_upload = Object.values(this.profile_options).reduce((any_csv, {profile}) => any_csv || profile=="csv", false)
 
       fetch(url, {
-        method: "POST"
+        method: "POST",
+        body: check_csv_to_upload ? formData : null
       })
         .then(response => {
           if (response.ok) {
@@ -222,8 +410,18 @@ export default {
           // this.report = responseJson["report"];
 
           // Parse plot from json to image data
-          this.plot1 = responseJson["plot1"];
-          this.plot2 = responseJson["plot2"];
+          this.plots = [
+            { name: "mv_highlevel", plot: responseJson["mv_highlevel"] },
+            { name: "lv_voltages", plot: responseJson["lv_voltages"] },
+            { name: "lv_comparison", plot: responseJson["lv_comparison"] },
+            { name: "mv_voltages", plot: responseJson["mv_voltages"] },
+            { name: "mv_powers", plot: responseJson["mv_powers"] },
+            { name: "mv_highlevel_clean", plot: responseJson["mv_highlevel_clean"] },
+            { name: "trn_powers", plot: responseJson["trn_powers"] },
+            { name: "profile_options", plot: responseJson["profile_options"] },
+            { name: "pmry_loadings", plot: responseJson["pmry_loadings"] },
+            { name: "pmry_powers", plot: responseJson["pmry_powers"] },
+          ];
 
           this.responseAvailable = true;
           this.isLoading = false;
@@ -231,6 +429,95 @@ export default {
         .catch(err => {
           console.log(err);
         });
+    },
+
+    appendProfileParams(url_params, form_data, name, params) {
+      url_params[name + "_profile"] = params.profile;
+      if (params.profile == "csv") {
+        url_params[name + "_units"] = params.units;
+        form_data.set(name + "_csv", params.csv[0]);
+      }
+      if (params.penetration !== undefined) {
+        url_params[name + "_pen"] = params.penetration;
+      }
+      return url_params, form_data
+    },
+
+    getProfileOptions(profile_name) {
+      return fetch(
+        process.env.VUE_APP_API_URL +
+          "/get-options?option_type=" +
+          profile_name,
+        {
+          method: "GET"
+        }
+      )
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          } else {
+            alert(
+              "Server returned " + response.status + " : " + response.statusText
+            );
+          }
+        })
+        .then(response => {
+          return JSON.parse(response);
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+
+    updateLVNetworksList() {
+      return fetch(
+        process.env.VUE_APP_API_URL + "/lv-network?n_id=" + this.network_options.n_id,
+        {
+          method: "GET"
+        }
+      )
+        .then(response => {
+          if (response.ok) {
+            return response.text();
+          } else {
+            alert(
+              "Server returned " + response.status + " : " + response.statusText
+            );
+          }
+        })
+        .then(response => {
+          this.lv_options.lv_list = JSON.parse(response).networks;
+          this.updatePreselectedLVNetworksList()
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    },
+
+    updatePreselectedLVNetworksList() {
+      if (this.lv_options.lv_default != "custom") {
+        return fetch(
+          process.env.VUE_APP_API_URL + "/lv-network-defaults?n_id=" + this.network_options.n_id + "&lv_default=" + this.lv_options.lv_default,
+          {
+            method: "GET"
+          }
+        )
+          .then(response => {
+            if (response.ok) {
+              return response.text();
+            } else {
+              alert(
+                "Server returned " + response.status + " : " + response.statusText
+              );
+            }
+          })
+          .then(response => {
+            this.lv_options.lv_selected = JSON.parse(response).networks;
+          })
+          .catch(err => {
+            console.log(err);
+          });
+      }
     }
   }
 };
