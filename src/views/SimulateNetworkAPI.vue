@@ -171,7 +171,7 @@
               Run simulation
             </label>
             <div class="col-md-3">
-            <button type="submit" name="button_submit" class="btn btn-primary btn-block" @click="fetchAPIData">
+            <button type="submit" name="button_submit" class="btn btn-primary btn-block" style="background-color: #00897B; border-color: #00897B" @click="fetchAPIData">
               Submit
               <template v-if="isLoading">
                 <div class="spinner-border spinner-border-sm" role="status"></div>
