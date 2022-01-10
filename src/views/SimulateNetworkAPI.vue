@@ -14,13 +14,13 @@
     </div>
 
     <form id="config" ref="config" @submit.prevent>
-      <div class="row">
-        <div class="col-lg-12">
-          <h4>Electricity distribution network parameters</h4>
+      <div class="row box-main" style="border-color: #039BE5">
+        <div class="col-lg-12" style="background-color: #B3E5FC">
+          <h3>Electricity distribution network parameters</h3>
         </div>
 
         <div class="col-lg-6">
-          <h5>Medium voltage (MV)</h5>
+          <h4>Medium voltage (MV)</h4>
 
           <div class="form-group row">
             <!-- Experiment parameter: n_id, network ID -->
@@ -101,7 +101,7 @@
         </div>
 
         <div class="col-lg-6">
-          <h5>Low voltage (LV)</h5>
+          <h4>Low voltage (LV)</h4>
 
           <div class="form-group row">
             <!-- Experiment parameter: lv_default (if custom, open lv_list option below) -->
@@ -140,19 +140,19 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-lg-12">
-          <h4>Demand and generation profiles</h4>
+      <div class="row box-main" style="border-color: #00ACC1">
+        <div class="col-lg-12" style="background-color: #B2EBF2">
+          <h3>Demand and generation profiles</h3>
         </div>
 
         <div class="col-lg-6">
-          <h5>MV connected</h5>
+          <h4>MV connected</h4>
           <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
           <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected electric vehicle charging profile"></select-profile>
         </div>
 
         <div class="col-lg-6">
-          <h5>LV connected</h5>
+          <h4>LV connected</h4>
             <select-profile v-model:profileOptions="profile_options.lv_smart_meter" title="Smart meter"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" title="Electric vehicles"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" title="Photovoltaic"></select-profile>
@@ -160,7 +160,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row box-main">
         <div class="col-lg-12">
           <h5>Run simulation</h5>
           <button type="submit" class="btn btn-primary" @click="fetchAPIData">
@@ -172,7 +172,7 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row box-main">
         <div class="col-lg-12">
           <h5>Results</h5>
         </div>
