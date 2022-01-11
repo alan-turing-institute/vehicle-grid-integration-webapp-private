@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
-        <h3>Build and simulate an electricity distribution network API</h3>
+        <h3>Build and simulate an electricity distribution network</h3>
         <p>
           You can find more information on OpenDSS parameters below in the
           <a
@@ -14,13 +14,13 @@
     </div>
 
     <form id="config" ref="config" @submit.prevent>
-      <div class="row">
-        <div class="col-lg-12">
-          <h4>Electricity distribution network parameters</h4>
+      <div class="row box-main" style="border-color: #039BE5">
+        <div class="col-lg-12 box-title" style="background-color: #B3E5FC">
+          <h3>Electricity distribution network parameters</h3>
         </div>
 
         <div class="col-lg-6">
-          <h5>Medium voltage (MV)</h5>
+          <h4>Medium voltage (MV)</h4>
 
           <div class="form-group row">
             <!-- Experiment parameter: n_id, network ID -->
@@ -86,7 +86,7 @@
           <div class="form-group row">
             <!-- Experiment parameter: rs_pen -->
             <label for="rs_pen" class="col-md-6 col-form-label">
-              Percentage residential loads
+              Proportion residential loads
             </label>
             <div class="col-md-6">
               <input
@@ -94,19 +94,19 @@
                 type="float"
                 class="form-control"
                 id="rs_pen"
-                placeholder="Percentage residential loads e.g. 0.8"
+                placeholder="Proportion residential loads e.g. 0.8"
               />
             </div>
           </div>
         </div>
 
         <div class="col-lg-6">
-          <h5>Low voltage (LV)</h5>
+          <h4>Low voltage (LV)</h4>
 
           <div class="form-group row">
             <!-- Experiment parameter: lv_default (if custom, open lv_list option below) -->
             <label for="lv_options.lv_default" class="col-md-6 col-form-label">
-              IDs of up to 5 LV networks to model in detail
+              Selection of LV networks to model in detail
             </label>
             <div class="col-md-6">
               <select v-model="lv_options.lv_default" class="form-control" @change="updatePreselectedLVNetworksList()">
@@ -118,9 +118,9 @@
             </div>
           </div>
 
-          <div class="form-group row">
+          <div v-if="lv_options.lv_default=='custom'" class="form-group row">
             <label for="lv_list" class="col-md-6 col-form-label">
-              Custom selection of IDs
+              LV network IDs
             </label>
             <div class="col-md-6">
               <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
@@ -131,7 +131,7 @@
 
           <div class="form group row">
             <label for="lv_selected_output" class="col-md-6 col-form-label">
-              Currently selected LV networks
+              Currently selected LV network IDs
             </label>
             <div class="col-md-6 col-form-label">
               {{ lv_options.lv_selected.join(", ") }}
@@ -140,19 +140,19 @@
         </div>
       </div>
 
-      <div class="row">
-        <div class="col-lg-12">
-          <h4>Demand and generation profiles</h4>
+      <div class="row box-main" style="border-color: #00ACC1">
+        <div class="col-lg-12 box-title" style="background-color: #B2EBF2">
+          <h3>Demand and generation profiles</h3>
         </div>
 
         <div class="col-lg-6">
-          <h5>MV connected</h5>
+          <h4>MV connected</h4>
           <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
           <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected electric vehicle charging profile"></select-profile>
         </div>
 
         <div class="col-lg-6">
-          <h5>LV connected</h5>
+          <h4>LV connected</h4>
             <select-profile v-model:profileOptions="profile_options.lv_smart_meter" title="Smart meter"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" title="Electric vehicles"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" title="Photovoltaic"></select-profile>
@@ -160,79 +160,72 @@
         </div>
       </div>
 
-      <div class="row">
+      <div class="row box-main" style="border-color: #00897B">
+        <div class="col-lg-12 box-title" style="background-color: #B2DFDB">
+          <h3>Simulation</h3>
+        </div>
+
         <div class="col-lg-12">
-          <h5>Run simulation</h5>
-          <button type="submit" class="btn btn-primary" @click="fetchAPIData">
-            Submit
-            <template v-if="isLoading">
-              <div class="spinner-border spinner-border-sm" role="status"></div>
-            </template>
-          </button>
+          <div class="form-group row">
+            <label for="button_submit" class="col-md-3 col-form-label">
+              Run simulation
+            </label>
+            <div class="col-md-3">
+            <button type="submit" name="button_submit" class="btn btn-primary btn-block" style="background-color: #00897B; border-color: #00897B" @click="fetchAPIData">
+              Submit
+              <template v-if="isLoading">
+                <div class="spinner-border spinner-border-sm" role="status"></div>
+              </template>
+            </button>
+            </div>
+          </div>       
+          <template v-if="isLoading">
+            <div class="form-group row col-md-6">
+              Simulation in progress...<br>
+              Usually complete in less than one minute
+            </div>
+          </template>
         </div>
-      </div>
 
-      <div class="row">
         <div class="col-lg-12">
-          <h5>Results</h5>
-        </div>
-      </div>
-    </form>
 
-    <template v-if="responseAvailable">
-      <div class="accordion" id="accordionResults">
-        <div class="card">
-          <div class="card-header">
-            <h2 class="mb-0">
-              <button
-                class="btn btn-link btn-block text-left"
-                type="button"
-                data-toggle="collapse"
-                data-target="#jsonCollapse"
-              >
-                DEBUG: Show JSON response
-              </button>
-            </h2>
-          </div>
-          <div
-            id="jsonCollapse"
-            class="collapse"
-            data-parent="#accordionResults"
-          >
-            <div class="card-body">
-              {{ rawJson }}
-            </div>
-          </div>
-        </div>
-
-        <div v-for="(p, ind) in plots" :key="p.ind">
-          <div class="card">
-            <div class="card-header">
-              <h2 class="mb-0">
-                <button
-                  class="btn btn-link btn-block text-left"
-                  type="button"
-                  data-toggle="collapse"
-                  :data-target="'#plotCollapse' + ind"
-                >
-                  {{ p.name }}
-                </button>
-              </h2>
-            </div>
-            <div
-              :id="'plotCollapse' + ind"
-              class="collapse"
-              v-bind:class="{ show: !ind }"
-              data-parent="#accordionResults"
-            >
-              <div class="card-body">
-                <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+          <template v-if="responseAvailable">
+            <h4>Results</h4>
+            <div class="accordion" id="accordionResults" style="margin-bottom: 1rem">
+              <div v-for="(p, ind) in plots" :key="p.ind">
+                <div class="card card-results">
+                  <div class="card-header">
+                    <h2 class="mb-0">
+                      <button
+                        class="btn btn-link btn-block text-left"
+                        type="button"
+                        data-toggle="collapse"
+                        :data-target="'#plotCollapse' + ind"
+                      >
+                        {{ p.name }}
+                      </button>
+                    </h2>
+                  </div>
+                  <div
+                    :id="'plotCollapse' + ind"
+                    class="collapse"
+                    v-bind:class="{ show: !ind }"
+                    data-parent="#accordionResults"
+                  >
+                    <div class="card-body">
+                      <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
+          </template>
         </div>
+
       </div>
-    </template>
+      
+
+    </form>
   </div>
 </template>
 
@@ -411,16 +404,15 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "mv_highlevel", plot: responseJson["mv_highlevel"] },
-            { name: "lv_voltages", plot: responseJson["lv_voltages"] },
-            { name: "lv_comparison", plot: responseJson["lv_comparison"] },
-            { name: "mv_voltages", plot: responseJson["mv_voltages"] },
-            { name: "mv_powers", plot: responseJson["mv_powers"] },
-            { name: "mv_highlevel_clean", plot: responseJson["mv_highlevel_clean"] },
-            { name: "trn_powers", plot: responseJson["trn_powers"] },
-            { name: "profile_options", plot: responseJson["profile_options"] },
-            { name: "pmry_loadings", plot: responseJson["pmry_loadings"] },
-            { name: "pmry_powers", plot: responseJson["pmry_powers"] },
+            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
+            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
+            { name: "MV network powers", plot: responseJson["mv_powers"] },
+            { name: "MV network voltages", plot: responseJson["mv_voltages"] },
+            { name: "LV network voltages comparison", plot: responseJson["lv_comparison"] },
+            { name: "Transformer powers", plot: responseJson["trn_powers"] },
+            { name: "Primary loadings", plot: responseJson["pmry_loadings"] },
+            { name: "Primary powers", plot: responseJson["pmry_powers"] },
+            { name: "Profiles", plot: responseJson["profile_options"] },
           ];
 
           this.responseAvailable = true;
@@ -437,7 +429,7 @@ export default {
         url_params[name + "_units"] = params.units;
         form_data.set(name + "_csv", params.csv[0]);
       }
-      if (params.penetration !== undefined) {
+      if (params.penetration !== undefined && params.profile !== "None") {
         url_params[name + "_pen"] = params.penetration;
       }
       return url_params, form_data
