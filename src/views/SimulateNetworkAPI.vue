@@ -199,7 +199,7 @@
                       <i class="bi bi-chevron-down"></i>
                       {{ p.name }}
                     </div>
-                    <button v-if="p.data_url !== undefined" class="btn btn-sm btn-outline-primary" type="button" style="float: right">
+                    <button v-if="p.data_url !== undefined" class="btn btn-sm btn-outline-dark" type="button" style="float: right">
                         <a :href=p.data_url :download=p.data_filename>
                           <i class="bi bi-download"></i>
                           csv
