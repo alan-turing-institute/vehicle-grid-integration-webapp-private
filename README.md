@@ -1,5 +1,6 @@
-# VGI API and WebAPp
+# VGI API and WebApp
 
+Check out our demonstration [website](https://salmon-forest-09e32d403.azurestaticapps.net/).
 
 ## API/Backend
 
