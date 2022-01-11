@@ -404,15 +404,15 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "mv_highlevel", plot: responseJson["mv_highlevel"] },
-            { name: "lv_comparison", plot: responseJson["lv_comparison"] },
-            { name: "mv_voltages", plot: responseJson["mv_voltages"] },
-            { name: "mv_powers", plot: responseJson["mv_powers"] },
-            { name: "mv_highlevel_clean", plot: responseJson["mv_highlevel_clean"] },
-            { name: "trn_powers", plot: responseJson["trn_powers"] },
-            { name: "profile_options", plot: responseJson["profile_options"] },
-            { name: "pmry_loadings", plot: responseJson["pmry_loadings"] },
-            { name: "pmry_powers", plot: responseJson["pmry_powers"] },
+            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
+            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
+            { name: "MV network powers", plot: responseJson["mv_powers"] },
+            { name: "MV network voltages", plot: responseJson["mv_voltages"] },
+            { name: "LV network voltages comparison", plot: responseJson["lv_comparison"] },
+            { name: "Transformer powers", plot: responseJson["trn_powers"] },
+            { name: "Primary loadings", plot: responseJson["pmry_loadings"] },
+            { name: "Primary powers", plot: responseJson["pmry_powers"] },
+            { name: "Profiles", plot: responseJson["profile_options"] },
           ];
 
           this.responseAvailable = true;
