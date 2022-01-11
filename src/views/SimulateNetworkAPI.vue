@@ -432,7 +432,7 @@ export default {
         url_params[name + "_units"] = params.units;
         form_data.set(name + "_csv", params.csv[0]);
       }
-      if (params.penetration !== undefined) {
+      if (params.penetration !== undefined && params.profile !== "None") {
         url_params[name + "_pen"] = params.penetration;
       }
       return url_params, form_data

@@ -35,8 +35,8 @@
         </div>
     </template>
 
-    <!-- Penetration is only needed for LV profiles -->
-    <div v-if="profileOptions.penetration !== undefined" class="form-group row">
+    <!-- Penetration is only needed for LV networks where a profile has been provided -->
+    <div v-if="profileOptions.penetration !== undefined && profileOptions.profile !== 'None'" class="form-group row">
         <label for="profile_pen" class="col-md-3 offset-md-6 col-form-label">
             Penetration
         </label>
