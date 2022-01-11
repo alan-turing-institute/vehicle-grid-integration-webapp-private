@@ -216,6 +216,9 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
                 fontsize="medium",
             )
             set_day_label()
+            logging.warning("%s", dplt.T.shape)
+            logging.warning("%s", dplt.T)
+
             data_out_lv_comparison = np.c_[data_out_lv_comparison, dplt.T]
 
         head_lv_comparison = [
