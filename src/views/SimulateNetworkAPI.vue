@@ -195,22 +195,16 @@
               <div v-for="(p, ind) in plots" :key="p.ind">
                 <div class="card card-results">
                   <div class="card-header">
-                    <h2 class="mb-0 row">
-                      <button
-                        class="btn btn-link btn-block text-left col-md-10"
-                        type="button"
-                        data-toggle="collapse"
-                        :data-target="'#plotCollapse' + ind"
-                      >
-                        {{ p.name }}
+                    <div data-toggle="collapse" :data-target="'#plotCollapse' + ind" style="float: left">
+                      <i class="bi bi-chevron-down"></i>
+                      {{ p.name }}
+                    </div>
+                    <button v-if="p.data_url !== undefined" class="btn btn-sm btn-outline-primary" type="button" style="float: right">
+                        <a :href=p.data_url :download=p.data_filename>
+                          <i class="bi bi-download"></i>
+                          csv
+                        </a>
                       </button>
-                      <template v-if="p.data_url !== undefined">
-                        <button class="btn btn-link btn-block text-right col-md-2"
-                          type="button">
-                          <a :href=p.data_url :download=p.data_filename> Download csv </a>
-                        </button>
-                      </template>
-                    </h2>
                   </div>
                   <div
                     :id="'plotCollapse' + ind"
