@@ -59,6 +59,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         slns, _ = simulation.run_dss_lds(lds)
 
         # From here: create all plots
+        plt.close("all")
 
         # PLOT: mv_highlevel, network plot highlighting LV networks etc
         plt.clf()
