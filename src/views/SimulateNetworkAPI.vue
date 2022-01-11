@@ -195,15 +195,21 @@
               <div v-for="(p, ind) in plots" :key="p.ind">
                 <div class="card card-results">
                   <div class="card-header">
-                    <h2 class="mb-0">
+                    <h2 class="mb-0 row">
                       <button
-                        class="btn btn-link btn-block text-left"
+                        class="btn btn-link btn-block text-left col-md-10"
                         type="button"
                         data-toggle="collapse"
                         :data-target="'#plotCollapse' + ind"
                       >
                         {{ p.name }}
                       </button>
+                      <template v-if="p.data_url !== undefined">
+                        <button class="btn btn-link btn-block text-right col-md-2"
+                          type="button">
+                          <a :href=p.data_url :download=p.data_filename> Download csv </a>
+                        </button>
+                      </template>
                     </h2>
                   </div>
                   <div
@@ -407,10 +413,10 @@ export default {
             { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
             { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
             { name: "MV network powers", plot: responseJson["mv_powers"] },
-            { name: "MV network voltages", plot: responseJson["mv_voltages"] },
-            { name: "LV network voltages comparison", plot: responseJson["lv_comparison"] },
-            { name: "Transformer powers", plot: responseJson["trn_powers"] },
-            { name: "Primary loadings", plot: responseJson["pmry_loadings"] },
+            { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
+            { name: "LV network voltages comparison", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
+            { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
+            { name: "Primary loadings", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
             { name: "Primary powers", plot: responseJson["pmry_powers"] },
             { name: "Profiles", plot: responseJson["profile_options"] },
           ];
