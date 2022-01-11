@@ -405,7 +405,6 @@ export default {
           // Parse plot from json to image data
           this.plots = [
             { name: "mv_highlevel", plot: responseJson["mv_highlevel"] },
-            { name: "lv_voltages", plot: responseJson["lv_voltages"] },
             { name: "lv_comparison", plot: responseJson["lv_comparison"] },
             { name: "mv_voltages", plot: responseJson["mv_voltages"] },
             { name: "mv_powers", plot: responseJson["mv_powers"] },
