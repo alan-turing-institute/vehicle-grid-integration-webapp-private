@@ -32,9 +32,36 @@ import logging
 fn_root = sys.path[0] if __name__ == "__main__" else os.path.dirname(__file__)
 
 
+# def convert_to_dict(x):
+
+#     for key, value in x.items():
+#         if isinstance(value, np.ndarray):
+#             x[key] = value.tolist()
+
+#         if isinstance(value, dict):
+#             convert_to_dict(value)
+
+
 def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
-    logging.info("Entering run_dss_simulation")
+    # import hashlib
+    # import json
+    # import copy
+
+    # hash_dict = copy.deepcopy(rd)
+
+    # #  INPUT HASH = ce8a68da7cacd09cdcfeab9ffc714010 
+    # # INPUT HASH =  ce8a68da7cacd09cdcfeab9ffc714010
+    # convert_to_dict(hash_dict)
+
+    # dhash = hashlib.md5()
+    # # We need to sort arguments so {'a': 1, 'b': 2} is
+    # # the same as {'b': 2, 'a': 1}
+
+    # encoded = json.dumps(hash_dict, sort_keys=True).encode()
+    # dhash.update(encoded)
+    # logging.warning("INPUT HASH = %s ", dhash.hexdigest())
+    # logging.info("Entering run_dss_simulation")
 
     # Set up a temporary directory to store network files
     with tempfile.TemporaryDirectory() as temp_dir:
