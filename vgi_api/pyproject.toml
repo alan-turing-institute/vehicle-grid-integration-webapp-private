@@ -13,20 +13,21 @@ govuk-bank-holidays = "^0.10"
 hsluv = "^5.0.2"
 matplotlib = "^3.5.0"
 scipy = "^1.7.2"
-fastapi = "^0.70.0"
+fastapi = {extras = ["standard"], version = "^0.71.0"}
 progress = "^1.6"
 python-multipart = "^0.0.5"
 pydantic = "^1.8.2"
+uvicorn = "^0.16.0"
+dss-python = "^0.10.7"
 
 [tool.poetry.scripts]
 azure_mockup = "vgi_api.azure_mockup:run_dss_simulation"
 
 
 [tool.poetry.dev-dependencies]
-uvicorn = {extras = ["standard"], version = "^0.15.0"}
 
 # Install normal dss-python in development. Install linux version manually on deployment
-dss-python =  "^0.10.7.post1"
+# dss-python =  "^0.10.7.post1"
                 
 httpie = "^2.6.0"
 black = "^21.11b1"
