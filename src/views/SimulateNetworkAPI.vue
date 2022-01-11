@@ -106,7 +106,7 @@
           <div class="form-group row">
             <!-- Experiment parameter: lv_default (if custom, open lv_list option below) -->
             <label for="lv_options.lv_default" class="col-md-6 col-form-label">
-              IDs of up to 5 LV networks to model in detail
+              Selection of LV networks to model in detail
             </label>
             <div class="col-md-6">
               <select v-model="lv_options.lv_default" class="form-control" @change="updatePreselectedLVNetworksList()">
@@ -118,9 +118,9 @@
             </div>
           </div>
 
-          <div class="form-group row">
+          <div v-if="lv_options.lv_default=='custom'" class="form-group row">
             <label for="lv_list" class="col-md-6 col-form-label">
-              Custom selection of IDs
+              LV network IDs
             </label>
             <div class="col-md-6">
               <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
@@ -131,7 +131,7 @@
 
           <div class="form group row">
             <label for="lv_selected_output" class="col-md-6 col-form-label">
-              Currently selected LV networks
+              Currently selected LV network IDs
             </label>
             <div class="col-md-6 col-form-label">
               {{ lv_options.lv_selected.join(", ") }}
