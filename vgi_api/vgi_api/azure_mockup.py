@@ -42,6 +42,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             dest_dir=os.path.join(temp_dir, "_network_mod"),
             n_id=rd["network_data"]["n_id"],
         )
+
         d = funcsDss_turing.dssIfc(dss.DSS)
         # Place modified files into _network_mod to match hardcoded value in slesNtwk_turing.py
         ntwk = ft.modify_network(rd, mod_dir=temp_dir, dnout="_network_mod")
