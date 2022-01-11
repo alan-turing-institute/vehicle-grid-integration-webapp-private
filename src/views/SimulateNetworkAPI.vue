@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
-        <h3>Build and simulate an electricity distribution network API</h3>
+        <h3>Build and simulate an electricity distribution network</h3>
         <p>
           You can find more information on OpenDSS parameters below in the
           <a
@@ -86,7 +86,7 @@
           <div class="form-group row">
             <!-- Experiment parameter: rs_pen -->
             <label for="rs_pen" class="col-md-6 col-form-label">
-              Percentage residential loads
+              Proportion residential loads
             </label>
             <div class="col-md-6">
               <input
@@ -94,7 +94,7 @@
                 type="float"
                 class="form-control"
                 id="rs_pen"
-                placeholder="Percentage residential loads e.g. 0.8"
+                placeholder="Proportion residential loads e.g. 0.8"
               />
             </div>
           </div>
