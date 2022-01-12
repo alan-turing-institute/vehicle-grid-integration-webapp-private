@@ -418,7 +418,7 @@ export default {
             { name: "MV network powers", plot: responseJson["mv_powers"] },
             { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
             { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
-            { name: "Profiles", plot: responseJson["profile_options"] },
+            { name: "Average of profiles", plot: responseJson["profile_options"] },
           ];
 
           this.responseAvailable = true;
