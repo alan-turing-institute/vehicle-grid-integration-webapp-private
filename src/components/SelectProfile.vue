@@ -48,13 +48,16 @@
             id="profile_pen"
             />
         </div>
+        <div v-for="error of penValidation" :key="error.$uid" class="col-md-6 offset-md-6 col-form-label text-danger">
+            {{ error.$message }}
+        </div>
     </div>
 
 </template>
 
 <script>
     export default {
-        props: ["profileOptions", "title"],
+        props: ["profileOptions", "title", "penValidation"],
         emits: ["update:profileOptions"],
         computed: {
             profile: {
@@ -64,6 +67,9 @@
                 set(profile) {
                     let profile_options = this.profileOptions
                     profile_options.profile = profile
+                    if (profile == "None") {
+                        profile_options.penetration = 1
+                    }
                     this.$emit("update:profileOptions", profile_options)
                 }
             },

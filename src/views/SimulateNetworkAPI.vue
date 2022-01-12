@@ -154,10 +154,10 @@
 
         <div class="col-lg-6">
           <h4>LV connected</h4>
-            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" title="Smart meter"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" title="Electric vehicles"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" title="Photovoltaic"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" title="Heat pump"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meter"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" v-model:penValidation="v$.profile_options.lv_electric_vehicle.penetration.$errors" title="Electric vehicles"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Photovoltaic"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" v-model:penValidation="v$.profile_options.lv_heat_pump.penetration.$errors" title="Heat pump"></select-profile>
         </div>
       </div>
 
@@ -338,6 +338,23 @@ export default {
         lv_selected: { required: requiredIf( function() { return this.lv_options.lv_default == "custom" }),
                        maxLength: maxLength(5)
          }
+      },
+      profile_options: {
+        lv_smart_meter: {
+          penetration: { required, between: between(0, 1) }
+        },
+        lv_electric_vehicle: {
+          penetration: { required: requiredIf( function() { return this.profile_options.lv_electric_vehicle.profile !== "None" } ),
+                         between: between(0, 1) }
+        },
+        lv_photovoltaic: {
+          penetration: { required: requiredIf( function() { return this.profile_options.lv_photovoltaic.profile !== "None" } ),
+                         between: between(0, 1) }
+        },
+        lv_heat_pump: {
+          penetration: { required: requiredIf( function() { return this.profile_options.lv_heat_pump.profile !== "None" } ),
+                         between: between(0, 1) }
+        }
       }
     }
   },
