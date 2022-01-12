@@ -32,7 +32,7 @@ from vgi_api.validation.validators import ValidateLVParams
 
 app = fastapi.FastAPI()
 
-origins = ["http://localhost:8080", "http://192.168.1.63:8080"]
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
