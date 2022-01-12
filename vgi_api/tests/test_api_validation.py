@@ -9,12 +9,18 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 from vgi_api import app
-from vgi_api.validation import (DEFAULT_LV_NETWORKS, VALID_LV_NETWORKS_RURAL,
-                                VALID_LV_NETWORKS_URBAN, DefaultLV,
-                                LVSmartMeterOptions, MVFCSOptions,
-                                MVSolarPVOptions, NetworkID, ValidateLVParams)
-from vgi_api.validation.types import (LVElectricVehicleOptions, LVHPOptions,
-                                      LVPVOptions)
+from vgi_api.validation import (
+    DEFAULT_LV_NETWORKS,
+    VALID_LV_NETWORKS_RURAL,
+    VALID_LV_NETWORKS_URBAN,
+    DefaultLV,
+    LVSmartMeterOptions,
+    MVFCSOptions,
+    MVSolarPVOptions,
+    NetworkID,
+    ValidateLVParams,
+)
+from vgi_api.validation.types import LVElectricVehicleOptions, LVHPOptions, LVPVOptions
 
 client = TestClient(app)
 
@@ -206,6 +212,26 @@ def upload_csv(file: io.BytesIO, param_key, option, csv_name) -> requests.Respon
 def test_valid_csv(valid_profile_csv: io.BytesIO, param_key, option, csv_name):
 
     resp = upload_csv(valid_profile_csv, param_key, option, csv_name)
+    debug(resp.json())
+    assert resp.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_valid_extra_blank_lines_csv(
+    valid_profile_extra_lines_csv: io.BytesIO, param_key, option, csv_name
+):
+
+    resp = upload_csv(valid_profile_extra_lines_csv, param_key, option, csv_name)
     debug(resp.json())
     assert resp.status_code == 200
 
