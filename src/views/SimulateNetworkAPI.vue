@@ -172,14 +172,27 @@
               Run simulation
             </label>
             <div class="col-md-3">
-            <button type="submit" name="button_submit" class="btn btn-primary btn-block" style="background-color: #00897B; border-color: #00897B" @click="fetchAPIData">
+            <button :disabled="v$.$errors.length" type="submit" name="button_submit" class="btn btn-primary btn-block" style="background-color: #00897B; border-color: #00897B" @click="fetchAPIData">
               Submit
               <template v-if="isLoading">
                 <div class="spinner-border spinner-border-sm" role="status"></div>
               </template>
             </button>
             </div>
-          </div>       
+          </div>
+          <div class="form-group row">
+            <div class="col-md-6">
+              <div v-if="v$.$errors.length" class="alert alert-danger" role="alert">
+                <strong>
+                  Invalid inputs - fix before submitting
+                </strong>
+                <hr>
+                <div v-for="error of v$.$errors" :key="error.$uid">
+                  {{ error.$property }}: {{ error.$message }}
+                </div>
+              </div>
+            </div>
+          </div>
           <template v-if="isLoading">
             <div class="form-group row col-md-6">
               Simulation in progress...<br>
