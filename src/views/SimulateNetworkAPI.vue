@@ -46,8 +46,8 @@
                 type="float"
                 class="form-control"
                 id="xfmr_scale"
-                placeholder="xfmr_scale"
               />
+              <div v-for="error of v$.network_options.xfmr_scale.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -231,11 +231,19 @@
 
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
+import useVuelidate from '@vuelidate/core'
+import { required, between } from '@vuelidate/validators'
 export default {
   el: "#main",
 
   components: {
     SelectProfile
+  },
+
+  setup () {
+    return {
+      v$: useVuelidate()
+    }
   },
 
   data() {
@@ -303,6 +311,14 @@ export default {
       isLoading: false,
       responseAvailable: false
     };
+  },
+
+  validations() {
+    return {
+       network_options: {
+        xfmr_scale: { required, between: between(0, 20), $autoDirty: true },
+      },
+    }
   },
 
   mounted() {
