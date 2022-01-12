@@ -204,6 +204,9 @@ def validate_csv(v: Optional[Union[IO, UploadFile]]):
     lines = [l.decode().replace(" ", "").split(",") for l in v.readlines()]
     lines = [[elem.replace("\n", "") for elem in line] for line in lines]
 
+    # Remove empty lines
+    lines = [l for l in lines if not all([i == "" for i in l])]
+
     n_lines = len(lines)
     if n_lines != expect_n_lines:
         raise ValueError(
