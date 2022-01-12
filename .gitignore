@@ -27,3 +27,6 @@ yarn-error.log*
 .vscode
 
 *.env
+
+# Never commit publish_profile
+*publish_profile.publishsettings
