@@ -226,16 +226,23 @@
       
 
     </form>
+
+    <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"></github-link>
+    <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"></github-link>
+    <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"></github-link>
+
   </div>
 </template>
 
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
+import GithubLink from "../components/GithubLink.vue"
 export default {
   el: "#main",
 
   components: {
-    SelectProfile
+    SelectProfile,
+    GithubLink
   },
 
   data() {
