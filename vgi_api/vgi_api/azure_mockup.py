@@ -218,7 +218,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         data_out_lv_comparison = np.c_[data_out_lv_comparison, dplt.T]
 
     head_lv_comparison = [
-        f"{int(q)}% quantile, LV Network: {simulation.ckts.ldNo[ii]}"
+        f"{int(q)}% quantile: LV Network: {simulation.ckts.ldNo[ii]}"
         for ii in range(simulation.ckts.N)
         for q in np.linspace(0, 100, 5)
     ]
@@ -273,7 +273,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
     mv_voltages_buffer = io.BytesIO()
     plt.gcf().savefig(mv_voltages_buffer, facecolor="LightGray")
 
-    head_mv_voltages = [f"MV voltage, {qq}% quantile" for qq in np.linspace(0, 100, 5)]
+    head_mv_voltages = [f"MV voltage: {qq}% quantile" for qq in np.linspace(0, 100, 5)]
     data_out_mv_voltage = dplt.T
 
     # PLOT: trn_powers
