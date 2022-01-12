@@ -242,7 +242,7 @@ export default {
 
   setup () {
     return {
-      v$: useVuelidate()
+      v$: useVuelidate({ $autoDirty: true })
     }
   },
 
@@ -316,7 +316,7 @@ export default {
   validations() {
     return {
        network_options: {
-        xfmr_scale: { required, between: between(0, 20), $autoDirty: true },
+        xfmr_scale: { required, between: between(0, 20) },
       },
     }
   },
