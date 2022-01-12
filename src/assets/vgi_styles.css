@@ -23,3 +23,9 @@
 .dark-link {
     color: var(--dark);
 }
+
+.center-element {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+    text-align: center;
+}
