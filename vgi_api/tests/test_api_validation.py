@@ -247,6 +247,26 @@ def test_valid_extra_blank_lines_csv(
         ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
     ],
 )
+def test_valid_extra_extra_blank_lines_csv(
+    valid_profile_extra_extra_lines_csv: io.BytesIO, param_key, option, csv_name
+):
+
+    resp = upload_csv(valid_profile_extra_extra_lines_csv, param_key, option, csv_name)
+    debug(resp.json())
+    assert resp.status_code == 200
+
+
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
 def test_invalid_csv_long(
     invalid_profile_csv_too_long: io.BytesIO, param_key, option, csv_name
 ):
