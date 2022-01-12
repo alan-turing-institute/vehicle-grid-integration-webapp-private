@@ -2,12 +2,12 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
-        <h3>Build and simulate an electricity distribution network</h3>
+        <h3>Build and simulate an electricity distribution network with EVs and other green technologies</h3>
         <p>
-          You can find more information on OpenDSS parameters below in the
+          You can find more information in the
           <a
-            href="http://svn.code.sf.net/p/electricdss/code/trunk/Distrib/Doc/OpenDSSManual.pdf"
-            >OpenDSS Manual</a
+            href="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/"
+            >project repository</a
           >.
         </p>
       </div>
