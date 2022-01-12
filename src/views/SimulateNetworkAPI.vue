@@ -257,7 +257,7 @@
 import SelectProfile from "../components/SelectProfile.vue"
 import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
-import { required, requiredIf, between, maxLength, minValue } from '@vuelidate/validators'
+import { required, requiredIf, between, minLength, maxLength, minValue } from '@vuelidate/validators'
 
 export default {
   el: "#main",
@@ -349,7 +349,8 @@ export default {
       },
       lv_options: {
         lv_selected: { required: requiredIf( function() { return this.lv_options.lv_default == "custom" }),
-                       maxLength: maxLength(5)
+                       maxLength: maxLength(5),
+                       minLength: minLength(2),
          }
       },
       profile_options: {
