@@ -62,8 +62,8 @@
                 type="float"
                 class="form-control"
                 id="oltc_setpoint"
-                placeholder="OLTC set point, e.g. 1.04"
               />
+              <div v-for="error of v$.network_options.oltc_setpoint.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -78,8 +78,8 @@
                 type="float"
                 class="form-control"
                 id="oltc_bandwidth"
-                placeholder="OLTC bandwidth, e.g. 0.13"
               />
+              <div v-for="error of v$.network_options.oltc_bandwidth.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -94,8 +94,8 @@
                 type="float"
                 class="form-control"
                 id="rs_pen"
-                placeholder="Proportion residential loads e.g. 0.8"
               />
+              <div v-for="error of v$.network_options.rs_pen.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
             </div>
           </div>
         </div>
@@ -232,7 +232,7 @@
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
 import useVuelidate from '@vuelidate/core'
-import { required, between } from '@vuelidate/validators'
+import { required, between, minValue } from '@vuelidate/validators'
 export default {
   el: "#main",
 
@@ -316,7 +316,10 @@ export default {
   validations() {
     return {
        network_options: {
-        xfmr_scale: { required, between: between(0, 20) },
+        xfmr_scale: { required, minValue: minValue(0) },
+        oltc_setpoint: { required, between: between(0.95, 1.1) },
+        oltc_bandwidth: { required, between: between(0.01, 0.05) },
+        rs_pen: { required, between: between(0, 1) },
       },
     }
   },
