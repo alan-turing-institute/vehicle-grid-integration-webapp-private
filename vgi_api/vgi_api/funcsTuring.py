@@ -1030,8 +1030,12 @@ class turingNet(snk.dNet):
 
         # Low voltage
         for ld, sdn in ld2sd.items():
+
             if self.ldsi[ld]["nlv"] > 0 and sdn in self.p.keys():
                 pp = self.p[sdn]
+                # Expand the number of dimensions
+                if pp.ndim == 1:
+                    pp = np.expand_dims(pp, axis=1)
                 self.dmnd[ld].lv = np.array(
                     [pp[:, i % pp.shape[1]] for i in range(self.ldsi[ld].nlv)]
                 )
