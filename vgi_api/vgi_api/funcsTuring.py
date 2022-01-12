@@ -1044,7 +1044,11 @@ class turingNet(snk.dNet):
             "hps",
         ]:
             if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
-                pp = self.p[ld2sd[ld] + "_"]
+                if ld2sd[ld] != "lv_hp_profile_array":
+                    pp = self.p[ld2sd[ld] + "_"]
+                else:
+                    pp = self.p[ld2sd[ld]]
+
                 frac = self.ldsi[ld].nlv / self.mvlvi.nlv
                 self.dmnd[ld].mv = np.array(
                     [pp * nhses[i] * frac for i in self.ldsi[ld].mv]
