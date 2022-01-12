@@ -126,6 +126,7 @@
               <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
                 <option v-for="lv_id in lv_options.lv_list" :key="lv_id">{{ lv_id }}</option>
               </select>
+              <div v-for="error of v$.lv_options.lv_selected.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -232,7 +233,7 @@
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
 import useVuelidate from '@vuelidate/core'
-import { required, between, minValue } from '@vuelidate/validators'
+import { required, requiredIf, between, maxLength, minValue } from '@vuelidate/validators'
 export default {
   el: "#main",
 
@@ -321,6 +322,11 @@ export default {
         oltc_bandwidth: { required, between: between(0.01, 0.05) },
         rs_pen: { required, between: between(0, 1) },
       },
+      lv_options: {
+        lv_selected: { required: requiredIf( function() { return this.lv_options.lv_default == "custom" }),
+                       maxLength: maxLength(5)
+         }
+      }
     }
   },
 
