@@ -224,7 +224,6 @@
 
       </div>
 
-      <h3>Supported by:</h3>
       <div class="row">
         <img class="col-md-3 logo" src="../assets/logos/supergen.png">
         <img class="col-md-3 logo" src="../assets/logos/turing.png">
