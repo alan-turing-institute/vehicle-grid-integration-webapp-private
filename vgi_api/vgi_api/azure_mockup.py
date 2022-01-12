@@ -355,7 +355,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
     set_day_label()
     plt.legend(title="Profile ID", fontsize="small", loc=(1.05, 0.1))
-    plt.ylabel("Power (kW, or normalised)")
+    plt.ylabel("Power, kW)")
     plt.tight_layout()
     if sf:
         sff(
