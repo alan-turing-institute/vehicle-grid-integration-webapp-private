@@ -768,7 +768,11 @@ class dNet:
         """
         d.resetDss()
 
+
+        cur_dir = os.getcwd()
+        # The next line changes the current working directory so we change it back
         d.DSSText.Command = "Compile " + self.fn
+        os.chdir(cur_dir)
         d.DSSText.Command = "Set tol=" + self.prm["tolStr"]
         d.SLN.Solve()
 

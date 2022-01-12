@@ -169,9 +169,6 @@ async def simulate(
     ),
 ):
 
-    # This is a temporary fix. See https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/issues/27
-    working_dir = os.getcwd()
-
     # MV parameters are already valid. LV parameters need additional validation
     lv_list_validated = validate_lv_parameters(lv_list, lv_default, lv_plot_list, n_id)
 
@@ -260,10 +257,6 @@ async def simulate(
         head_lv_comparison,
         data_out_lv_comparison,
     ) = azure_mockup.run_dss_simulation(parameters)
-
-
-    # Temporary fix for https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/issues/27
-    os.chdir(working_dir)
 
     def prepare_csv(header: List[str], plot_data: np.array) -> str:
 
@@ -376,6 +369,11 @@ async def get_options(option_type: AllOptions):
     elif option_type == AllOptions.LVHPOptions:
 
         return get_members(LVHPOptions)
+
+
+@app.get("/health-check")
+def health_check():
+    return "alive"
 
 
 if __name__ == "__main__":
