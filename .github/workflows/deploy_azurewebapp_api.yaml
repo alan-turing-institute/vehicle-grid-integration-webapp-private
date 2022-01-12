@@ -23,8 +23,8 @@ jobs:
     environment: dev
     steps:
     - uses: actions/checkout@master
-    - name: Azure authentication
-      uses: azure/login@v1
+    # - name: Azure authentication
+    #   uses: azure/login@v1
       # with:
       #   creds: ${{ secrets.AZURE_CREDENTIALS }}
 #     - name: Azure CLI script to provision a new Web App for Container
