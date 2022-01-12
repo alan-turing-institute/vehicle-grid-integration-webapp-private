@@ -236,8 +236,14 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         fontsize="small",
     )
     axs[0].set_ylabel("Voltage, per unit")
-    axs[2].set_xlabel("Hour of the day")
-    axs[-1].set_xlabel("")
+
+    # Set table on second subplot, unless not enough plots. Then use the last subplot
+    if len(axs) < 3:
+        axs[len(axs) - 1].set_xlabel("Hour of the day")
+    else:
+        axs[2].set_xlabel("Hour of the day")
+        axs[-1].set_xlabel("")
+
     xlm = plt.xlim()
     plt.xlim(xlm)
     plt.tight_layout()
