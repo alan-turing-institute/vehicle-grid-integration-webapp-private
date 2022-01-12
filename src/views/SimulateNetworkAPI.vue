@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
-        <h3>Build and simulate an electricity distribution network with EVs and other green technologies</h3>
+        <h4>Build and simulate an electricity distribution network with EVs and other green technologies</h4>
         <p>
           You can find more information in the
           <a
@@ -249,6 +249,12 @@
     <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"></github-link>
     <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"></github-link>
     <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"></github-link>
+
+    <div class="row">
+      <img class="col-md-4 logo" src="../assets/logos/supergen.png">
+      <img class="col-md-4 logo" src="../assets/logos/turing.png">
+      <img class="col-md-4 logo" src="../assets/logos/newcastle.png">
+    </div>
 
   </div>
 </template>
