@@ -182,15 +182,18 @@
           </div>
           <div class="form-group row">
             <div class="col-md-6">
-              <div v-if="v$.$errors.length || invalid_csvs.length" class="alert alert-danger" role="alert">
+              <div v-if="v$.$errors.length || invalid_csvs.length || error_messages.length" class="alert alert-danger" role="alert">
                   <i class="bi bi-exclamation-octagon-fill"></i>
-                  Invalid inputs - fix before submitting
+                  Invalid inputs
                 <hr>
                 <div v-for="error of v$.$errors" :key="error.$uid">
                   {{ error.$property }}: {{ error.$message }}
                 </div>
                 <div v-for="csv_name of invalid_csvs" :key="csv_name.$uid">
                   One csv file required for input {{ csv_name }}
+                </div>
+                <div v-for="message of error_messages" :key="message.$uid">
+                  {{ message }}
                 </div>
               </div>
             </div>
@@ -322,6 +325,7 @@ export default {
       },
       rawJson: "empty",
       invalid_csvs: [],
+      error_messages: [],
       isShowJson: false,
       isLoading: false,
       responseAvailable: false
@@ -396,6 +400,7 @@ export default {
       // Ask user to wait while API request is formed and made
       this.plots = [];
       this.invalid_csvs = []
+      this.error_messages = []
       this.rawJson = "wait...";
       this.isLoading = true;
       this.responseAvailable = false;
@@ -422,6 +427,7 @@ export default {
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_hp", this.profile_options.lv_heat_pump)
       if ( this.invalid_csvs.length > 0 ) {
         this.isLoading = false;
+        this.responseAvailable = false;
         return
       }
 
@@ -442,7 +448,7 @@ export default {
         body: check_csv_to_upload ? formData : null
       })
         .then(response => {
-          if (response.ok) {
+          if (response.ok || response.status == 422) {
             return response.text();
           } else {
             alert(
@@ -457,11 +463,17 @@ export default {
           // Parse json repsonse
           var responseJson = JSON.parse(response);
 
-          // // Parse revoltages port from json to array to list
-          // this.voltages = responseJson["voltages"];
-
-          // // Parse report from json to array to list
-          // this.report = responseJson["report"];
+          // Show error message if there was an issue
+          if ("detail" in responseJson) {
+            for (let d of responseJson.detail) {
+              for (let name of d.loc) {
+                this.error_messages.push(name + ": " + d.msg)
+              }
+            }
+            this.isLoading = false
+            this.responseAvailable = false
+            return
+          }
 
           // Parse plot from json to image data
           this.plots = [
