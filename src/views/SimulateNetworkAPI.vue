@@ -2,7 +2,7 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
-        <h3>Build and simulate an electricity distribution network with EVs and other green technologies</h3>
+        <h4>Build and simulate an electricity distribution network with EVs and other green technologies</h4>
         <p>
           You can find more information in the
           <a
@@ -250,6 +250,12 @@
     <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"></github-link>
     <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"></github-link>
 
+    <div class="row">
+      <img class="col-md-4 logo" src="../assets/logos/supergen.png">
+      <img class="col-md-4 logo" src="../assets/logos/turing.png">
+      <img class="col-md-4 logo" src="../assets/logos/newcastle.png">
+    </div>
+
   </div>
 </template>
 
@@ -257,7 +263,7 @@
 import SelectProfile from "../components/SelectProfile.vue"
 import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
-import { required, requiredIf, between, maxLength } from '@vuelidate/validators'
+import { required, requiredIf, between, minLength, maxLength, minValue } from '@vuelidate/validators'
 
 export default {
   el: "#main",
@@ -349,7 +355,8 @@ export default {
       },
       lv_options: {
         lv_selected: { required: requiredIf( function() { return this.lv_options.lv_default == "custom" }),
-                       maxLength: maxLength(5)
+                       maxLength: maxLength(5),
+                       minLength: minLength(2),
          }
       },
       profile_options: {

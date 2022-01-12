@@ -16,13 +16,6 @@
       </svg>
       EVENT</router-link
     >
-    <ul class="navbar-nav mr-auto">
-      <li class="nav-item">
-        <router-link class="nav-link" :to="{ name: 'Analysis' }"
-          >Analysis</router-link
-        >
-      </li>
-    </ul>
   </nav>
   <div style="margin: 1.5rem;">
     <router-view></router-view>

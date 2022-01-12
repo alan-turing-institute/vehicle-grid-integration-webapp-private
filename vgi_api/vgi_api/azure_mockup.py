@@ -218,7 +218,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         data_out_lv_comparison = np.c_[data_out_lv_comparison, dplt.T]
 
     head_lv_comparison = [
-        f"{int(q)}% quantile, LV Network: {simulation.ckts.ldNo[ii]}"
+        f"{int(q)}% quantile: LV Network: {simulation.ckts.ldNo[ii]}"
         for ii in range(simulation.ckts.N)
         for q in np.linspace(0, 100, 5)
     ]
@@ -236,8 +236,14 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         fontsize="small",
     )
     axs[0].set_ylabel("Voltage, per unit")
-    axs[2].set_xlabel("Hour of the day")
-    axs[-1].set_xlabel("")
+
+    # Set table on second subplot, unless not enough plots. Then use the last subplot
+    if len(axs) < 3:
+        axs[len(axs) - 1].set_xlabel("Hour of the day")
+    else:
+        axs[2].set_xlabel("Hour of the day")
+        axs[-1].set_xlabel("")
+
     xlm = plt.xlim()
     plt.xlim(xlm)
     plt.tight_layout()
@@ -273,7 +279,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
     mv_voltages_buffer = io.BytesIO()
     plt.gcf().savefig(mv_voltages_buffer, facecolor="LightGray")
 
-    head_mv_voltages = [f"MV voltage, {qq}% quantile" for qq in np.linspace(0, 100, 5)]
+    head_mv_voltages = [f"MV voltage: {qq}% quantile" for qq in np.linspace(0, 100, 5)]
     data_out_mv_voltage = dplt.T
 
     # PLOT: trn_powers
@@ -355,7 +361,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
 
     set_day_label()
     plt.legend(title="Profile ID", fontsize="small", loc=(1.05, 0.1))
-    plt.ylabel("Power (kW, or normalised)")
+    plt.ylabel("Power, kW)")
     plt.tight_layout()
     if sf:
         sff(

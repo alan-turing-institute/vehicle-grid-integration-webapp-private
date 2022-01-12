@@ -16,21 +16,7 @@ const routes = [
           import(/* webpackChunkName: "home" */ "../views/Home.vue")
       },
       {
-        path: "analysis",
-        name: "Analysis",
-        component: () =>
-          import(/* webpackChunkName: "analysis" */ "../views/Analysis.vue")
-      },
-      {
-        path: "analysis/simulate_network",
-        name: "SimulateNetwork",
-        component: () =>
-          import(
-            /* webpackChunkName: "simulate_network" */ "../views/SimulateNetwork.vue"
-          )
-      },
-      {
-        path: "analysis/simulate_network_API",
+        path: "simulate_network",
         name: "SimulateNetworkAPI",
         component: () =>
           import(
