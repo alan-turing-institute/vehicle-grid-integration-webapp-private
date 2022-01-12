@@ -47,7 +47,7 @@
                 class="form-control"
                 id="xfmr_scale"
               />
-              <div v-for="error of v$.network_options.xfmr_scale.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
+              <div v-for="error of v$.network_options.xfmr_scale.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -63,7 +63,7 @@
                 class="form-control"
                 id="oltc_setpoint"
               />
-              <div v-for="error of v$.network_options.oltc_setpoint.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
+              <div v-for="error of v$.network_options.oltc_setpoint.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -79,7 +79,7 @@
                 class="form-control"
                 id="oltc_bandwidth"
               />
-              <div v-for="error of v$.network_options.oltc_bandwidth.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
+              <div v-for="error of v$.network_options.oltc_bandwidth.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -95,7 +95,7 @@
                 class="form-control"
                 id="rs_pen"
               />
-              <div v-for="error of v$.network_options.rs_pen.$errors" :key="error.$uid" style="color:red">{{ error.$message }}</div>
+              <div v-for="error of v$.network_options.rs_pen.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
         </div>
