@@ -1,42 +1,39 @@
 <template>
-  <div>
-    <div
-      style="background-image: url('https://www.turing.ac.uk/sites/default/files/styles/hero/public/2019-07/vehicle_charging.jpg'); background-repeat:repeat-x; background-position: 0% 25%;  background-size: 100%; height:200px;"
-    />
-    <h1>Introduction</h1>
-    <p class="lead">
-      Electric vehicles (EVs) can break our dependence on fossil fuels in
-      transport and energy sectors. However, mass adoption of EVs introduces
-      significant and disruptive electricity demand to meet the charging needs
-      of these vehicles. Vehicle grid integration strategies, underpinned by
-      data science, ensure that electric vehicle charging infrastructure is
-      synergistic with the electricity grid, reliable, cost effective and
-      sustainable.
-    </p>
-    <h2>Project aims</h2>
-    <ul>
-      <li>
-        Apply and develop data science methods and tools to help in the
-        transformation of electricity and transport infrastructure into
-        sustainable and efficient infrastructure, while maintaining reliable
-        operation
-      </li>
-      <li>
-        Contribute to open communication protocols for vehicle grid integration
-      </li>
-      <li>Contribute to open source software for vehicle grid integration</li>
-      <li>
-        Apply and develop privacy preserving methods for energy demand data
-      </li>
-      <li>
-        Conduct security analysis to grid-integrated EV charging infrastructure
-        (assessing security of communication, hardware and software)
-      </li>
-      <li>Devise response plans to potential security threats and attacks</li>
-      <li>
-        Assess several new technology pathways to help policy makers make
-        informed decisions
-      </li>
-    </ul>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-6" style="margin-bottom: 20px">
+        <div class="box-main" style="border-color: #3949AB; height: 100%">
+          <div class="col-lg-12 box-title" style="background-color: #C5CAE9">
+            <h3>EVENT</h3>
+          </div>
+          <div class="center-element">
+            <h5><u>E</u>lectric <u>VE</u>hicle <u>N</u>etwork analysis <u>T</u>ool</h5>
+          </div>
+          <div class="center-element">
+            <router-link
+              class="btn btn-primary"
+              style="background-color: #3949AB; border-color: #3949AB"
+              :to="{ name: 'SimulateNetworkAPI' }"
+              >Build a Network
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-6" style="margin-bottom: 20px">
+        <div class="box-main" style="border-color: #1E88E5; height: 100%">
+          <div class="col-lg-12 box-title" style="background-color: #BBDEFB">
+            <h3>Acknowledgements</h3>
+          </div>
+          <div class="col-lg-12">
+            <p>This work is a collaboration of Newcastle University, Research Engineering at The Alan Turing Institute and the Supergen Energy Networks Hub.</p>
+            <p>For more information see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
+            <p>This work is funded by the e4Future grant (104227) - under UK Research and Innovation by the Department for Business, Energy and Industrial Strategy (BEIS) and The Office for Zero Emission Vehicles (OZEV) and delivered through Innovate UK; and a grant from the Lloyd's Register Foundation (G0095) under the Data-Centric Engineering Programme of The Alan Turing Institute.</p>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
+
 </template>
