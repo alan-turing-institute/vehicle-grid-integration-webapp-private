@@ -182,12 +182,15 @@
           </div>
           <div class="form-group row">
             <div class="col-md-6">
-              <div v-if="v$.$errors.length" class="alert alert-danger" role="alert">
+              <div v-if="v$.$errors.length || invalid_csvs.length" class="alert alert-danger" role="alert">
                   <i class="bi bi-exclamation-octagon-fill"></i>
                   Invalid inputs - fix before submitting
                 <hr>
                 <div v-for="error of v$.$errors" :key="error.$uid">
                   {{ error.$property }}: {{ error.$message }}
+                </div>
+                <div v-for="csv_name of invalid_csvs" :key="csv_name.$uid">
+                  One csv file required for input {{ csv_name }}
                 </div>
               </div>
             </div>
@@ -317,9 +320,8 @@ export default {
           penetration: 1
         }
       },
-      // voltages: [],
-      // report: [],
       rawJson: "empty",
+      invalid_csvs: [],
       isShowJson: false,
       isLoading: false,
       responseAvailable: false
@@ -393,6 +395,7 @@ export default {
     fetchAPIData() {
       // Ask user to wait while API request is formed and made
       this.plots = [];
+      this.invalid_csvs = []
       this.rawJson = "wait...";
       this.isLoading = true;
       this.responseAvailable = false;
@@ -417,6 +420,10 @@ export default {
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_ev", this.profile_options.lv_electric_vehicle)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_pv", this.profile_options.lv_photovoltaic)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_hp", this.profile_options.lv_heat_pump)
+      if ( this.invalid_csvs.length > 0 ) {
+        this.isLoading = false;
+        return
+      }
 
       url_params.dry_run = false;
 
@@ -481,7 +488,12 @@ export default {
       url_params[name + "_profile"] = params.profile;
       if (params.profile == "csv") {
         url_params[name + "_units"] = params.units;
-        form_data.set(name + "_csv", params.csv[0]);
+        if ( (params.csv == null) || (params.csv.length !== 1) ) {
+          this.invalid_csvs.push(name)
+        }
+        else {
+          form_data.set(name + "_csv", params.csv[0]);
+        }
       }
       if (params.penetration !== undefined && params.profile !== "None") {
         url_params[name + "_pen"] = params.penetration;
