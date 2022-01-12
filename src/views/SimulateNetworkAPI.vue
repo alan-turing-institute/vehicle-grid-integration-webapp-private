@@ -213,7 +213,7 @@
                     data-parent="#accordionResults"
                   >
                     <div class="card-body">
-                      <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+                      <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%; min-width: 75%"/>
                     </div>
                   </div>
                 </div>
