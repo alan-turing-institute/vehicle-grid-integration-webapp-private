@@ -410,14 +410,14 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
-            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
-            { name: "MV network powers", plot: responseJson["mv_powers"] },
-            { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
             { name: "LV network voltages comparison", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
             { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
             { name: "Primary feeders' loadings", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
             { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
+            { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
+            { name: "MV network powers", plot: responseJson["mv_powers"] },
+            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
+            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
             { name: "Profiles", plot: responseJson["profile_options"] },
           ];
 
