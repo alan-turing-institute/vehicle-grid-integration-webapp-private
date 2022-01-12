@@ -196,14 +196,6 @@ async def simulate(
         lv_hp_profile, lv_hp_csv, lv_hp_profile_units
     )
 
-    logging.warning("Check profile inputs")
-    logging.warning("mv_solar_profile_array: %s", mv_solar_profile_array)
-    logging.warning("mv_fcs_profile_array: %s", mv_fcs_profile_array)
-    logging.warning("smart_meter_profile_array: %s", smart_meter_profile_array)
-    logging.warning("lv_ev_profile_array: %s", lv_ev_profile_array)
-    logging.warning("lv_pv_profile_array: %s", lv_pv_profile_array)
-    logging.warning("lv_hp_profile_array: %s", lv_hp_profile_array)
-
     logging.info("Passing params to dss")
     file_name = None
 
