@@ -41,7 +41,7 @@ jobs:
         password: ${{ secrets.REGISTRY_PASSWORD }}    
     - name: Docker Build & Push to ACR
       run: |
-        docker build . -t ${{ env.CONTAINER_REGISTRY }}/vgi_api:latest
+        docker build -f docker_images/vgi_api.dockerfile -t ${{ env.CONTAINER_REGISTRY }}/vgi_api:latest . 
         docker push ${{ env.CONTAINER_REGISTRY }}/vgi_api:latest
 # Uncomment the below action snippet if the Web app credentials are not updated as web app settings
 #     - name: Set Web App ACR authentication
