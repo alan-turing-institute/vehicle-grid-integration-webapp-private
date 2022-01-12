@@ -2,12 +2,12 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-12">
-        <h3>Build and simulate an electricity distribution network</h3>
+        <h3>Build and simulate an electricity distribution network with EVs and other green technologies</h3>
         <p>
-          You can find more information on OpenDSS parameters below in the
+          You can find more information in the
           <a
-            href="http://svn.code.sf.net/p/electricdss/code/trunk/Distrib/Doc/OpenDSSManual.pdf"
-            >OpenDSS Manual</a
+            href="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/"
+            >project repository</a
           >.
         </p>
       </div>
@@ -232,7 +232,7 @@
                     data-parent="#accordionResults"
                   >
                     <div class="card-body">
-                      <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%"/>
+                      <img v-bind:src="'data:image/jpeg;base64,' + p.plot" style="max-width: 100%; min-width: 75%"/>
                     </div>
                   </div>
                 </div>
@@ -245,18 +245,26 @@
       
 
     </form>
+
+    <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"></github-link>
+    <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"></github-link>
+    <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"></github-link>
+
   </div>
 </template>
 
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
+import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
 import { required, requiredIf, between, maxLength, minValue } from '@vuelidate/validators'
+
 export default {
   el: "#main",
 
   components: {
-    SelectProfile
+    SelectProfile,
+    GithubLink
   },
 
   setup () {
@@ -299,7 +307,6 @@ export default {
           profile: null,
           units: "kW",
           csv: null,
-          penetration: 1
         },
         lv_electric_vehicle: {
           list: [],
@@ -477,15 +484,15 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
-            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
-            { name: "MV network powers", plot: responseJson["mv_powers"] },
-            { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
             { name: "LV network voltages comparison", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
             { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
-            { name: "Primary loadings", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
-            { name: "Primary powers", plot: responseJson["pmry_powers"] },
-            { name: "Profiles", plot: responseJson["profile_options"] },
+            { name: "Primary feeders' loadings", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
+            { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
+            { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
+            { name: "MV network powers", plot: responseJson["mv_powers"] },
+            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
+            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
+            { name: "Average of profiles", plot: responseJson["profile_options"] },
           ];
 
           this.responseAvailable = true;
