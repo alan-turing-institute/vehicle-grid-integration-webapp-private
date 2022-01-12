@@ -15,3 +15,8 @@
 .box-title {
     margin-bottom: 0.5rem;
 }
+
+.logo {
+    object-fit: contain;
+    padding: 20px;
+}
