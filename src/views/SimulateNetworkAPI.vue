@@ -183,9 +183,8 @@
           <div class="form-group row">
             <div class="col-md-6">
               <div v-if="v$.$errors.length" class="alert alert-danger" role="alert">
-                <strong>
+                  <i class="bi bi-exclamation-octagon-fill"></i>
                   Invalid inputs - fix before submitting
-                </strong>
                 <hr>
                 <div v-for="error of v$.$errors" :key="error.$uid">
                   {{ error.$property }}: {{ error.$message }}
