@@ -46,8 +46,8 @@
                 type="float"
                 class="form-control"
                 id="xfmr_scale"
-                placeholder="xfmr_scale"
               />
+              <div v-for="error of v$.network_options.xfmr_scale.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -62,8 +62,8 @@
                 type="float"
                 class="form-control"
                 id="oltc_setpoint"
-                placeholder="OLTC set point, e.g. 1.04"
               />
+              <div v-for="error of v$.network_options.oltc_setpoint.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -78,8 +78,8 @@
                 type="float"
                 class="form-control"
                 id="oltc_bandwidth"
-                placeholder="OLTC bandwidth, e.g. 0.13"
               />
+              <div v-for="error of v$.network_options.oltc_bandwidth.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -94,8 +94,8 @@
                 type="float"
                 class="form-control"
                 id="rs_pen"
-                placeholder="Proportion residential loads e.g. 0.8"
               />
+              <div v-for="error of v$.network_options.rs_pen.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
         </div>
@@ -126,6 +126,7 @@
               <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
                 <option v-for="lv_id in lv_options.lv_list" :key="lv_id">{{ lv_id }}</option>
               </select>
+              <div v-for="error of v$.lv_options.lv_selected.$errors" :key="error.$uid" class="text-danger">{{ error.$message }}</div>
             </div>
           </div>
 
@@ -153,10 +154,10 @@
 
         <div class="col-lg-6">
           <h4>LV connected</h4>
-            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" title="Smart meter"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" title="Electric vehicles"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" title="Photovoltaic"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" title="Heat pump"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meter"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" v-model:penValidation="v$.profile_options.lv_electric_vehicle.penetration.$errors" title="Electric vehicles"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Photovoltaic"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" v-model:penValidation="v$.profile_options.lv_heat_pump.penetration.$errors" title="Heat pump"></select-profile>
         </div>
       </div>
 
@@ -171,14 +172,32 @@
               Run simulation
             </label>
             <div class="col-md-3">
-            <button type="submit" name="button_submit" class="btn btn-primary btn-block" style="background-color: #00897B; border-color: #00897B" @click="fetchAPIData">
+            <button :disabled="v$.$errors.length" type="submit" name="button_submit" class="btn btn-primary btn-block" style="background-color: #00897B; border-color: #00897B" @click="fetchAPIData">
               Submit
               <template v-if="isLoading">
                 <div class="spinner-border spinner-border-sm" role="status"></div>
               </template>
             </button>
             </div>
-          </div>       
+          </div>
+          <div class="form-group row">
+            <div class="col-md-6">
+              <div v-if="v$.$errors.length || invalid_csvs.length || error_messages.length" class="alert alert-danger" role="alert">
+                  <i class="bi bi-exclamation-octagon-fill"></i>
+                  Invalid inputs
+                <hr>
+                <div v-for="error of v$.$errors" :key="error.$uid">
+                  {{ error.$property }}: {{ error.$message }}
+                </div>
+                <div v-for="csv_name of invalid_csvs" :key="csv_name.$uid">
+                  One csv file required for input {{ csv_name }}
+                </div>
+                <div v-for="message of error_messages" :key="message.$uid">
+                  {{ message }}
+                </div>
+              </div>
+            </div>
+          </div>
           <template v-if="isLoading">
             <div class="form-group row col-md-6">
               Simulation in progress...<br>
@@ -231,11 +250,19 @@
 
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
+import useVuelidate from '@vuelidate/core'
+import { required, requiredIf, between, maxLength, minValue } from '@vuelidate/validators'
 export default {
   el: "#main",
 
   components: {
     SelectProfile
+  },
+
+  setup () {
+    return {
+      v$: useVuelidate({ $autoDirty: true })
+    }
   },
 
   data() {
@@ -296,13 +323,46 @@ export default {
           penetration: 1
         }
       },
-      // voltages: [],
-      // report: [],
       rawJson: "empty",
+      invalid_csvs: [],
+      error_messages: [],
       isShowJson: false,
       isLoading: false,
       responseAvailable: false
     };
+  },
+
+  validations() {
+    return {
+       network_options: {
+        xfmr_scale: { required, minValue: minValue(0) },
+        oltc_setpoint: { required, between: between(0.95, 1.1) },
+        oltc_bandwidth: { required, between: between(0.01, 0.05) },
+        rs_pen: { required, between: between(0, 1) },
+      },
+      lv_options: {
+        lv_selected: { required: requiredIf( function() { return this.lv_options.lv_default == "custom" }),
+                       maxLength: maxLength(5)
+         }
+      },
+      profile_options: {
+        lv_smart_meter: {
+          penetration: { required, between: between(0, 1) }
+        },
+        lv_electric_vehicle: {
+          penetration: { required: requiredIf( function() { return this.profile_options.lv_electric_vehicle.profile !== "None" } ),
+                         between: between(0, 1) }
+        },
+        lv_photovoltaic: {
+          penetration: { required: requiredIf( function() { return this.profile_options.lv_photovoltaic.profile !== "None" } ),
+                         between: between(0, 1) }
+        },
+        lv_heat_pump: {
+          penetration: { required: requiredIf( function() { return this.profile_options.lv_heat_pump.profile !== "None" } ),
+                         between: between(0, 1) }
+        }
+      }
+    }
   },
 
   mounted() {
@@ -339,6 +399,8 @@ export default {
     fetchAPIData() {
       // Ask user to wait while API request is formed and made
       this.plots = [];
+      this.invalid_csvs = []
+      this.error_messages = []
       this.rawJson = "wait...";
       this.isLoading = true;
       this.responseAvailable = false;
@@ -363,6 +425,11 @@ export default {
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_ev", this.profile_options.lv_electric_vehicle)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_pv", this.profile_options.lv_photovoltaic)
       url_params, formData = this.appendProfileParams(url_params, formData, "lv_hp", this.profile_options.lv_heat_pump)
+      if ( this.invalid_csvs.length > 0 ) {
+        this.isLoading = false;
+        this.responseAvailable = false;
+        return
+      }
 
       url_params.dry_run = false;
 
@@ -381,7 +448,7 @@ export default {
         body: check_csv_to_upload ? formData : null
       })
         .then(response => {
-          if (response.ok) {
+          if (response.ok || response.status == 422) {
             return response.text();
           } else {
             alert(
@@ -396,11 +463,17 @@ export default {
           // Parse json repsonse
           var responseJson = JSON.parse(response);
 
-          // // Parse revoltages port from json to array to list
-          // this.voltages = responseJson["voltages"];
-
-          // // Parse report from json to array to list
-          // this.report = responseJson["report"];
+          // Show error message if there was an issue
+          if ("detail" in responseJson) {
+            for (let d of responseJson.detail) {
+              for (let name of d.loc) {
+                this.error_messages.push(name + ": " + d.msg)
+              }
+            }
+            this.isLoading = false
+            this.responseAvailable = false
+            return
+          }
 
           // Parse plot from json to image data
           this.plots = [
@@ -427,7 +500,12 @@ export default {
       url_params[name + "_profile"] = params.profile;
       if (params.profile == "csv") {
         url_params[name + "_units"] = params.units;
-        form_data.set(name + "_csv", params.csv[0]);
+        if ( (params.csv == null) || (params.csv.length !== 1) ) {
+          this.invalid_csvs.push(name)
+        }
+        else {
+          form_data.set(name + "_csv", params.csv[0]);
+        }
       }
       if (params.penetration !== undefined && params.profile !== "None") {
         url_params[name + "_pen"] = params.penetration;
