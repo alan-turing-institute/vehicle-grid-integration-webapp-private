@@ -371,9 +371,9 @@ async def get_options(option_type: AllOptions):
         return get_members(LVHPOptions)
 
 
-@app.get("/health-check")
-def health_check():
-    return "alive"
+# @app.get("/health-check")
+# def health_check():
+#     return "alive"
 
 
 if __name__ == "__main__":
