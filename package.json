@@ -11,6 +11,7 @@
     "@vuelidate/core": "*",
     "@vuelidate/validators": "*",
     "bootstrap": "^4.5.3",
+    "bootstrap-icons": "^1.7.2",
     "core-js": "^3.6.5",
     "jquery": "^3.5.1",
     "popper.js": "^1.16.1",
