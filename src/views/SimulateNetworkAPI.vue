@@ -231,6 +231,12 @@
     <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"></github-link>
     <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"></github-link>
 
+    <div class="row">
+      <img class="col-md-4 logo" src="../assets/logos/supergen.png">
+      <img class="col-md-4 logo" src="../assets/logos/turing.png">
+      <img class="col-md-4 logo" src="../assets/logos/newcastle.png">
+    </div>
+
   </div>
 </template>
 

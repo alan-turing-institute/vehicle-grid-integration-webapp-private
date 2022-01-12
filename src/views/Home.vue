@@ -31,6 +31,11 @@
             <p>For more information see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
             <p>This work is funded by the e4Future grant (104227) - under UK Research and Innovation by the Department for Business, Energy and Industrial Strategy (BEIS) and The Office for Zero Emission Vehicles (OZEV) and delivered through Innovate UK; and a grant from the Lloyd's Register Foundation (G0095) under the Data-Centric Engineering Programme of The Alan Turing Institute.</p>
           </div>
+          <div class="row" style="padding: 20px 15px 10px">
+            <img class="col-md-4 logo" src="../assets/logos/supergen.png">
+            <img class="col-md-4 logo" src="../assets/logos/turing.png">
+            <img class="col-md-4 logo" src="../assets/logos/newcastle.png">
+          </div>
         </div>
       </div>
     </div>
