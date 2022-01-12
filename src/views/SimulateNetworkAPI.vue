@@ -257,7 +257,7 @@
 import SelectProfile from "../components/SelectProfile.vue"
 import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
-import { required, requiredIf, between, maxLength, minValue } from '@vuelidate/validators'
+import { required, requiredIf, between, maxLength } from '@vuelidate/validators'
 
 export default {
   el: "#main",
@@ -342,7 +342,7 @@ export default {
   validations() {
     return {
        network_options: {
-        xfmr_scale: { required, minValue: minValue(0) },
+        xfmr_scale: { required, between: between(0, 2) },
         oltc_setpoint: { required, between: between(0.95, 1.1) },
         oltc_bandwidth: { required, between: between(0.01, 0.05) },
         rs_pen: { required, between: between(0, 1) },
