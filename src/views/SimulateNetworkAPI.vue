@@ -279,7 +279,6 @@ export default {
           profile: null,
           units: "kW",
           csv: null,
-          penetration: 1
         },
         lv_electric_vehicle: {
           list: [],
