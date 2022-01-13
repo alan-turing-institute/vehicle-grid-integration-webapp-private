@@ -4,7 +4,7 @@
       <div class="col-sm-12">
         <h4>Build and simulate an electricity distribution network with EVs and other green technologies</h4>
         <p>
-          You can find more information in the
+          You can find more information on the network models, profiles and parameters in the
           <a
             href="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/"
             >project repository</a
