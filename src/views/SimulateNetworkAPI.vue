@@ -96,6 +96,9 @@
             <!-- Experiment parameter: rs_pen -->
             <label for="rs_pen" class="col-md-6 col-form-label">
               Proportion residential loads
+              <input-details inputName="Proportion residential loads"
+                             inputInfo="For example 0.8 indicates that 80% of the loads on the network are residential loads and 20% are industrial and commercial loads."
+                             inputValues="Value should be between 0 and 1."/>
             </label>
             <div class="col-md-6">
               <input
