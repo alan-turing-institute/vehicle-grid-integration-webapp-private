@@ -1,21 +1,21 @@
-# VGI API and WebApp
+# Vehicle Grid Integration
 
-Check out our demonstration [website](https://salmon-forest-09e32d403.azurestaticapps.net/).
+A Frontend (Vue) and REST API (FastAPI) to simulate the effect of electric vehicles, heat pumps, solar photovoltaic and other loads on the electricity grid.
 
-## API/Backend
+✨ Check out the VGI website at [https://www.e4futuregrid.com/](https://www.e4futuregrid.com/) ✨
 
-The VGI API is written in [FastAPI](https://fastapi.tiangolo.com/) and run in production via [Azure Functions](https://docs.microsoft.com/en-us/azure/azure-functions/).
 
-The project directory contains the following folders
-```
-vgi_api/
-azure_funcs/
-```
+## Getting started
+
+### Running locally
+
+#### API/Backend
+
+The VGI API is written in [FastAPI](https://fastapi.tiangolo.com/) and is in the [/vgi_api](/vgi_api/) directory.
 
 
 [`vgi_api`](vgi_api) is the VGI API (a python package).
 
-[`azure_funcs`](azure_funcs) is the Azure Function App which runs `vgi_api` in production.
 
 
 ## WebApp
