@@ -162,16 +162,16 @@
 
         <div class="col-lg-6">
           <h4>MV connected</h4>
-          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
-          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected electric vehicle charging profile"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected fast chargers station"></select-profile>
         </div>
 
         <div class="col-lg-6">
           <h4>LV connected</h4>
-            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meter"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meters"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" v-model:penValidation="v$.profile_options.lv_electric_vehicle.penetration.$errors" title="Electric vehicles"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Photovoltaic"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" v-model:penValidation="v$.profile_options.lv_heat_pump.penetration.$errors" title="Heat pump"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Solar PV"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" v-model:penValidation="v$.profile_options.lv_heat_pump.penetration.$errors" title="Heat pumps"></select-profile>
         </div>
       </div>
 
