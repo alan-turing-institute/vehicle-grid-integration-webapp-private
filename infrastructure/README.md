@@ -61,7 +61,15 @@ $ terraform plan
 ```
 
 this will print a list of changes to your terminal so you can see what terraform
-will do. Run the terraform plan with
+will do.
+
+## WARNING :skull_and_crossbones:
+
+Terraform will create a file that ends with `.tfstate`. This is sensitive and should not be comited to source code. This is in [gitignore](../../.gitignore), but be warned!
+
+
+
+Deploy the infrastructure with
 
 ```
 $ terraform apply
