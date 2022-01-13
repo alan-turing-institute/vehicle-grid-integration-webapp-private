@@ -348,7 +348,7 @@ export default {
   validations() {
     return {
        network_options: {
-        xfmr_scale: { required, minValue: minValue(0) },
+        xfmr_scale: { required, between: between(0.5, 4) },
         oltc_setpoint: { required, between: between(0.95, 1.1) },
         oltc_bandwidth: { required, between: between(0.01, 0.05) },
         rs_pen: { required, between: between(0, 1) },

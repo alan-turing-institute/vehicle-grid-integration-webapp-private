@@ -57,7 +57,8 @@ async def simulate(
     ),
     xfmr_scale: float = Query(
         1.0,
-        ge=0,
+        ge=0.5,
+        le=4,
         description="Medium Voltage transformer scaling",
     ),
     oltc_setpoint: float = Query(
