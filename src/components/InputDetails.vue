@@ -14,6 +14,7 @@
         <div class="modal-body">
             <p>{{ inputInfo }}</p>
             <p>{{ inputValues }}</p>
+            <p v-if=inputExampleLink>See <a :href=inputExampleLink>here</a> for an example.</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -27,7 +28,7 @@
 <script>
     import { v4 as uuidv4 } from "uuid";
     export default {
-        props: ["inputName", "inputInfo", "inputValues"],
+        props: ["inputName", "inputInfo", "inputValues", "inputExampleLink"],
         data() {
             return { 
                 showModal: false,
