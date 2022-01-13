@@ -30,3 +30,5 @@ yarn-error.log*
 
 # Never commit publish_profile
 *publish_profile.publishsettings
+
+*.tfstate*
