@@ -42,3 +42,12 @@ cd vgi_api && poetry run uvicorn vgi_api:app --reload --port 8000
 ```
 
 If you want to use the production API (i.e. deployed on Azure) change the contents of [.env.development](.env.development) to match that in [.env.production](.env.production).
+
+
+### 🚧 Replicating our Production Infrastructure 🚧
+
+You can deploy the API and Frontend to any hosting service you like. We use [Microsoft Azure](https://azure.microsoft.com/en-gb/). To help us quickly redeploy our hosting environment we use [Terraform](https://www.terraform.io/), which means it's easy for you to recreate our infrastructure.
+
+For instructions on how to deploy hosting infrastructure on Azure see:
+
+- [Deploy Infrastructure with Terraform](/infrastructure)
