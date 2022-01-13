@@ -230,8 +230,9 @@
                   <div class="card-header">
                     <div data-toggle="collapse" :data-target="'#plotCollapse' + ind" style="float: left">
                       <i class="bi bi-chevron-down"></i>
-                      {{ p.name }}
+                      {{ p.name }}&nbsp;&nbsp;
                     </div>
+                    <input-details v-if="p.info" :inputName="p.name" :inputInfo="p.info"/>
                     <button v-if="p.data_url !== undefined" class="btn btn-sm btn-outline-dark" type="button" style="float: right">
                         <a :href=p.data_url :download=p.data_filename>
                           <i class="bi bi-download"></i>
@@ -507,9 +508,9 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "LV network voltages comparison", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
+            { name: "LV network voltages comparison", info: "Here is a test", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
             { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
-            { name: "Primary feeders' loadings", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
+            { name: "Primary feeders' loadings", info: "Here is a test for primary feeders figure", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
             { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
             { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
             { name: "MV network powers", plot: responseJson["mv_powers"] },
