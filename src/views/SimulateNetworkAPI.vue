@@ -58,6 +58,9 @@
             <!-- Experiment parameter: oltc_setpoint -->
             <label for="oltc_setpoint" class="col-md-6 col-form-label">
               MV transformer on-load tap charger (OLTC) set point
+              <input-details inputName="MV transformer on-load tap charger (OLTC) set point"
+                             inputInfo="Nominal voltage, in 'per-unit', at which the voltage is held on the low-voltage side of the primary substation. The on-load tap changer on those transformers will aim to keep the voltage close to this value."
+                             inputValues="Value should be between 0.95 and 1.1."/>
             </label>
             <div class="col-md-6">
               <input
@@ -74,6 +77,9 @@
             <!-- Experiment parameter: oltc_bandwidth -->
             <label for="oltc_bandwidth" class="col-md-6 col-form-label">
               MV transformer on-load tap charger (OLTC) bandwidth
+              <input-details inputName="MV transformer on-load tap charger (OLTC) bandwidth"
+                             inputInfo="In 'per-unit', the on-load tap changers at the primary transformer will only change when the voltage passes outside of the setpoint plus-or-minus the bandwidth. A wider bandwidth means that the voltage at the primary substation will vary more before the tap changes."
+                             inputValues="Value should be between 0.01 and 0.05."/>
             </label>
             <div class="col-md-6">
               <input
