@@ -1,9 +1,9 @@
 # Vehicle Grid Integration
 
+✨ Check out the deployed version of the VGI website at [https://www.e4futuregrid.com/](https://www.e4futuregrid.com/) ✨
+
+
 A Frontend (Vue) and REST API (FastAPI) to simulate the effect of electric vehicles, heat pumps, solar photovoltaic and other loads on the electricity grid.
-
-✨ Check out the VGI website at [https://www.e4futuregrid.com/](https://www.e4futuregrid.com/) ✨
-
 
 ## 💻 Getting started 💻
 
