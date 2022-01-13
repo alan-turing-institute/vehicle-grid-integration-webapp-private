@@ -356,6 +356,24 @@ def test_invalid_csv_not_float(
     assert resp.status_code == 422
 
 
+@pytest.mark.parametrize(
+    "param_key, option, csv_name",
+    [
+        ("mv_solar_pv_profile", MVSolarPVOptions.CSV, "mv_solar_pv_csv"),
+        ("mv_fcs_profile", MVFCSOptions.CSV, "mv_fcs_csv"),
+        ("lv_smart_meter_profile", LVSmartMeterOptions.CSV, "lv_smart_meter_csv"),
+        ("lv_ev_profile", LVElectricVehicleOptions.CSV, "lv_ev_csv"),
+        ("lv_pv_profile", LVPVOptions.CSV, "lv_pv_csv"),
+        ("lv_hp_profile", LVHPOptions.CSV, "lv_hp_csv"),
+    ],
+)
+def test_one_dim_csv(valid_csv_one_dim: io.BytesIO, param_key, option, csv_name):
+
+    resp = upload_csv(valid_csv_one_dim, param_key, option, csv_name)
+    debug(resp.json())
+    assert resp.status_code == 200
+
+
 # ToDo: We should have a test for every option
 @pytest.mark.parametrize(
     "param_key, option",
