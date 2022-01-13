@@ -130,6 +130,8 @@
           <div v-if="lv_options.lv_default=='custom'" class="form-group row">
             <label for="lv_list" class="col-md-6 col-form-label">
               LV network IDs
+              <input-details inputName="Selected LV network IDs"
+                             inputValues="Select between two and five network IDs from the provided list."/>
             </label>
             <div class="col-md-6">
               <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
