@@ -39,7 +39,9 @@
             <!-- Experiment parameter: xfmr_scale, MV transformer scaling -->
             <label for="xfmr_scale" class="col-md-6 col-form-label">
               MV transformer scaling
-              <input-details inputName="MV transformer scaling" inputInfo="Should be between 0 and 2."></input-details>
+              <input-details inputName="MV transformer scaling" 
+                             inputInfo="Number by which the nominal power rating of the primary (HV/MV) power transformer are multiplied by, to allow an increase in demand before the substation is overloaded. (Affects the primary substation utilization on the 'Transformer Powers' figure that is returned.)"
+                             inputValues="Value should be between 0.5 and 4."/>
             </label>
             <div class="col-md-6">
               <input

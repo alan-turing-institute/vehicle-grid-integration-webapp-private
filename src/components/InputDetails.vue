@@ -12,7 +12,8 @@
             <button type="button" class="close" data-dismiss="modal">&times;</button>
         </div>
         <div class="modal-body">
-            {{ inputInfo }}
+            <p>{{ inputInfo }}</p>
+            <p>{{ inputValues }}</p>
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -25,7 +26,7 @@
 
 <script>
     export default {
-        props: ["inputName", "inputInfo"],
+        props: ["inputName", "inputInfo", "inputValues"],
         data() {
             return { showModal: false}
         }
