@@ -168,8 +168,6 @@
 
         <div class="col-lg-6">
           <h4>LV connected</h4>
-            <p>Leave empty for no green technologies, or alternatively use the available profiles or upload your own data for electric vehicles, solar PV and heat pumps.</p>
-            <p> The higher the penetration (on a scale of 0 to 1) of green technologies, the higher the impact seen on the network (e.g. voltage and powers will exceed statutory limits, represented in red dashed lines in the output figures).</p>
             <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meters"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" v-model:penValidation="v$.profile_options.lv_electric_vehicle.penetration.$errors" title="Electric vehicles"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Solar PV"></select-profile>
