@@ -1,6 +1,6 @@
 <template>
 
-    <button type="button" class="btn btn-link" data-toggle="modal" :data-target="'#inputDetailsModal'+idModal">
+    <button type="button" class="btn btn-link" style="padding:0.375rem 0.1rem; font-size:0.8rem" data-toggle="modal" :data-target="'#inputDetailsModal'+idModal">
     <i class="bi bi-info-circle"></i>
     </button>
 
