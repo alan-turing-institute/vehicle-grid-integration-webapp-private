@@ -25,8 +25,8 @@
             </div>
         </div>
         <div class="form-group row">
-            <label for="profile_units" class="col-md-3 offset-md-6 col-form-label">Units</label>
-            <div class="col-md-3">
+            <label for="profile_units" class="col-md-4 offset-md-6 col-form-label">Units</label>
+            <div class="col-md-2">
                 <select name="profile_units" v-model="units" class="form-control">
                     <option>kW</option>
                     <option>kWh</option>
@@ -37,10 +37,11 @@
 
     <!-- Penetration is only needed for LV networks where a profile has been provided -->
     <div v-if="profileOptions.penetration !== undefined && profileOptions.profile !== 'None'" class="form-group row">
-        <label for="profile_pen" class="col-md-3 offset-md-6 col-form-label">
+        <label for="profile_pen" class="col-md-4 offset-md-6 col-form-label">
             Penetration
+            <input-details inputName="Penetration" inputValues="Value should be between 0 and 1"/>
         </label>
-        <div class="col-md-3">
+        <div class="col-md-2">
             <input
             v-model="penetration"
             type="float"
@@ -56,7 +57,9 @@
 </template>
 
 <script>
+import InputDetails from "./InputDetails.vue"
     export default {
+        components: { InputDetails },
         props: ["profileOptions", "title", "penValidation"],
         emits: ["update:profileOptions"],
         computed: {
