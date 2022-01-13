@@ -39,6 +39,7 @@
             <!-- Experiment parameter: xfmr_scale, MV transformer scaling -->
             <label for="xfmr_scale" class="col-md-6 col-form-label">
               MV transformer scaling
+              <input-details inputName="MV transformer scaling" inputInfo="Should be between 0 and 2."></input-details>
             </label>
             <div class="col-md-6">
               <input
@@ -261,6 +262,7 @@
 
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
+import InputDetails from "../components/InputDetails.vue"
 import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
 import { required, requiredIf, between, minLength, maxLength, minValue } from '@vuelidate/validators'
@@ -270,6 +272,7 @@ export default {
 
   components: {
     SelectProfile,
+    InputDetails,
     GithubLink
   },
 
