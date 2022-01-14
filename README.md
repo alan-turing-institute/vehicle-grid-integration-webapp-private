@@ -19,6 +19,8 @@ azure_funcs/
 
 
 ## WebApp
+If you're on Windows and don't have Node.js installed, you can install it from here https://nodejs.org/en/download/
+The Node.js installer includes the NPM package manager.
 
 ## Project setup
 ```
