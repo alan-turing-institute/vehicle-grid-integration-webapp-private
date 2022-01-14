@@ -1,13 +1,14 @@
 <template>
-    <div class="row">
-        <a :href="link" class="dark-link">
-            <i class="bi bi-github icon-space"></i> {{ text }}
-        </a>
-    </div>
+    <a :href="link" class="dark-link">
+        <i class="bi icon-space" :class="icon"></i> {{ text }}
+    </a>
 </template>
 
 <script>
     export default {
-        props: ["text", "link"],
+        props: { "text": String,
+                 "link": String, 
+                 "icon": { "type": String, default: "bi-github" },
+        }
     }
 </script>
