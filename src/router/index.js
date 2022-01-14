@@ -24,11 +24,11 @@ const routes = [
           )
       },
       {
-        path: "documentation",
-        name: "Documentation",
+        path: "resources",
+        name: "Resources",
         component: () =>
           import(
-            /* webpackChunkName: "documentation" */ "../views/Documentation.vue"
+            /* webpackChunkName: "resources" */ "../views/Resources.vue"
           )
       }
     ]
