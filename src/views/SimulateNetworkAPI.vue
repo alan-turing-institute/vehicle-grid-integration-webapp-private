@@ -4,7 +4,7 @@
       <div class="col-sm-12">
         <h4>Build and simulate an electricity distribution network with EVs and other green technologies</h4>
         <p>
-          You can find more information in the
+          You can find more information on the network models, profiles and parameters in the
           <a
             href="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/"
             >project repository</a
@@ -39,6 +39,9 @@
             <!-- Experiment parameter: xfmr_scale, MV transformer scaling -->
             <label for="xfmr_scale" class="col-md-6 col-form-label">
               MV transformer scaling
+              <input-details inputName="MV transformer scaling" 
+                             inputInfo="Number by which the nominal power rating of the primary (HV/MV) power transformer are multiplied by, to allow an increase in demand before the substation is overloaded. (Affects the primary substation utilization on the 'Transformer Powers' figure that is returned.)"
+                             inputValues="Value should be between 0.5 and 4."/>
             </label>
             <div class="col-md-6">
               <input
@@ -54,7 +57,10 @@
           <div class="form-group row">
             <!-- Experiment parameter: oltc_setpoint -->
             <label for="oltc_setpoint" class="col-md-6 col-form-label">
-              MV transformer on-load tap charger (OLTC) set point
+              MV transformer on-load tap changer (OLTC) set point
+              <input-details inputName="MV transformer on-load tap changer (OLTC) set point"
+                             inputInfo="Nominal voltage, in 'per-unit', at which the voltage is held on the low-voltage side of the primary substation. The on-load tap changer will aim to keep the voltage close to this value."
+                             inputValues="Value should be between 0.95 and 1.1."/>
             </label>
             <div class="col-md-6">
               <input
@@ -70,7 +76,10 @@
           <div class="form-group row">
             <!-- Experiment parameter: oltc_bandwidth -->
             <label for="oltc_bandwidth" class="col-md-6 col-form-label">
-              MV transformer on-load tap charger (OLTC) bandwidth
+              MV transformer on-load tap changer (OLTC) bandwidth
+              <input-details inputName="MV transformer on-load tap changer (OLTC) bandwidth"
+                             inputInfo="In 'per-unit', the on-load tap changer at the primary substation will only change when the voltage passes outside of the setpoint plus-or-minus the bandwidth. A wider bandwidth means that the voltage at the primary substation will vary more before the tap changes."
+                             inputValues="Value should be between 0.01 and 0.05."/>
             </label>
             <div class="col-md-6">
               <input
@@ -87,6 +96,9 @@
             <!-- Experiment parameter: rs_pen -->
             <label for="rs_pen" class="col-md-6 col-form-label">
               Proportion residential loads
+              <input-details inputName="Proportion residential loads"
+                             inputInfo="For example 0.8 indicates that 80% of the loads on the network are residential loads and 20% are industrial and commercial loads."
+                             inputValues="Value should be between 0 and 1."/>
             </label>
             <div class="col-md-6">
               <input
@@ -121,6 +133,8 @@
           <div v-if="lv_options.lv_default=='custom'" class="form-group row">
             <label for="lv_list" class="col-md-6 col-form-label">
               LV network IDs
+              <input-details inputName="Selected LV network IDs"
+                             inputValues="Select between two and five network IDs from the provided list."/>
             </label>
             <div class="col-md-6">
               <select multiple class="form-control" id="lv_list" v-model="lv_options.lv_selected" :disabled="lv_options.lv_default!=='custom'">
@@ -216,8 +230,9 @@
                   <div class="card-header">
                     <div data-toggle="collapse" :data-target="'#plotCollapse' + ind" style="float: left">
                       <i class="bi bi-chevron-down"></i>
-                      {{ p.name }}
+                      {{ p.name }}&nbsp;&nbsp;
                     </div>
+                    <input-details v-if="p.info" :inputName="p.name" :inputInfo="p.info"/>
                     <button v-if="p.data_url !== undefined" class="btn btn-sm btn-outline-dark" type="button" style="float: right">
                         <a :href=p.data_url :download=p.data_filename>
                           <i class="bi bi-download"></i>
@@ -261,6 +276,7 @@
 
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
+import InputDetails from "../components/InputDetails.vue"
 import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
 import { required, requiredIf, between, minLength, maxLength, minValue } from '@vuelidate/validators'
@@ -270,6 +286,7 @@ export default {
 
   components: {
     SelectProfile,
+    InputDetails,
     GithubLink
   },
 
@@ -491,9 +508,9 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "LV network voltages comparison", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
+            { name: "LV network voltages comparison", info: "Here is a test", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
             { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
-            { name: "Primary feeders' loadings", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
+            { name: "Primary feeders' loadings", info: "Here is a test for primary feeders figure", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
             { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
             { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
             { name: "MV network powers", plot: responseJson["mv_powers"] },
