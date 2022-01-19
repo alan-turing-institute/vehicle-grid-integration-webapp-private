@@ -64,10 +64,10 @@ class LVPVOptions(str, Enum):
 
 class LVHPOptions(str, Enum):
     NONE = "None"
-    OPTION1 = "Mid weekday"
-    OPTION2 = "Mid weekend"
-    OPTION3 = "Week"
-    OPTION4 = "Weekend"
+    OPTION1 = "Mild weekday"
+    OPTION2 = "Mild weekend"
+    OPTION3 = "Cold weekday"
+    OPTION4 = "Cold weekend"
     CSV = "csv"
 
 
