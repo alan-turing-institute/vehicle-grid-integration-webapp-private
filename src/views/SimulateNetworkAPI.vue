@@ -162,16 +162,16 @@
 
         <div class="col-lg-6">
           <h4>MV connected</h4>
-          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV profile"></select-profile>
-          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected electric vehicle charging profile"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected fast chargers station"></select-profile>
         </div>
 
         <div class="col-lg-6">
           <h4>LV connected</h4>
-            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meter"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meters"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" v-model:penValidation="v$.profile_options.lv_electric_vehicle.penetration.$errors" title="Electric vehicles"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Photovoltaic"></select-profile>
-            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" v-model:penValidation="v$.profile_options.lv_heat_pump.penetration.$errors" title="Heat pump"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Solar PV"></select-profile>
+            <select-profile v-model:profileOptions="profile_options.lv_heat_pump" v-model:penValidation="v$.profile_options.lv_heat_pump.penetration.$errors" title="Heat pumps"></select-profile>
         </div>
       </div>
 
@@ -261,14 +261,19 @@
 
     </form>
 
-    <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"></github-link>
-    <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"></github-link>
-    <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"></github-link>
+    <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"/>
+    <br>
+    <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"/>
+    <br>
+    <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"/>
+    <br>
+    <github-link text="API documentation" :link="docs_url" icon="bi-lightning-fill"/>
 
     <div class="row">
-      <img class="col-md-4 logo" src="../assets/logos/supergen.png">
-      <img class="col-md-4 logo" src="../assets/logos/turing.png">
-      <img class="col-md-4 logo" src="../assets/logos/newcastle.png">
+      <img class="col-md-3 logo" style="padding-top:20px" src="../assets/logos/supergen.png">
+      <img class="col-md-3 logo" style="padding-top:20px" src="../assets/logos/turing.png">
+      <img class="col-md-3 logo" style="padding-top:20px" src="../assets/logos/newcastle.png">
+      <img class="col-md-3 logo" style="padding-top:20px" src="../assets/logos/lrf.svg">
     </div>
 
   </div>
@@ -358,7 +363,8 @@ export default {
       error_messages: [],
       isShowJson: false,
       isLoading: false,
-      responseAvailable: false
+      responseAvailable: false,
+      docs_url: new URL("/docs", process.env.VUE_APP_API_URL).href
     };
   },
 

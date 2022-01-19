@@ -20,7 +20,15 @@ const routes = [
         name: "SimulateNetworkAPI",
         component: () =>
           import(
-            /* webpackChunkName: "simulate_network_api" */ "../views/SimulateNetworkAPI.vue"
+            /* webpackChunkName: "simulate_network" */ "../views/SimulateNetworkAPI.vue"
+          )
+      },
+      {
+        path: "resources",
+        name: "Resources",
+        component: () =>
+          import(
+            /* webpackChunkName: "resources" */ "../views/Resources.vue"
           )
       }
     ]

@@ -16,6 +16,19 @@
       </svg>
       EVENT</router-link
     >
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'Home' }">Home</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'SimulateNetworkAPI' }">Simulate</router-link>
+        </li>
+        <li class="nav-item">
+          <router-link class="nav-link" :to="{ name: 'Resources' }">Resources</router-link>
+        </li>
+      </ul>
+    </div>
   </nav>
   <div style="margin: 1.5rem;">
     <router-view></router-view>

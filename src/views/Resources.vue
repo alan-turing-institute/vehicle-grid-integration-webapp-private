@@ -1,0 +1,76 @@
+<template>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="box-main" style="border-color: #F4511E">
+          <div class="col-lg-12 box-title" style="background-color: #FFCCBC">
+            <h3>Contact</h3>
+          </div>
+          <div class="col-lg-12">
+            <p>Contact <a href="https://www.turing.ac.uk/people/researchers/myriam-neaimeh">Dr Myriam Neaimeh</a> (<a href="mailto:myriam.neaimeh@ncl.ac.uk">myriam.neaimeh@ncl.ac.uk</a>) for further details about the project.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="box-main" style="border-color: #F57C00">
+          <div class="col-lg-12 box-title" style="background-color: #FFE0B2">
+            <h3>The EVENT simulation platform</h3>
+          </div>
+          <div class="col-lg-12">
+            <p> The EVENT simulation platform was built by members of the Alan Turing Institute's <a href="https://www.turing.ac.uk/research-engineering">Research Engineering Group</a> in collaboration with Myriam Neaimeh.
+                The simulation code was provided by Matt Deakin.
+            </p>
+            <p>
+                The website itself is built using Vue.js and Bootstrap, and FastAPI is used for the API.
+                All resources are hosted on Microsoft Azure.
+                <br>
+                <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"/>
+                <br>
+                <github-link text="API documentation" :link="fastapi_docs_url" icon="bi-lightning-fill"/>
+            </p>
+            <p>
+                Two further GitHub repositories hold the networks used in the simulations and scripts to generate profiles in csv format from open data sources.
+                <br>
+                <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"/>
+                <br>
+                <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"/>
+            </p>
+            <p>
+                The original network models developed by Matt Deakin are also available on GitHub.
+                <br>
+                <github-link text="Original network models" link="https://github.com/deakinmt/uk-mvlv-models"/>
+                <br>
+                <github-link icon="bi-book-fill" text="Hybrid European MV-LV Network Models for Smart Distribution Network Modelling, M. Deakin, D. Greenwood, S. Walker and P. C. Taylor, 2021 IEEE Madrid PowerTech. IEEE, 2021." link="http://arxiv.org/abs/2009.14240"/>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-lg-12">
+        <div class="box-main" style="border-color: #FFA000">
+          <div class="col-lg-12 box-title" style="background-color: #FFECB3">
+            <h3>Further resources</h3>
+          </div>
+          <div class="col-lg-12">
+            <p>For more information about the project, see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</template>
+
+<script>
+import GithubLink from "../components/GithubLink.vue"
+    export default {
+        components: { GithubLink },
+        data() {
+            return { "fastapi_docs_url": new URL("/docs", process.env.VUE_APP_API_URL).href }
+        }
+    }
+</script>

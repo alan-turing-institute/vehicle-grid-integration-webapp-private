@@ -32,5 +32,10 @@
 
 .logo {
     object-fit: contain;
-    max-height: 80px;
-} 
+    max-height: 90px;
+}
+
+.logo-main {
+    object-fit: contain;
+    max-height: 70px;
+}
