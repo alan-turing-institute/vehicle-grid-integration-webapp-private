@@ -56,9 +56,11 @@
           <div class="col-lg-12">
             <p>For information about the wider project, see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
             <br>
+            <p>
             <github-link icon="bi-book-fill" text="Hybrid European MV-LV Network Models for Smart Distribution Network Modelling." link="http://arxiv.org/abs/2009.14240"/>
             <br>
             <github-link icon="bi-book-fill" text="A probabilistic approach to combining smart meter and electric vehicle charging data to investigate distribution network impacts." link="https://www.sciencedirect.com/science/article/pii/S0306261915001944"/>
+           </p>
           </div>
         </div>
       </div>
