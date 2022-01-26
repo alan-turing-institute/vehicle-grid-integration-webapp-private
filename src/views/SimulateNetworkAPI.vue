@@ -4,11 +4,8 @@
       <div class="col-sm-12">
         <h4>Build and simulate an electricity distribution network with EVs and other green technologies</h4>
         <p>
-          You can find more information on the network models, profiles and parameters in the
-          <a
-            href="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/"
-            >project repository</a
-          >.
+          You can find more information on the network models, profiles and parameters in the Resources section.
+          
         </p>
       </div>
     </div>
@@ -162,8 +159,8 @@
 
         <div class="col-lg-6">
           <h4>MV connected</h4>
-          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="11kV connected solar PV"></select-profile>
-          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="11kV connected fast chargers station"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="Commercial solar PV"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="Fast chargers stations"></select-profile>
         </div>
 
         <div class="col-lg-6">
@@ -261,13 +258,13 @@
 
     </form>
 
-    <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"/>
+    <!-- <github-link text="Website and simulation code" link="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private"/>
     <br>
     <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"/>
     <br>
     <github-link text="Network models" link="https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks"/>
     <br>
-    <github-link text="API documentation" :link="docs_url" icon="bi-lightning-fill"/>
+    <github-link text="API documentation" :link="docs_url" icon="bi-lightning-fill"/> -->
 
     <div class="row">
       <img class="col-md-3 logo" style="padding-top:20px" src="../assets/logos/supergen.png">
@@ -282,7 +279,7 @@
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
 import InputDetails from "../components/InputDetails.vue"
-import GithubLink from "../components/GithubLink.vue"
+// import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
 import { required, requiredIf, between, minLength, maxLength} from '@vuelidate/validators'
 
@@ -292,7 +289,7 @@ export default {
   components: {
     SelectProfile,
     InputDetails,
-    GithubLink
+    // GithubLink
   },
 
   setup () {
