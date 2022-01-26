@@ -54,7 +54,7 @@
             <h3>Further resources</h3>
           </div>
           <div class="col-lg-12">
-            <p>For more information about the wider project, see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
+            <p>For information about the wider project, see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
             <br>
             <github-link icon="bi-book-fill" text="Hybrid European MV-LV Network Models for Smart Distribution Network Modelling." link="http://arxiv.org/abs/2009.14240"/>
             <br>
