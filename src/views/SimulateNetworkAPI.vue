@@ -511,7 +511,9 @@ export default {
 
           // Parse plot from json to image data
           this.plots = [
-            { name: "LV network voltages comparison", info: "Info coming", plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
+            { name: "LV network voltages comparison", 
+            info: "Plots the range, interquartile range and median customer voltages, simulated for each time period, and for each of the LV networks that are modelled in detail.",
+            plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
             { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
             { name: "Primary feeders' loadings", info: "Info coming", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
             { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
