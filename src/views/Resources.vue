@@ -25,7 +25,7 @@
           </div>
           <div class="col-lg-12">
             <p> The EVENT simulation platform was built by members of the Alan Turing Institute's <a href="https://www.turing.ac.uk/research-engineering">Research Engineering Group</a> in collaboration with Myriam Neaimeh.
-                The simulation code was provided by Matt Deakin.
+                The network models and simulation code were developed by <a href="https://www.turing.ac.uk/people/research-associates/matthew-deakin">Matt Deakin</a> (<a href="mailto:Matthew.Deakin@newcastle.ac.uk">Matthew.Deakin@newcastle.ac.uk</a>).
             </p>
             <p>
                 The website itself is built using Vue.js and Bootstrap, and FastAPI is used for the API.
@@ -42,13 +42,7 @@
                 <br>
                 <github-link text="Open profiles data" link="https://github.com/alan-turing-institute/e4Future-opendata"/>
             </p>
-            <p>
-                The original network models developed by Matt Deakin are also available on GitHub.
-                <br>
-                <github-link text="Original network models" link="https://github.com/deakinmt/uk-mvlv-models"/>
-                <br>
-                <github-link icon="bi-book-fill" text="Hybrid European MV-LV Network Models for Smart Distribution Network Modelling, M. Deakin, D. Greenwood, S. Walker and P. C. Taylor, 2021 IEEE Madrid PowerTech. IEEE, 2021." link="http://arxiv.org/abs/2009.14240"/>
-            </p>
+            
           </div>
         </div>
       </div>
@@ -60,7 +54,11 @@
             <h3>Further resources</h3>
           </div>
           <div class="col-lg-12">
-            <p>For more information about the project, see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
+            <p>For more information about the wider project, see <a href="https://www.turing.ac.uk/research/research-projects/vehicle-grid-integration">the project website</a>.</p>
+            <br>
+            <github-link icon="bi-book-fill" text="Hybrid European MV-LV Network Models for Smart Distribution Network Modelling." link="http://arxiv.org/abs/2009.14240"/>
+            <br>
+            <github-link icon="bi-book-fill" text="A probabilistic approach to combining smart meter and electric vehicle charging data to investigate distribution network impacts." link="https://www.sciencedirect.com/science/article/pii/S0306261915001944"/>
           </div>
         </div>
       </div>
