@@ -284,7 +284,7 @@ import SelectProfile from "../components/SelectProfile.vue"
 import InputDetails from "../components/InputDetails.vue"
 import GithubLink from "../components/GithubLink.vue"
 import useVuelidate from '@vuelidate/core'
-import { required, requiredIf, between, minLength, maxLength, minValue } from '@vuelidate/validators'
+import { required, requiredIf, between, minLength, maxLength} from '@vuelidate/validators'
 
 export default {
   el: "#main",
