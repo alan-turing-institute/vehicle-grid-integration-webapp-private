@@ -13,7 +13,7 @@
           </div>
 
           <div class="center-element">
-            <div class="img-fluid"><img src="../assets/logos/220126_icons_web.png" alt="Responsive image">
+            <div class="img-fluid"><img src="../assets/images/220127-icons.png" alt="Responsive image">
             </div>
           </div>
           

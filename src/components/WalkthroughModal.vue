@@ -23,14 +23,14 @@
                 <li style="padding: 0.2rem 0rem">
                     <b>Assign data to the network.</b>
                     <br>Use available demand and generation profiles or upload your own data in “Demand and generation profiles” section.
-                    <br>You can choose to have ditributed generation (e.g.commercial solar installations) and fast charging stations.
+                    <br>You can choose to have distributed generation (e.g.commercial solar installations) and fast charging stations.
                     <br>Zoom in on the second picture to see their location on the network.
                     <br>Then you can choose the mix and penetration levels of green technologies assigned to the households, which are shown as dots on the 2 LV networks examples below.
                 </li>
                 <li style="padding: 0.2rem 0rem">
                     <b>Run your simulation.</b>
                     <br>Click submit and wait for up to a minute for the results.
-                    <br>You can save the figures and download some of output data as csv.
+                    <br>You can save the figures and download some output data as csv.
                     <br>The results include the status of the electricity network, specifically voltage and thermal constraints for the MV and LV networks. 
                 </li>
             </ol>
