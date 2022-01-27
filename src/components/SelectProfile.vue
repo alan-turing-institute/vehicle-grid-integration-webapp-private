@@ -4,10 +4,10 @@
     <div class="form-group row">
         <label for="profile_option_dropdown" class="col-md-6 col-form-label">
             {{ title }}
-            <input-details :inputName="title"
+            <!-- <input-details :inputName="title"
                             inputInfo="Choose from available profiles or upload your own data. More information on the available profiles can be found in the project repositories."
                             inputValues="If uploading your own profile, please upload a csv file with a header and 48 rows corresponding to 1 day at 30-minute resolution data. There is no limit on the number of columns that can be uploaded (i.e. several days of data)."
-                            inputExampleLink="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/blob/main/vgi_api/vgi_api/data/example_profile.csv"/>
+                            inputExampleLink="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/blob/main/vgi_api/vgi_api/data/example_profile.csv"/> -->
         </label>
         <div class="col-md-6" name="profile_option_dropdown">
             <select class="form-control" v-model="profile">

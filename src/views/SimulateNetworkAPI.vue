@@ -13,6 +13,7 @@
       <div class="row box-main" style="border-color: #039BE5">
         <div class="col-lg-12 box-title" style="background-color: #B3E5FC">
           <h3>Electricity distribution network parameters</h3>
+          
         </div>
 
         <div class="col-lg-6">
@@ -153,17 +154,31 @@
 
       <div class="row box-main" style="border-color: #00ACC1">
         <div class="col-lg-12 box-title" style="background-color: #B2EBF2">
-          <h3>Demand and generation profiles</h3>
+          <h3>Demand and generation profiles
+          <input-details inputName="Choose from available profiles or upload your own data."
+                         inputInfo= "If uploading your own data, please use a csv file with a header and 48 rows corresponding to 1 day at 30-minute resolution data."
+                         inputValues= "There is no limit on the number of columns that can be uploaded (i.e. several days of data)."
+                         inputExampleLink="https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/blob/main/vgi_api/vgi_api/data/example_profile.csv"/> </h3>
+          
         </div>
-
+                            
         <div class="col-lg-6">
-          <h4>MV connected</h4>
+          <h4>MV connected
+          <input-details inputName="MV connected generation and demand"
+                         inputValues= "The walkthrough guide shows the network connection of these sites."
+                         inputInfo= "Leave as None or connect DG sites such as commercial solar installations and/or FC sites such a Tesla or Fastned FC stations."/>
+          </h4>
+
           <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="Large distributed generation (DG) e.g. Commercial solar PV"></select-profile>
           <select-profile v-model:profileOptions="profile_options.mv_fcs" title="Fast charging stations"></select-profile>
         </div>
 
         <div class="col-lg-6">
-          <h4>LV connected</h4>
+          <h4>LV connected
+          <input-details inputName="LV connected generation and demand"
+                         inputValues= "Change the penetration level from 0% to 100% penetration. The higher the penetration of green technologies, the higher the impact that will be seen on the network."  
+                         inputInfo= "Leave empty for no green technologies, use available profiles, or upload your own data."/>
+          </h4>
             <select-profile v-model:profileOptions="profile_options.lv_smart_meter" v-model:penValidation="v$.profile_options.lv_smart_meter.penetration.$errors" title="Smart meters"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_electric_vehicle" v-model:penValidation="v$.profile_options.lv_electric_vehicle.penetration.$errors" title="Electric vehicles"></select-profile>
             <select-profile v-model:profileOptions="profile_options.lv_photovoltaic" v-model:penValidation="v$.profile_options.lv_photovoltaic.penetration.$errors" title="Solar PV"></select-profile>
