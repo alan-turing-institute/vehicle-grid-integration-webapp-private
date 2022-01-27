@@ -158,8 +158,8 @@
 
         <div class="col-lg-6">
           <h4>MV connected</h4>
-          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="Commercial solar PV"></select-profile>
-          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="Fast chargers stations"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_solar_pv" title="Large distributed generation (DG) e.g. Commercial solar PV"></select-profile>
+          <select-profile v-model:profileOptions="profile_options.mv_fcs" title="Fast charging stations"></select-profile>
         </div>
 
         <div class="col-lg-6">

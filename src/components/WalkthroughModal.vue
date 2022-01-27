@@ -15,25 +15,28 @@
             <h6>Steps to build and simulate an electricity distribution network</h6>
             <ol>
                 <li style="padding: 0.2rem 0rem">
-                    Build the network. Leave the default options in the “Electricity distribution network parameters” section or modify them to change the network.
-                    The integrated MV-LV 11kV urban network represents a town of around 20k households. 
-                    You can choose up to 5 LV networks - this is equivalent to simulating 5 neighbourhoods in detail (2 examples of LV networks/neighbourhoods, from the LVNS project, are shown on top of the figure below.
+                    <b>Build the network.</b> 
+                    <br>Leave the default options in the “Electricity distribution network parameters” section or modify them to change the network.
+                    <br>The integrated MV-LV 11kV urban network represents a town of around 20k households. 
+                    <br>You can choose up to 5 LV networks - this is equivalent to simulating 5 neighbourhoods in detail (2 examples of LV networks/neighbourhoods, from the LVNS project, are shown on top of the top figure below.
                 </li>
                 <li style="padding: 0.2rem 0rem">
-                    Assign data to the network.
-                    Use available demand and generation profiles or upload your own data in “Demand and generation profiles” section.
-                    You can choose to have industrial solar installations and fast charging stations.
-                    Then you can choose the mix and penetration levels of green technologies assigned to the households, which are shown as dots on the LV networks.
+                    <b>Assign data to the network.</b>
+                    <br>Use available demand and generation profiles or upload your own data in “Demand and generation profiles” section.
+                    <br>You can choose to have ditributed generation (e.g.commercial solar installations) and fast charging stations.
+                    <br>Zoom in on the second picture to see their location on the network.
+                    <br>Then you can choose the mix and penetration levels of green technologies assigned to the households, which are shown as dots on the 2 LV networks examples below.
                 </li>
                 <li style="padding: 0.2rem 0rem">
-                    Run your simulation.
-                    Click submit and wait for up to a minute for the results.
-                    You can save the figures and download some of output data as csv.
-                    The results include information on the electricity network status, specifically voltage and thermal constraints for the MV and LV networks. 
+                    <b>Run your simulation.</b>
+                    <br>Click submit and wait for up to a minute for the results.
+                    <br>You can save the figures and download some of output data as csv.
+                    <br>The results include the status of the electricity network, specifically voltage and thermal constraints for the MV and LV networks. 
                 </li>
             </ol>
-            If you want to learn more about the details of this tool, including network characteristics and data sources, you can find more information in the project repositories.
-            <img src="../assets/images/11kv_urban.png" style="max-width: 100%; min-width: 75%; padding: 1rem 0rem">
+            If you want to learn more about the details of this tool, including network characteristics and data sources, you can find more information in the Resources section.
+            <img src="../assets/images/overview_urban.png" style="max-width: 100%; min-width: 75%; padding: 1rem 0rem">
+            <img src="../assets/images/networks_v3.png" style="max-width: 100%; min-width: 75%; padding: 1rem 0rem">
         </div>
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
