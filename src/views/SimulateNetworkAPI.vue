@@ -5,7 +5,9 @@
         <h4>Build and simulate an electricity distribution network with EVs and other green technologies</h4>
         <p>
           You can find more information on the network models, profiles and parameters in the Resources section.
-          
+        </p>
+        <p>
+          <walkthrough-modal></walkthrough-modal>Walkthrough
         </p>
       </div>
     </div>
@@ -279,7 +281,7 @@
 <script>
 import SelectProfile from "../components/SelectProfile.vue"
 import InputDetails from "../components/InputDetails.vue"
-// import GithubLink from "../components/GithubLink.vue"
+import WalkthroughModal from "../components/WalkthroughModal.vue"
 import useVuelidate from '@vuelidate/core'
 import { required, requiredIf, between, minLength, maxLength} from '@vuelidate/validators'
 
@@ -289,7 +291,7 @@ export default {
   components: {
     SelectProfile,
     InputDetails,
-    // GithubLink
+    WalkthroughModal,
   },
 
   setup () {
