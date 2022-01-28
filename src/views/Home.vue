@@ -13,8 +13,9 @@
           </div>
 
           <div class="center-element">
-            <div class="img-fluid"><img src="../assets/images/220127-icons.png" alt="Responsive image">
-            </div>
+            <!-- <div class="img-fluid"><img src="../assets/images/220127-icons.png" alt="Responsive image">
+            </div> -->
+           <img src="../assets/images/220127_icons.svg" class="img-fluid" alt="Responsive image" height: auto> 
           </div>
           
             <div class="center-element">
@@ -29,10 +30,10 @@
             </div>
           </div>
           <div class="row" style="padding: 60px 20px 20px">
-            <img class="col-md-3 logo-main" src="../assets/logos/supergen.png">
-            <img class="col-md-3 logo-main" src="../assets/logos/turing.png">
-            <img class="col-md-3 logo-main" src="../assets/logos/newcastle.png">
-            <img class="col-md-3 logo-main" src="../assets/logos/lrf.svg">
+            <img class="col-md-3 logo-main" src="../assets/logos/supergen.png" alt="Responsive image">
+            <img class="col-md-3 logo-main" src="../assets/logos/turing.png" alt="Responsive image">
+            <img class="col-md-3 logo-main" src="../assets/logos/newcastle.png" alt="Responsive image">
+            <img class="col-md-3 logo-main" src="../assets/logos/lrf.svg" alt="Responsive image">
           </div>
 
         <!-- </div>
