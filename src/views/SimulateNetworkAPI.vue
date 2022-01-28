@@ -243,7 +243,7 @@
                       <i class="bi bi-chevron-down"></i>
                       {{ p.name }}&nbsp;&nbsp;
                     </div>
-                    <input-details v-if="p.info" :inputName="p.name" :inputInfo="p.info"/>
+                    <input-details v-if="p.info" :inputName="p.name" :inputInfo="p.info" :inputInfo2="p.info2"  :inputValues="p.values"/>
                     <button v-if="p.data_url !== undefined" class="btn btn-sm btn-outline-dark" type="button" style="float: right">
                         <a :href=p.data_url :download=p.data_filename>
                           <i class="bi bi-download"></i>
@@ -527,15 +527,44 @@ export default {
           this.plots = [
             { name: "LV network voltages comparison", 
             info: "Plots the range, interquartile range and median customer voltages, simulated for each time period, and for each of the LV networks that are modelled in detail.",
+            info2:"Voltages (on the y-axis) are given in per-unit: multiplying by 230 will give the voltage in volts (e.g., 1.10 per unit is the same as 253 volts).",
+            values:"If any part of the plotted graphs passes the dashed red lines (labelled Lower and Upper limit, at 0.94 and 1.10 per unit respectively) then the voltage will have passed outside of the steady-state voltage limits for the UK.",
             plot: responseJson["lv_comparison"], data_filename: "lv_comparison.csv", data_url: URL.createObjectURL(new Blob([responseJson["lv_comparison_data"]], {type: "text/csv"})) },
-            { name: "Transformer powers", plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
-            { name: "Primary feeders' loadings", info: "Info coming", plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
+
+            { name: "Transformer powers",
+            info:"Plots the total utilization, in %, of the primary (HV to MV) and secondary (MV to LV) substations.",
+            info2:"The power flow (in kVA) through the modelled secondary substations can be found by multiplying by the rating of that substation (within the legend, inset).",
+            values:"NB: the utilization is based on the apparent power, and so the utilization is always positive.", 
+            plot: responseJson["trn_powers"], data_filename: "transformer_powers.csv", data_url: URL.createObjectURL(new Blob([responseJson["trn_powers_data"]], {type: "text/csv"})) },
+
+            { name: "Primary feeders' loadings",
+            info:"The apparent power, in %, at the top of each of the MV feeders. ",
+            info2:"The feeders can be identified by the node to which the feeder is connected from the primary substation (see “MV network overview (detailed)” figure).",
+            values:"NB: the power reported is based on the apparent power, and is always positive.",
+            plot: responseJson["pmry_loadings"], data_filename: "primary_loadings.csv", data_url: URL.createObjectURL(new Blob([responseJson["primary_loadings_data"]], {type: "text/csv"})) },
+
             // { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
-            { name: "MV network voltages", plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
+            { name: "MV network voltages",
+            info:"Similar to “LV network voltages comparison”: this figure plots the range (max / min), interquartile range and median voltage for nodes on the MV network.",
+            info2:"The voltage limits for MV networks are narrower than LV networks – they should be between 0.94 and 1.06 per unit.",
+            plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
+
             // { name: "MV network powers", plot: responseJson["mv_powers"] },
-            { name: "MV network overview (basic)", plot: responseJson["mv_highlevel_clean"] },
-            { name: "MV network overview (detailed)", plot: responseJson["mv_highlevel"] },
-            { name: "Average of profiles", plot: responseJson["profile_options"] },
+            { name: "MV network overview (basic)",
+            info:"Plots the topology of the MV network.",
+            info2:"Residential and I&C lumped loads are indicated alongside the locations the LV networks which are modelled in detail.",
+            values:"The central black and white hexagon indicates the location of the HV-MV (primary) substation.",
+            plot: responseJson["mv_highlevel_clean"] },
+
+            { name: "MV network overview (detailed)",
+            info:"Plots the topology of the MV network in detail.",
+            info2:"This includes: (i) the node ID for each node, (ii) the locations of the LV modelled networks (iii) the locations of the modelled EV fast charging stations; (iv) the locations of the large solar (denoted ‘large DG’) (v) the locations of lumped residential and I&C loads.",
+            plot: responseJson["mv_highlevel"] },
+
+            { name: "Average of profiles",
+            info:"This plots the mean power, in kW, for each of the demand profiles that are used in the simulation.",
+            info2:"Negative values imply generation (e.g., for solar profiles or vehicle-to-grid).",
+            plot: responseJson["profile_options"] },
           ];
 
           this.responseAvailable = true;

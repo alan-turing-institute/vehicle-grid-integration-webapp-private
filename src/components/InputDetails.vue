@@ -13,6 +13,7 @@
         </div>
         <div class="modal-body">
             <p>{{ inputInfo }}</p>
+            <p>{{ inputInfo2 }}</p>
             <p>{{ inputValues }}</p>
             <p v-if=inputExampleLink>See <a :href=inputExampleLink>here</a> for an example.</p>
         </div>
@@ -28,7 +29,7 @@
 <script>
     import { v4 as uuidv4 } from "uuid";
     export default {
-        props: ["inputName", "inputInfo", "inputValues", "inputExampleLink"],
+        props: ["inputName", "inputInfo","inputInfo2", "inputValues", "inputExampleLink"],
         data() {
             return { 
                 showModal: false,
