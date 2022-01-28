@@ -546,7 +546,7 @@ export default {
             // { name: "Primary feeders' powers", plot: responseJson["pmry_powers"] },
             { name: "MV network voltages",
             info:"Similar to “LV network voltages comparison”: this figure plots the range (max / min), interquartile range and median voltage for nodes on the MV network.",
-            info2:"The voltage limits for MV networks are narrower than LV networks – they should be between 0.94 and 1.06 per unit.",
+            info2:"The voltage limits for MV networks are narrower than LV networks. These should be between 0.94 and 1.06 per unit.",
             plot: responseJson["mv_voltages"], data_filename: "mv_voltages.csv", data_url: URL.createObjectURL(new Blob([responseJson["mv_voltages_data"]], {type: "text/csv"})) },
 
             // { name: "MV network powers", plot: responseJson["mv_powers"] },
