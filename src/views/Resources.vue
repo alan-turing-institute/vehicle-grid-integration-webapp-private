@@ -12,7 +12,7 @@
             <p>The work is funded by the e4Future grant (104227) - under UK Research and Innovation by the Department for Business, Energy and Industrial Strategy (BEIS) and The Office for Zero Emission Vehicles (OZEV) and delivered through Innovate UK; and a grant from the Lloyd's Register Foundation (G0095) under the Data-Centric Engineering Programme of The Alan Turing Institute.</p>
           </div>
           <div class="col-lg-12">
-            <p>Contact <a href="https://www.turing.ac.uk/people/researchers/myriam-neaimeh">Myriam Neaimeh</a> (<a href="mailto:myriam.neaimeh@ncl.ac.uk">myriam.neaimeh@ncl.ac.uk</a>) for further details about the project.</p>
+            <p>Contact <a href="https://www.turing.ac.uk/people/researchers/myriam-neaimeh">Myriam Neaimeh</a> (<a href="mailto:mneaimeh@turing.ac.uk">mneaimeh@turing.ac.uk</a>) for further details about the project.</p>
           </div>
         </div>
       </div>
@@ -25,7 +25,7 @@
           </div>
           <div class="col-lg-12">
             <p> The EVENT simulation platform was built by members of the Alan Turing Institute's <a href="https://www.turing.ac.uk/research-engineering">Research Engineering Group</a> in collaboration with Myriam Neaimeh.
-                The network models and simulation code were developed by <a href="https://www.turing.ac.uk/people/research-associates/matthew-deakin">Matt Deakin</a> (<a href="mailto:Matthew.Deakin@newcastle.ac.uk">Matthew.Deakin@newcastle.ac.uk</a>).
+                The network models and simulation code were developed by <a href="https://www.turing.ac.uk/people/research-associates/matthew-deakin">Matt Deakin</a> (<a href="mailto:mdeakin@turing.ac.uk">mdeakin@turing.ac.uk</a>).
             </p>
             <p>
                 The website itself is built using Vue.js and Bootstrap, and FastAPI is used for the API.

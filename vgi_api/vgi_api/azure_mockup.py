@@ -75,7 +75,8 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         pnkw={"txtOpts": "all", "dgFlag": True},
     )
     mv_highlevel_buffer = io.BytesIO()
-    plt.gcf().savefig(mv_highlevel_buffer, facecolor="DarkGray")
+    #plt.gcf().savefig(mv_highlevel_buffer, facecolor="DarkGray")
+    plt.gcf().savefig(mv_highlevel_buffer)
 
     # PLOT: mv_highlevel_clean, network plot without further highlights
     plt.clf()
@@ -93,7 +94,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         pnkw={"txtOpts": None, "dgFlag": False, "figsize": (7, 3.6)},
     )
     mv_highlevel_clean_buffer = io.BytesIO()
-    plt.gcf().savefig(mv_highlevel_clean_buffer, facecolor="DarkGray")
+    plt.gcf().savefig(mv_highlevel_clean_buffer)
 
     # PLOT: mv_powers, power plot (no LV circles)
     plt.clf()
@@ -120,6 +121,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         pnkw=pnkw,
     )
     mv_powers_buffer = io.BytesIO()
+    #plt.gcf().savefig(mv_powers_buffer)
     plt.gcf().savefig(mv_powers_buffer, facecolor="LightGray")
 
     # PLOT: lv_voltages, compare two lv voltage timeseries
@@ -170,7 +172,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         sff("lv_voltages")
 
     lv_voltages_buffer = io.BytesIO()
-    plt.gcf().savefig(lv_voltages_buffer, facecolor="LightGray")
+    plt.gcf().savefig(lv_voltages_buffer)
 
     # PLOT: lv_comparison
     plt.clf()
@@ -251,7 +253,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         sff("lv_comparison")
 
     lv_comparison_buffer = io.BytesIO()
-    plt.gcf().savefig(lv_comparison_buffer, facecolor="LightGray")
+    plt.gcf().savefig(lv_comparison_buffer)
 
     # PLOT: mv_voltages, voltage plot against time
     plt.clf()
@@ -277,7 +279,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         sff("mv_voltage_ts")
 
     mv_voltages_buffer = io.BytesIO()
-    plt.gcf().savefig(mv_voltages_buffer, facecolor="LightGray")
+    plt.gcf().savefig(mv_voltages_buffer)
 
     head_mv_voltages = [f"MV voltage: {qq}% quantile" for qq in np.linspace(0, 100, 5)]
     data_out_mv_voltage = dplt.T
@@ -335,7 +337,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         sff("trn_powers")
 
     trn_powers_buffer = io.BytesIO()
-    plt.gcf().savefig(trn_powers_buffer, facecolor="LightGray")
+    plt.gcf().savefig(trn_powers_buffer)
 
     head_trn_powers = ["Prmy. Sub. Util."] + ["Sdry. Sub. Util." + l for l in lgns]
     data_out_trn_powers = np.c_[
@@ -352,7 +354,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
             3.6,
         )
     )
-    ksel = [k for k, v in simulation.p.items() if v.ndim == 1]
+    ksel = [k for k, v in simulation.p.items() if v.ndim == 1 and k!="ic00_" and k!="mv_fcs_profile_array_" and k!="mv_solar_profile_array_"]
     clrs = new_hsl_map(len(ksel), 100, 50)
 
     mrks = ["--", "-.", ":"] * (1 + (len(ksel) // 3))
@@ -369,7 +371,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         )
 
     profile_options_buffer = io.BytesIO()
-    plt.gcf().savefig(profile_options_buffer, facecolor="LightGray")
+    plt.gcf().savefig(profile_options_buffer)
 
     # Needed for pmry_powers and pmry_loadings plots
     splt = np.array([np.abs(np.sum(ss["Sfmv"], axis=1)) for ss in slns])
@@ -399,7 +401,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         sff("pmry_loadings")
 
     pmry_loadings_buffer = io.BytesIO()
-    plt.gcf().savefig(pmry_loadings_buffer, facecolor="LightGray")
+    plt.gcf().savefig(pmry_loadings_buffer)
 
     # Todo: Return from API
     head_primary_loadings = lgnd
@@ -419,7 +421,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         sff("pmry_powers")
 
     pmry_powers_buffer = io.BytesIO()
-    plt.gcf().savefig(pmry_powers_buffer, facecolor="LightGray")
+    plt.gcf().savefig(pmry_powers_buffer)
 
     # # PLOT: profile_sel
     # plt.clf()

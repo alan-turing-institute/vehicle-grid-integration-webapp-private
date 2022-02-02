@@ -558,11 +558,11 @@ export default {
 
             { name: "MV network overview (detailed)",
             info:"Plots the topology of the MV network in detail.",
-            info2:"This includes: (i) the node ID for each node, (ii) the locations of the LV modelled networks (iii) the locations of the modelled EV fast charging stations; (iv) the locations of the large solar (denoted ‘large DG’) (v) the locations of lumped residential and I&C loads.",
+            info2:"This includes: (i) the ID for each node, (ii) the locations of the LV modelled networks (iii) the locations of the modelled EV fast charging stations; (iv) the locations of the large solar (denoted ‘large DG’) (v) the locations of lumped residential and I&C loads.",
             plot: responseJson["mv_highlevel"] },
 
-            { name: "Average of profiles",
-            info:"This plots the mean power, in kW, for each of the demand profiles that are used in the simulation.",
+            { name: "Average of LV profiles",
+            info:"Plots the mean power, in kW, for the LV profiles. Individual profiles, not their average which is shown here, are used in the simulations.",
             info2:"Negative values imply generation (e.g., for solar profiles or vehicle-to-grid).",
             plot: responseJson["profile_options"] },
           ];
