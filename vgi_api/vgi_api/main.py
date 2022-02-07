@@ -247,6 +247,7 @@ async def simulate(
         mv_highlevel_clean_buffer,
         trn_powers_buffer,
         profile_options_buffer,
+        profile_options_dgs_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
         head_primary_loadings,
@@ -289,6 +290,9 @@ async def simulate(
         ).decode("utf-8"),
         "trn_powers": base64.b64encode(trn_powers_buffer.getvalue()).decode("utf-8"),
         "profile_options": base64.b64encode(profile_options_buffer.getvalue()).decode(
+            "utf-8"
+        ),
+        "profile_options_dgs": base64.b64encode(profile_options_dgs_buffer.getvalue()).decode(
             "utf-8"
         ),
         "pmry_loadings": base64.b64encode(pmry_loadings_buffer.getvalue()).decode(
