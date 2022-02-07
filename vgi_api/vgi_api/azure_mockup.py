@@ -402,7 +402,34 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
     profile_options_dgs_buffer = io.BytesIO()
     plt.gcf().savefig(profile_options_dgs_buffer)
 
+################FCS
+    plt.clf()
+    fig, ax = plt.subplots(
+        figsize=(
+            6.2,
+            3.6,
+        )
+    )
+    ksel = [k for k, v in simulation.p.items() if v.ndim == 1 and k!="ic00_" and k!="mv_solar_profile_array_" and k!="lv_hp_profile_array"and k!="smart_meter_profile_array_" and k!="lv_ev_profile_array_" and k!="lv_pv_profile_array_"]
+    
+    if len(ksel)>0:
+        clrs = new_hsl_map(len(ksel), 100, 50)
 
+        mrks = ["--", "-.", ":"] * (1 + (len(ksel) // 3))
+        for k, clr, mrk in zip(ksel, clrs, mrks):
+            plt.plot(tt, simulation.p[k], mrk, color=clr, label=k)
+
+        set_day_label()
+        plt.legend(title="Profile ID", fontsize="small", loc=(1.05, 0.1))
+        plt.ylabel("Power, kW)")
+        plt.tight_layout()
+        if sf:
+            sff(
+                "profile_options_fcs",
+            )
+
+    profile_options_fcs_buffer = io.BytesIO()
+    plt.gcf().savefig(profile_options_fcs_buffer)
 
     #####################
     # Needed for pmry_powers and pmry_loadings plots
@@ -512,6 +539,7 @@ def run_dss_simulation(rd=aox.run_dict0, sf=0):
         trn_powers_buffer,
         profile_options_buffer,
         profile_options_dgs_buffer,
+        profile_options_fcs_buffer,
         pmry_loadings_buffer,
         pmry_powers_buffer,
         head_primary_loadings,
