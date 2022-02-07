@@ -566,10 +566,15 @@ export default {
             info2:"Negative values imply generation (e.g., for solar profiles or vehicle-to-grid).",
             plot: responseJson["profile_options"] },
 
-            { name: "MV distributed generation profile",
+            { name: "MV distributed generation average profile",
             info:"Plots the mean power, in kW, for the MV DG profiles. Individual profiles, not their average which is shown here, are used in the simulations.",
             info2:"If no DG profiles are selected or uploaded, then an empty figure is shown.",
             plot: responseJson["profile_options_dgs"] },
+
+            { name: "MV fast charging stations average profile",
+            info:"Plots the mean power, in kW, for the MV FC profiles. Individual profiles, not their average which is shown here, are used in the simulations.",
+            info2:"If no FC profiles are selected or uploaded, then an empty figure is shown.",
+            plot: responseJson["profile_options_fcs"] },
 
           ];
 
