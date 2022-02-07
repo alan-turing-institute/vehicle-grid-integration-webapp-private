@@ -565,6 +565,12 @@ export default {
             info:"Plots the mean power, in kW, for the LV profiles. Individual profiles, not their average which is shown here, are used in the simulations.",
             info2:"Negative values imply generation (e.g., for solar profiles or vehicle-to-grid).",
             plot: responseJson["profile_options"] },
+
+            { name: "MV distributed generation profile",
+            info:"Plots the mean power, in kW, for the MV DG profiles. Individual profiles, not their average which is shown here, are used in the simulations.",
+            info2:"If no DG profiles are selected or uploaded, then an empty figure is shown.",
+            plot: responseJson["profile_options_dgs"] },
+
           ];
 
           this.responseAvailable = true;
