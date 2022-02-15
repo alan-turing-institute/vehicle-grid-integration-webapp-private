@@ -32,3 +32,9 @@ yarn-error.log*
 *publish_profile.publishsettings
 package-lock.json
 package.json
+
+
+*.tfstate
+*.tfstate.backup
+*.lock.hcl
+*.terraform
