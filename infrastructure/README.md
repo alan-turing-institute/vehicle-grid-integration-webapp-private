@@ -54,7 +54,7 @@ Set the subscription you would like to deploy to. The VGI Turing Azure subscript
 az account set --subscription "Electric Vehicle Grid Integration"
 ```
 
-#### :wrench: Configuration
+#### :wrench: Infrastructure Configuration
 
 Set the `/infrastructure` directory as your current working directory:
 
@@ -86,7 +86,9 @@ When you are happy deploy the infrastructure with
 terraform apply
 ```
 
-### :hammer: Deploy API and frontend to infrastructure
+### Step 2. Configure Continuous Delivery Pipeline
+
+#### :hammer: Deploy API and frontend to infrastructure
 
 Terraform should now have deployed the infrastructure. However, we still need to deploy our code to run on the infrastructure.
 
@@ -154,6 +156,11 @@ terraform destroy
 
 This will delete all Azure resources and any data stored on these resources will
 be lost.
+
+
+## Step 3. Optionally configure DNS for a custom domain name.
+
+You can add a custom domain name to the frontend. For example, we manage DNS with [CloudFlare](https://www.cloudflare.com/en-gb/multi-cloud/azure/).
 
 ### Running the webapp locally
 
