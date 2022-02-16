@@ -121,10 +121,18 @@ where `<secret-name>` is given in the following table:
 | REGISTRY_URL                    | URL Azure Container Registry          | registry_url        |
 | AZURE_STATIC_WEB_APPS_API_TOKEN | API Key for Static WebSite            | static_site_api_key |
 
-We can ask terraform to provide to give the secrets
+We can ask terraform to provide to give the secrets.
 
 
-You need to trigger both GitHub actions, and they should then deploy to Azure.
+You need to trigger both GitHub actions, and they should then deploy to Azure. We also need to provide the hostname of the api to the frontend. You can use this commit to trigger the actions. 
+
+To provide the API hostname to the front end find the [.env.production](../.env.production) file in the project root directory. Then set the `VUE_APP_API_URL` key to the value provided by
+
+```bash
+terraform output api_hostname
+```
+
+If you want to test a locally running frontend with the deployed API, you can do the same in [.env.development](../.env.development) .
 
 #### Manually deploy API
 

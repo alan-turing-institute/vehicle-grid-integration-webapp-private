@@ -26,47 +26,6 @@ resource "azurerm_resource_group" "website_rg" {
 }
 
 
-# Create networks storage account
-resource "azurerm_storage_account" "networks_data_account" {
-  name                     = "${var.website_prefix}${var.networks_data_account}${random_integer.ri.result}"
-  resource_group_name      = azurerm_resource_group.website_rg.name
-  location                 = var.website_location
-  account_tier             = "Premium"
-  account_kind             = "BlockBlobStorage"
-  account_replication_type = "LRS"
-}
-
-# Create networks storage container
-resource "azurerm_storage_container" "networks_data_container" {
-  name                  = "${var.website_prefix}${var.networks_data_container}-${random_integer.ri.result}"
-  storage_account_name  = azurerm_storage_account.networks_data_account.name
-  container_access_type = "private"
-}
-
-
-data "azurerm_storage_account_blob_container_sas" "example" {
-  connection_string = azurerm_storage_account.networks_data_account.primary_connection_string
-  container_name    = azurerm_storage_container.networks_data_container.name
-  https_only        = true
-
-  start = "2022-01-01"
-  expiry = "2030-01-01"
-  permissions {
-    read   = true
-    add    = true
-    create = false
-    write  = false
-    delete = true
-    list   = true
-  }
-
-  cache_control       = "max-age=5"
-  content_disposition = "inline"
-  content_encoding    = "deflate"
-  content_language    = "en-US"
-  content_type        = "application/json"
-}
-
 
 # Create an app service plan - Hosts the API
 resource "azurerm_app_service_plan" "appserviceplan" {
@@ -150,6 +109,11 @@ output "registry_url" {
     description = "For CI with GitHub actions set the 'REGISTRY_URL' secret in your GitHub repo"
     value = "REGISTRY_URL=${azurerm_container_registry.acr.login_server}"
     sensitive = true
+}
+
+output "api_hostname" {
+    description = "The default host name of the API"
+    value = "https://${azurerm_app_service.webapp.default_site_hostname}"
 }
 
 output "static_site_api_key" {
