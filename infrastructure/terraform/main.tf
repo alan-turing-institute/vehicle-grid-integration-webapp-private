@@ -76,8 +76,8 @@ resource "azurerm_app_service_plan" "appserviceplan" {
   kind                = "linux"
   reserved            = true
   sku {
-    tier = "Standard"
-    size = "P2V2"
+    tier = "PremiumV2"
+    size = "P2v2"
   }
 }
 
@@ -123,57 +123,47 @@ resource "azurerm_app_service" "webapp" {
   }
 }
 
-# Create app service plan and its prerequsites
-# resource "azurerm_app_service_plan" "app_service_plan" {
-#   name                = "${var.website_prefix}${var.app_service_plan}"
-#   resource_group_name = azurerm_resource_group.website_rg.name
-#   location            = var.website_location
-#   kind                = "elastic"
-#   reserved            = true # same as az functionapp --is-linux true
-#   sku {
-#     tier = "ElasticPremium"
-#     size = "EP2"
-#   }
-# }
-
-# resource "azurerm_storage_account" "app_data_account" {
-#   name                     = "${var.website_prefix}${var.app_data_account}"
-#   resource_group_name      = azurerm_resource_group.website_rg.name
-#   location                 = var.website_location
-#   account_tier             = "Standard"
-#   account_replication_type = "LRS"
-# }
-
-# resource "azurerm_function_app" "function_app" {
-#   name                       = "${var.website_prefix}${var.function_app}"
-#   resource_group_name        = azurerm_resource_group.website_rg.name
-#   location                   = var.website_location
-#   app_service_plan_id        = azurerm_app_service_plan.app_service_plan.id
-#   storage_account_name       = azurerm_storage_account.app_data_account.name
-#   storage_account_access_key = azurerm_storage_account.app_data_account.primary_access_key
-#   os_type                    = "linux"
-#   version                    = "~3"
-#   app_settings = {
-#     "BUILD_FLAGS"                                        = "UseExpressBuild"
-#     "ENABLE_ORYX_BUILD"                                  = true
-#     "FUNCTIONS_WORKER_RUNTIME"                           = "python"
-#     "SCM_DO_BUILD_DURING_DEPLOYMENT"                     = 1
-#     "NETWORKS_DATA_CONTAINER_READONLY"                   = azurerm_storage_container.networks_data_container.name
-#     "NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING" = "${var.networks_data_blobendpoint}"
-#   }
-#   site_config {
-#     http2_enabled             = true
-#     linux_fx_version          = "PYTHON|3.8"
-#     use_32_bit_worker_process = false
-#     pre_warmed_instance_count = 1
-#     cors {
-#       allowed_origins = ["*"]
-#     }
-#   }
-# }
-
+//Static site (Frontend)
 resource "azurerm_static_site" "static_site" {
   name                = "${var.website_prefix}${var.static_site_name}"
   resource_group_name = azurerm_resource_group.website_rg.name
   location            = var.website_location
+}
+
+
+
+//Outputs
+output "docker_api_command" {
+  description = "Run the following command to build and push the docker image. Make sure you are in the project root directory first"
+  value       = "az acr build --file docker_images/vgi_api.dockerfile --registry ${azurerm_container_registry.acr.login_server} --image vgi_api:latest ."
+}
+
+output "registery_username" {
+    description = "For CI with GitHub actions set the 'REGISTRY_USERNAME' secret in your GitHub repo"
+    value = "REGISTRY_USERNAME=${azurerm_container_registry.acr.admin_username}"
+    sensitive = true
+}
+
+output "registry_password" {
+    description = "For CI with GitHub actions set the 'REGISTRY_PASSWORD' secret in your GitHub repo"
+    value = "REGISTRY_PASSWORD=${azurerm_container_registry.acr.admin_password}"
+    sensitive = true
+}
+
+output "registry_url" {
+    description = "For CI with GitHub actions set the 'REGISTRY_URL' secret in your GitHub repo"
+    value = "REGISTRY_URL=${azurerm_container_registry.acr.login_server}"
+    sensitive = true
+}
+
+output "static_site_api_key" {
+    description = "To deploy the static website set the `AZURE_STATIC_WEB_APPS_API_TOKEN` in your GitHub repo"
+    value = "AZURE_STATIC_WEB_APPS_API_TOKEN=${azurerm_static_site.static_site.api_key}"
+    sensitive = true
+}
+
+output "static_site_hostname" {
+    description = "Append the host name to the filename .github/workflows/azure-static-web-apps-salmon-forest`"
+    value = "azure-static-web-apps-salmon-forest-${azurerm_static_site.static_site.default_host_name}"
+    sensitive = true
 }
