@@ -33,7 +33,7 @@ yarn-error.log*
 package-lock.json
 package.json
 
-
+# Terraform state
 *.tfstate
 *.tfstate.backup
 *.lock.hcl
