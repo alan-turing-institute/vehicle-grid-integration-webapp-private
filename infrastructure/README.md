@@ -62,17 +62,9 @@ Set the `/infrastructure` directory as your current working directory:
 cd ./infrastructure
 ```
 
-Make a copy of the terraform config file. We will use this to configure the deployment.
+You can set configuration options by editing [`terraform/terraform.tfvars`](terraform/terraform.tfvars). To see what configuration options are available go to [`terraform/variables.tf`](terraform/variables.tf). Any that say `nullable = true` must have a value. You can also set these as environment variables, see https://www.terraform.io/language/values/variables. However, it is worth checking the deployment configuration into version control.
 
-```
-cp terraform/terraform.vgi.tfvars terraform/terraform.tfvars
-```
-
-Next you can configure your deployment by editing [`terraform/terraform.tfvars`](terraform/terraform.tfvars).
-
-This file has comments explaining the configuration options and their default values.
-
-The default values given in the file are the same as those used for our production infrastructure. Note that you will need to fill in `networks_data_blobendpoint` yourself, after the blob storage account for the network data has been created. Instructions on how to do so are provided later in this document.
+#### :arrow_up: Deploy
 
 Initialise terraform
 
@@ -86,78 +78,78 @@ Plan your changes
 terraform plan
 ```
 
-this will print a list of changes to your terminal so you can see what terraform
-will do.
-Run the terraform plan with
+this will print a list of changes to your terminal so you can see what terraform will do.
+
+When you are happy deploy the infrastructure with
 
 ```bash
 terraform apply
 ```
 
-### VGI specific manual steps
+### :hammer: Deploy API and frontend to infrastructure
 
-Apart from the running of terraform, these are the manual steps to do:
+Terraform should now have deployed the infrastructure. However, we still need to deploy our code to run on the infrastructure.
 
-- GitHub
-  - Navigate to [vehicle-grid-integration-opendss-networks](https://github.com/alan-turing-institute/vehicle-grid-integration-opendss-networks/settings/secrets/actions)
-    - Set secret `NETWORKS_DATA_CONTAINER_CONNECTION_STRING` to read/write networks storage container blob endpoint
+To do this we use GitHub actions. This makes sure any changes to our codebase are published to Azure whenever they are pushed to the `main` branch.
 
-- Azure
-  - Terraform might [automate in the future](https://github.com/hashicorp/terraform-provider-azurerm/issues/8739)
-  - For now, download and save the publish profile:
-    - In the [Azure Portal](https://portal.azure.com)
-    - Select the relevant resource group for this deployment (with default names, `vgiprodwebRG`, otherwise `<website_prefix>RG` based on the contents of `terraform.tfvars`)
-    - Open up the Function App (`vgiwebprodfunctionapp`, or `<website_prefix><function_app>`)
-    - From the menu on the left, open the Deployment Centre (in the Deployment section)
-    - Click on "Manage publish profile" in the top panel
-    - Download the publish profile
+There are two GitHub actions:
 
-- GitHub
-  - Navigate to [vehicle-grid-integration-webapp-private](https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private/settings/secrets/actions)
-  - Set secret `FUNCTION_APP_PUBLISH_PROFILE` to the contents of the publish profile downloaded in the last step.
+1. API: [deploy_azurewebapp_api.yaml](../.github/workflows/deploy_azurewebapp_api.yaml)
+2. Frontend: [azure-static-web-apps-salmon-forest-09e32d403.yml](../.github/workflows/azure-static-web-apps-salmon-forest-09e32d403.yml)
 
-- Terraform
-  - Run `terraform state show azurerm_static_site.static_site`
-  - Copy `api_key` and make a note of the first part of `default_host_name`
+These use secrets from the GitHub repo to authenticate against Azure. To set the secrets follow the [GitHub instructions](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Terraform will output the secrets when we run
 
-- GitHub
-  - vehicle-grid-integration-webapp-private
-    - Set secret `AZURE_STATIC_WEB_APPS_API_TOKEN_<host-name>`
-      - Obtain `<host_name>` from `default_host_name` above - remove the trailing `azurestaticapps.net` and capitalise (e.g. `salmon-forest-09e32d403.azurestaticapps.net` -> `salmon_forest_09E32D403`)
-      -❓ Is there a particular reason for leaving the host name inside the secret name? Not as far as I can tell, but the GitHub Action (next point) does need the host name in the filename so we'll keep it this way for consistency.
-    - Append the host name to the filename of the GitHub Action for CD of the website (e.g. `azure-static-web-apps-salmon-forest-09e32d403.yml`)
+```bash
+terraform output
+```
 
-- Terraform
-  - Change your terraform.tfvars to include settings:
-    - `networks_data_blobendpoint = ` a read-only connection string to the networks storage container
+However, many of these are sensitive and this will not show. You can get the secrets by running
+
+```bash
+terraform output `<secret-name>`
+```
+
+where `<secret-name>` is given in the following table:
+
+
+ Thus we need to set the following secrets in the repo:
+
+| Secret Name                     | Purpose                               | secret-name         |
+| ------------------------------- | ------------------------------------- | ------------------- |
+| REGISTRY_USERNAME               | Username for Azure Container Registry | registery_username  |
+| REGISTRY_PASSWORD               | Password for Azure Container Registry | registry_password   |
+| REGISTRY_URL                    | URL Azure Container Registry          | registry_url        |
+| AZURE_STATIC_WEB_APPS_API_TOKEN | API Key for Static WebSite            | static_site_api_key |
+
+We can ask terraform to provide to give the secrets
+
+
+You need to trigger both GitHub actions, and they should then deploy to Azure.
+
+#### Manually deploy API
+
+The API can be deployed without GitHub actions, which might be useful if you are just testing things out. The exact command you need to run is unique to your deployment. Luckily you can ask terraform to give you the exact command:
+
+```bash
+terraform output docker_api_command
+```
+
+You should then run the command from the project root directory.
 
 ### 💣 Destroy the resources
 
-When you are finished, you can destroy the resources using Terraform. From the
-terraform directory run
+If you no longer need your Azure resources you can remove them all with
 
-```
-$ terraform destroy
+```bash
+terraform destroy
 ```
 
 This will delete all Azure resources and any data stored on these resources will
 be lost.
 
-### Generate SAS tokens
-
-To enable files to be sent to the storage container:
-- Generate a SAS token for EON data
-    `az storage container generate-sas --account-name datatesteonrestricted --name datatesteonincoming --permissions acdlrw --expiry 2022-01-01`
-- Use `azcopy` to transfer the file across to the storage container
-    `azcopy copy "test.txt" "https://datatesteonrestricted.blob.core.windows.net/datatesteonincoming/test.txt?<sas>`
-
 ### Running the webapp locally
 
 See the guide in `azure_funcs/README.md` in the [WebApp Repo](https://github.com/alan-turing-institute/vehicle-grid-integration-webapp-private).
-
-You will need the following:
-- `NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING`
-- `NETWORKS_DATA_CONTAINER_READONLY`, which will be `<website_prefix><networks_data_container>`using the variables from your `terraform.tfvars` file (`vgiwebprodopendssnetworks` if using the default/production variable names).
 
 ### Refreshing the webapp
 

@@ -111,9 +111,6 @@ resource "azurerm_app_service" "webapp" {
     # Environment vars for Docker image
     APP_MODULE = "vgi_api:app"
     GRACEFUL_TIMEOUT = 300
-
-    NETWORKS_DATA_CONTAINER_READONLY = "${var.website_prefix}${var.networks_data_account}${random_integer.ri.result}"
-    NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING = data.azurerm_storage_account_blob_container_sas.example.sas
   }
 
   # Configure Docker Image to load on start
@@ -131,14 +128,13 @@ resource "azurerm_static_site" "static_site" {
 }
 
 
-
 //Outputs
 output "docker_api_command" {
   description = "Run the following command to build and push the docker image. Make sure you are in the project root directory first"
   value       = "az acr build --file docker_images/vgi_api.dockerfile --registry ${azurerm_container_registry.acr.login_server} --image vgi_api:latest ."
 }
 
-output "registery_username" {
+output "registry_username" {
     description = "For CI with GitHub actions set the 'REGISTRY_USERNAME' secret in your GitHub repo"
     value = "REGISTRY_USERNAME=${azurerm_container_registry.acr.admin_username}"
     sensitive = true
