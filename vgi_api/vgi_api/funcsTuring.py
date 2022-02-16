@@ -1888,40 +1888,30 @@ def unzip_networks(dest_dir, n_id):
 
     logging.info("Entering unzip_networks")
 
-    # Unzip the network zip file if not already
-    # Connect to blob service, yes hard-coded is bad
-    blob_service_client = BlobServiceClient.from_connection_string(
-        get_settings().networks_data_container_readonly_connection_string
-    )
-    container = get_settings().networks_data_container_readonly
+    DATA_FOLDER = Path(__file__).parent / "data" / "opendssnetworks"
+    zip_names = {
+        1060: DATA_FOLDER / "HV_UG_full.zip",
+        1061: DATA_FOLDER / "HV_UG-OHa_full.zip",
+    }
 
-    zip_names = {1060: "HV_UG_full.zip", 1061: "HV_UG-OHa_full.zip"}
-
-    # Connect to 'apidata' container which has the networks and no more
-    # It should be renamed to 'networks_store' or something
-    container_client = blob_service_client.get_container_client(container=container)
-    logging.info("Unzipping files to: %s", dest_dir)
+    # # Connect to 'apidata' container which has the networks and no more
+    # # It should be renamed to 'networks_store' or something
+    # container_client = blob_service_client.get_container_client(container=container)
+    # logging.info("Unzipping files to: %s", dest_dir)
 
     ntwk_name = zip_names[n_id]
 
     # Connect to the blob itself
-    blob_client = blob_service_client.get_blob_client(
-        container=container, blob=ntwk_name
-    )
-    # Download the network zip as data, not written to disk
-    ntwk_data = blob_client.download_blob().readall()
+    # blob_client = blob_service_client.get_blob_client(
+    #     container=container, blob=ntwk_name
+    # )
+    # # Download the network zip as data, not written to disk
+    # ntwk_data = blob_client.download_blob().readall()
 
-    unzipped_folder = os.path.join(dest_dir, ntwk_name.split(".")[0])
+    # unzipped_folder = os.path.join(dest_dir, ntwk_name.split(".")[0])
 
-    if not os.path.exists(unzipped_folder):
-        with zipfile.ZipFile(BytesIO(ntwk_data), "r") as zip_ref:
-            zip_ref.extractall(dest_dir)
-
-            # Check directory separator style and edit from \ -> / if necessary
-            # dss_utils.changeDirectorySeparatorStyle(os.path.join(dest_dir, ntwk.name.split(".")[0]), verbose=True)
-
-    del ntwk_data
-    gc.collect()
+    with zipfile.ZipFile(ntwk_name, "r") as zip_ref:
+        zip_ref.extractall(dest_dir)
 
     # Basic checking numbers - basic, might need updating in future for,
     # e.g., frIds above 100
