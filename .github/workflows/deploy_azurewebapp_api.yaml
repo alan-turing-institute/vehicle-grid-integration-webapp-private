@@ -44,34 +44,3 @@ jobs:
       run: |
         docker build -f docker_images/vgi_api.dockerfile -t ${{ env.CONTAINER_REGISTRY }}/vgi_api:latest . 
         docker push ${{ env.CONTAINER_REGISTRY }}/vgi_api:latest
-# Uncomment the below action snippet if the Web app credentials are not updated as web app settings
-#     - name: Set Web App ACR authentication
-#       uses: Azure/appservice-settings@v1
-#       with:
-#         app-name: ${{ env.AZURE_WEBAPP_NAME }} 
-#         app-settings-json: |
-#           [
-#               {
-#                   "name": "DOCKER_REGISTRY_SERVER_PASSWORD",
-#                   "value": "${{ secrets.REGISTRY_PASSWORD }}",
-#                   "slotSetting": false
-#               },
-#               {
-#                   "name": "DOCKER_REGISTRY_SERVER_URL",
-#                   "value": "https://${{ env.CONTAINER_REGISTRY }}",
-#                   "slotSetting": false
-#               },
-#               {
-#                   "name": "DOCKER_REGISTRY_SERVER_USERNAME",
-#                   "value": "${{ secrets.REGISTRY_USERNAME  }}",
-#                   "slotSetting": false
-#               }
-#           ]
-
-    - name: 'Deploy to Azure Web App for Container'
-      uses: azure/webapps-deploy@v2
-      with: 
-        app-name: ${{ env.AZURE_WEBAPP_NAME }} 
-        images: ${{ env.CONTAINER_REGISTRY }}/vgi_api:latest
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
-#         startup-command: 'npm start'    # Include start up command to start the app container

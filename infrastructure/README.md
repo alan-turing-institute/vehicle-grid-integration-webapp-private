@@ -136,6 +136,17 @@ terraform output api_hostname
 
 If you want to test a locally running frontend with the deployed API, you can do the same in [.env.development](../.env.development) .
 
+
+### Help my API isn't live
+
+Make sure you trigger the GitHub action workflows. They will deploy the frontend and API to Azure. It may take a little while for the API to go live. The following steps will happen automatically:
+
+1. GH Action builds the API docker image and pushes it to the Azure Container Registry (ACR) created by terraform.
+2. The ACR notifies the Azure WebApp that a new docker image has been pushed.
+3. The Azure WebApp restarts and downloads the container from the ACR.
+
+However, in practice the Azure WebApp may try and get a container image from the ACR before GH Actions uploads it. It may take some time before it tries to get the container image again. You can speed this up by restarting the Azure Web App.
+
 #### Manually deploy API
 
 The API can be deployed without GitHub actions, which might be useful if you are just testing things out. The exact command you need to run is unique to your deployment. Luckily you can ask terraform to give you the exact command:
