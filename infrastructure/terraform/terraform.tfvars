@@ -1,1 +1,1 @@
-website_prefix = "test"
+website_prefix = "prod"

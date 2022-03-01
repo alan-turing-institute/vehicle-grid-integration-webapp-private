@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - main
+      - ogiles/add-terraform-infrastructure
 
 # CONFIGURATION
 # For help, go to https://github.com/Azure/Actions

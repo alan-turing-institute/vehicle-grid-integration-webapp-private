@@ -56,10 +56,10 @@ az account set --subscription "Electric Vehicle Grid Integration"
 
 #### :wrench: Infrastructure Configuration
 
-Set the `/infrastructure` directory as your current working directory:
+Set the `/infrastructure/terraform` directory as your current working directory:
 
 ```bash
-cd ./infrastructure
+cd ./infrastructure/terraform
 ```
 
 You can set configuration options by editing [`terraform/terraform.tfvars`](terraform/terraform.tfvars). To see what configuration options are available go to [`terraform/variables.tf`](terraform/variables.tf). Any that say `nullable = true` must have a value. You can also set these as environment variables, see https://www.terraform.io/language/values/variables. However, it is worth checking the deployment configuration into version control.
