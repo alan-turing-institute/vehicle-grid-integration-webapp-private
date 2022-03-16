@@ -99,7 +99,7 @@ There are two GitHub actions:
 1. API: [deploy_azurewebapp_api.yaml](../.github/workflows/deploy_azurewebapp_api.yaml)
 2. Frontend: [azure-static-web-apps-salmon-forest-09e32d403.yml](../.github/workflows/azure-static-web-apps-salmon-forest-09e32d403.yml)
 
-These use secrets from the GitHub repo to authenticate against Azure. To set the secrets follow the [GitHub instructions](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Terraform will output the secrets when we run
+These use secrets from the GitHub repo to authenticate against Azure. To set the secrets follow the [GitHub instructions](https://docs.github.com/en/actions/security-guides/encrypted-secrets). Terraform will have created appropriate secrets for us. To get these values run:
 
 ```bash
 terraform output
@@ -122,8 +122,6 @@ where `<secret-name>` is given in the following table:
 | REGISTRY_PASSWORD               | Password for Azure Container Registry | registry_password   |
 | REGISTRY_URL                    | URL Azure Container Registry          | registry_url        |
 | AZURE_STATIC_WEB_APPS_API_TOKEN | API Key for Static WebSite            | static_site_api_key |
-
-We can ask terraform to provide to give the secrets.
 
 
 You need to trigger both GitHub actions, and they should then deploy to Azure. We also need to provide the hostname of the api to the frontend. You can use this commit to trigger the actions. 
