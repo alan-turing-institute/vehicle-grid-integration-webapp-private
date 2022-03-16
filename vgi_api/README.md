@@ -23,7 +23,7 @@ The API reads files from blob storage which were uploaded from the [vehicle-grid
 
 
 | Variable                                           | Info                                                                     |
-|----------------------------------------------------|--------------------------------------------------------------------------|
+| -------------------------------------------------- | ------------------------------------------------------------------------ |
 | NETWORKS_DATA_CONTAINER_READONLY_CONNECTION_STRING | A connection string/ SAS token used to authenticate against blob storage |
 | NETWORKS_DATA_CONTAINER_READONLY                   | The name of the blob storage container                                   |
 
@@ -44,11 +44,6 @@ Send a request to the API using [HTTPie](https://httpie.io/docs) (you installed 
 ```bash
 http POST :8000/simulate
 ```
-
-### Run as an Azure function
-
-See the instructions in [azure_funcs](../azure_funcs/README.md)
-
 
 ### Run unit tests
 
