@@ -1067,6 +1067,8 @@ class turingNet(snk.dNet):
         ]:
             if self.ldsi[ld]["nmv"] > 0 and ld2sd[ld] in self.p.keys():
                 pp = self.p[ld2sd[ld]]
+                if pp.ndim == 1:
+                    pp = np.expand_dims(pp, axis=1)
                 self.dmnd[ld].mv = np.array(
                     [pp[:, i % pp.shape[1]] for i in self.ldsi[ld].mv]
                 )
