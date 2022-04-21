@@ -1,14 +1,3 @@
-# =====
-# SCRIPT AUTOMATICALLY GENERATED!
-# =====
-#
-# This means it is liable to being overwritten, so it is suggested NOT
-# to change this script, instead make a copy and work from there.
-#
-# Code for generating these in ./misc/copy-mtd-funcs-raw.py.
-#
-# =====
-
 import numpy as np
 import os, time
 from scipy import sparse, linalg
