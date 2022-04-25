@@ -36,26 +36,13 @@ from hsluv import hsluv_to_rgb
 # A useful set of directories for saving/loading data from etc
 fd = os.path.dirname(__file__)
 
-computerName = socket.gethostname()
-if computerName in ["20s-merz-201148", "19s-merz-100030"]:
-    supergenDir = r"H:\supergen"
-    fnD = r"D:\DocumentsD_l\turing_vgi\e4Future-collab\mtd-dss-digital-twins".lower()
-    if fnD in sys.argv[0].lower():
-        fn_root = fnD
-    else:
-        fn_root = fnD
-
-    papersDir = r"D:\DocumentsD_l\papersWorking"
-elif computerName == "MattsPC":
-    supergenDir = r"C:\Users\Matt\Documents\supergen"
-else:
-    current_dir = os.path.dirname(os.path.realpath(__file__))
-    print(
-        "\n*****\nUnidentified computer\nUsing {} as root folder\n*****\n".format(
-            current_dir
-        )
+current_dir = os.path.dirname(os.path.realpath(__file__))
+print(
+    "\n*****\nUnidentified computer\nUsing {} as root folder\n*****\n".format(
+        current_dir
     )
-    fn_root = current_dir
+)
+fn_root = current_dir
 
 scriptCallingName = sys.argv[0].split("\\")[-1].split(".")[0]
 gDir = os.path.join(fn_root, "gallery", scriptCallingName)
